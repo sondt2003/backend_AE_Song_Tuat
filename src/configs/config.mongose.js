@@ -3,7 +3,8 @@
 const mongoose = require('mongoose');
 const {db: {host, name, port, username, password}} = require('./config')
 
-const connectString = `mongodb://${username}:${password}@${host}:${port}/${name}?authSource=admin`;
+// const connectString = `mongodb+srv://${username}:${password}@${host}:${port}/${name}?authSource=admin`;
+const connectString = `mongodb+srv://${username}:${password}@${host}/${name}?retryWrites=true&w=majority`;
 const {countConnect} = require('../helpers/check.connect');
 const MAX_POLL_SIZE = 50;
 const TIME_OUT_CONNECT = 3000;
@@ -25,7 +26,7 @@ class Database {
 
         mongoose.connect(connectString, {
             serverSelectionTimeoutMS: TIME_OUT_CONNECT,
-            maxPoolSize: MAX_POLL_SIZE
+            maxPoolSize: MAX_POLL_SIZE,
         })
             .then(
                 _ => {

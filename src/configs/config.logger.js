@@ -34,7 +34,7 @@ transport.on('rotate', function(oldFilename, newFilename) {
 require('winston-mongodb');
 
 const {db: {host, name, port, username, password}} = require('./config')
-const connectString = `mongodb://${username}:${password}@${host}:${port}/${name}?authSource=admin`;
+const connectString = `mongodb+srv://${username}:${password}@${host}/${name}?retryWrites=true&w=majority`;
 const configLogMongoDB = new transports.MongoDB({
     level : "warn",
     db : connectString,

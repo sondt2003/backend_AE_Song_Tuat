@@ -8,7 +8,7 @@
     "start": "node server.js",
     "start:dev": "nodemon --legacy-watch server.js",
     "start:local": "SET NODE_ENV=local nodemon --legacy-watch server.js",
-    "push:master":"git add . && git commit -m 'test' && git push origin master"
+    "push:master":"git add . && git commit -m 'Update .env' && git push origin master"
   },
   "keywords": [
     "ecommerce",
