@@ -9,15 +9,15 @@ const options = {
         },
         servers: [
             {
-                url: `http://localhost:${process.env.PORT}`,
+                url: `https://delifood.io.vn/`,
                 description: 'Development server'
             },
             {
-                url: `http://localhost:${process.env.PORT}`,
+                url: `https://delifood.io.vn/`,
                 description: 'Uat server'
             },
             {
-                url: `http://localhost:${process.env.PORT}`,
+                url: `https://delifood.io.vn/`,
                 description: 'Product server'
             },
         ],
