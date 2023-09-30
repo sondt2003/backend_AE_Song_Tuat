@@ -1,9 +1,9 @@
-const {Schema, mongoose} = require("mongoose");
+const {model, Schema} = require("mongoose");
 
 const DOCUMENT_NAME = 'Admin';
 const COLLECTION_NAME = 'Admins';
 
-const adminSchema = new mongoose.Schema({
+const adminSchema = new Schema({
     f_name: {
         type: String,
         trim: true,
@@ -41,4 +41,4 @@ const adminSchema = new mongoose.Schema({
 });
 
 
-module.exports = mongoose.model(DOCUMENT_NAME, adminSchema)
+module.exports = model(DOCUMENT_NAME, adminSchema)

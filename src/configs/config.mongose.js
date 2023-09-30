@@ -5,6 +5,7 @@ const {db: {host, name, port, username, password}} = require('./config')
 
 // const connectString = `mongodb+srv://${username}:${password}@${host}:${port}/${name}?authSource=admin`;
 const connectString = `mongodb+srv://${username}:${password}@${host}/${name}?retryWrites=true&w=majority`;
+// const connectString = `mongodb://127.0.0.1:27017/shopDev`;
 const {countConnect} = require('../helpers/check.connect');
 const MAX_POLL_SIZE = 50;
 const TIME_OUT_CONNECT = 3000;
