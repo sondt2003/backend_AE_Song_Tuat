@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "jest",
-    "start_pro": "pm2 start",
+    "start:pro": "pm2 start",
     "start": "node server.js",
     "start:dev": "nodemon --legacy-watch server.js",
     "start:local": "SET NODE_ENV=local nodemon --legacy-watch server.js",

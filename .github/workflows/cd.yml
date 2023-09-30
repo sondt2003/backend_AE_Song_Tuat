@@ -26,5 +26,5 @@ jobs:
             git checkout HEAD
             git pull 
             npm i
-            npm run start_pro
+            npm run start:pro
 
