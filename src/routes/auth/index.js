@@ -73,6 +73,8 @@ router.use(authenticationV2)
  *             application/json
  */
 router.post('/logout', accessController.logout)
+
+
 /**
  * @swagger
  *   /api/v1/auth/refresh-token:

@@ -4,7 +4,7 @@ const commentController = require('../../controllers/comment.controller')
 const {authenticationV2} = require("../../auth/authUtils");
 
 // start authentication //
-router.use(authenticationV2)
+// router.use(authenticationV2)
 // end authentication //
 
 router.post('', commentController.createComment)

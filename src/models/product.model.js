@@ -1,4 +1,4 @@
-const {Schema, mongoose} = require("mongoose");
+const {Schema,model} = require("mongoose");
 const slugify = require('slugify')
 
 const DOCUMENT_NAME = 'Product';
@@ -7,7 +7,7 @@ const COLLECTION_CLOTHING_NAME = 'Clothings';
 const COLLECTION_ELECTRON_NAME = 'Electrons';
 const COLLECTION_FURNITURE_NAME = 'Furnitures';
 
-const productSchema = new mongoose.Schema({
+const productSchema = new Schema({
     product_name: {
         type: String,
         trim: true,
@@ -124,8 +124,8 @@ productSchema.pre('save', function (next) {
 })
 
 module.exports = {
-    product: mongoose.model(DOCUMENT_NAME, productSchema),
-    electronic: mongoose.model("Electronic", electronicsSchema),
-    clothing: mongoose.model("Clothing", clothingSchema),
-    furniture: mongoose.model("Furniture", furnitureSchema)
+    product: model(DOCUMENT_NAME, productSchema),
+    electronic: model("Electronic", electronicsSchema),
+    clothing: model("Clothing", clothingSchema),
+    furniture: model("Furniture", furnitureSchema)
 }
