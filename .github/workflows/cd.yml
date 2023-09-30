@@ -22,6 +22,7 @@ jobs:
           script: |
             echo 3 > /proc/sys/vm/drop_caches
             cd backend_AE_Song_Tuat
+            git reset --hard
             git fetch
             git checkout HEAD
             git pull 
