@@ -1,0 +1,30 @@
+#file: noinspection YAMLSchemaValidation
+name: push-and-deploy-to-server
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  deploy-back-end:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.PRIVATE_KEY }}
+          port: 22
+          script: |
+            echo 3 > /proc/sys/vm/drop_caches
+            cd backend_AE_Song_Tuat
+            git fetch
+            git checkout HEAD
+            git pull 
+            npm i
+            npm start_pro
+
