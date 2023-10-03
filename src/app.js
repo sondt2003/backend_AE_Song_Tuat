@@ -83,10 +83,10 @@ app.use(expressWinston.logger({
 }))
 
 // config i18n
-if (checkEnable(configs.i18n.enable)) {
-    const i18n = require('./configs/config.i18n')
-    app.use(i18n.init)
-}
+// if (checkEnable(configs.i18n.enable)) {
+//     const i18n = require('./configs/config.i18n')
+//     app.use(i18n.init)
+// }
 
 // init routes
 app.use('', require('./routes'))
