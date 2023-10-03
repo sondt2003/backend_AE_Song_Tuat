@@ -7,7 +7,6 @@ const {getInfoData} = require('../utils')
 const {Api403Error, BusinessLogicError, Api401Error} = require("../core/error.response");
 const {findByEmail} = require('./shop.service')
 const apiKeyModel = require('../models/apikey.model')
-const i18n = require('../configs/config.i18n')
 
 const RoleShop = {
     SHOP: 'SHOP',
@@ -141,7 +140,6 @@ class AccessService {
     signUp = async ({name, email, password, msisdn}) => {
         // step1: check email exists?
         const holderShop = await shopModel.findOne({email}).lean()
-        console.log('locale:::', i18n.getLocale())
         if (holderShop) {
             throw new Api403Error("Thông tin shop đã tồn tại")
         }
