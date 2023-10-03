@@ -1,6 +1,5 @@
 const _NotifyModel = require('../models/notification.model')
 const {BusinessLogicError} = require("../core/error.response");
-const {i18n}= require('../configs/config.i18n')
 const {NotifyTypeConstant} = require("../constants/notify-type.constant");
 
 class NotificationService {
