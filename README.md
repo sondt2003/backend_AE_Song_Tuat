@@ -1,5 +1,3 @@
-## Learning with https://www.youtube.com/@anonystick
-
 ## Todo list
 
 - [x] Swagger or OpenApi
