@@ -15,14 +15,14 @@ class ProductService {
 
     static async createProduct(type, payload) {
         const productClass = ProductService.productRegistry[type]
-        if (!productClass) throw new BusinessLogicError(i18n.translate('messages.error006', type))
+        if (!productClass) throw new BusinessLogicError("Product type %s không hợp lệ")
 
         return new productClass(payload).createProduct()
     }
 
     static async updateProduct(type, productId, payload) {
         const productClass = ProductService.productRegistry[type]
-        if (!productClass) throw new BusinessLogicError(i18n.translate('messages.error006', type))
+        if (!productClass) throw new BusinessLogicError("Product type %s không hợp lệ")
 
         return new productClass(payload).updateProduct(productId)
     }

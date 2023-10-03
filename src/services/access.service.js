@@ -37,14 +37,14 @@ class AccessService {
 
             // delete token in keyStore
             await KeyTokenService.deleteKeyById(userId)
-            throw new Api403Error(i18n.translate('messages.error001'))
+            throw new Api403Error("Có lỗi xảy ra, vui long đăng nhập lại")
         }
 
-        if (refreshToken !== keyStore.refreshToken) throw Api401Error(i18n.t('messages.error002'))
+        if (refreshToken !== keyStore.refreshToken) throw Api401Error("Thông tin shop đã tồn tại")
 
         // check userId
         const foundShop = await findByEmail({email})
-        if (!foundShop) throw new Api401Error(i18n.translate('messages.error000'))
+        if (!foundShop) throw new Api401Error("Token không hợp lệ")
 
         // create accessToken, refreshToken
         const tokens = await createTokenPair({userId, email}, keyStore.publicKey, keyStore.privateKey)
@@ -92,11 +92,11 @@ class AccessService {
     singIn = async ({email, password}) => {
         // 1.
         const foundShop = await findByEmail({email})
-        if (!foundShop) throw new Api403Error(i18n.translate('messages.error002'))
+        if (!foundShop) throw new Api403Error("Thông tin shop Không tồn tại")
 
         // 2.
         const match = bcrypt.compare(password, foundShop.password)
-        if (!match) throw new BusinessLogicError(i18n.translate('messages.error003'))
+        if (!match) throw new BusinessLogicError("Đăng nhập thất bại")
 
         // 3. create private key, public key
         const {
@@ -143,7 +143,7 @@ class AccessService {
         const holderShop = await shopModel.findOne({email}).lean()
         console.log('locale:::', i18n.getLocale())
         if (holderShop) {
-            throw new Api403Error(i18n.translate('messages.error004'))
+            throw new Api403Error("Thông tin shop đã tồn tại")
         }
 
         const passwordHash = await bcrypt.hash(password, 10)
@@ -180,7 +180,7 @@ class AccessService {
         })
 
         if (!publicKeyString) {
-            throw new BusinessLogicError(i18n.translate('messages.error005'))
+            throw new BusinessLogicError("Thông tin public key không hợp lệ")
         }
         console.log('publicKeyString:: ', publicKeyString)
 

@@ -49,7 +49,7 @@ router.post('/amount', discountController.getDiscountAmount)
 router.get('/list-product-code', discountController.getAllDiscountCodeWithProduct)
 
 // authentication
-// router.use(authenticationV2)
+router.use(authenticationV2)
 
 /**
  * @swagger
