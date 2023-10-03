@@ -3,7 +3,6 @@ const {findAllDraftsForShop, findAllPublishForShop, publishProductByShop, search
     advancedSearch
 } = require("../models/repositories/product.repo")
 const {getSelectData, unGetSelectData} = require("../utils");
-const {i18n}= require('../configs/config.i18n')
 
 class ProductService {
 
