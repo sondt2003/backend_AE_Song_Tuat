@@ -111,6 +111,42 @@ const options = {
                         "password": "123123a@"
                     }
                 },
+                RequestLogout: {
+                    type: 'object',
+                    required: ['refresh-token', 'authorization'],
+                    properties: {
+                        "refresh-token": {
+                            type: 'string',
+                            description: 'The refresh-token of the shop'
+                        },
+                        authorization: {
+                            type: 'string',
+                            description: 'The accessToken of the shop'
+                        },
+                    },
+                    example: {
+                        "refresh-token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTE3ZGZmZmY0NjI3Mzk0YWQ2NGUzYTIiLCJlbWFpbCI6IiBkdXlob2FuZ2F3c0BnbWFpbC5jb20iLCJpYXQiOjE2OTY0NjA0NTMsImV4cCI6MTY5NjYzMzI1M30.oPcGlBgBFLik1qKUUgM3J0pCdX3D02bkrVsYKnPwhUvSmzbM7ffEeK9IPsjHszjsyKlPprYVbIJ-9zmMGe7VaxTmtuSGhhRw1RS3YyRSyv4K8jyzUVYCdptr8CzIK1BbsfGA0SQLZEwgWVo2miUV0Gd3icbWF3r-j9D8Cpls9cyIX_WZg36aqoaiB8aDNs19j6xYyhGqTtdykjSOfTfc76_J3M2cIQT8GPguK7z6cuO9bUT9ANWecMPsggCpUBTAJ3O19At5amJk5sOF928oHgphUxnhTETAVyBzlIvvvY8SqP3PD55whuo3iPjuJuXckPn-oKhjMzUpttMGJ6Gshb0MNOgwPWYov7WWUuUAyZn3res1kPzZCnBdzeq3lUdgTdFfXogg4qd3ntEMOpKiqHDGipwjPzv53WG_Ie4WSXUk_eGr7oyYbOj1d5vddMnIH0sw46zhpd1KsNIh3eIui-fucDEOkLddxy75mHobm4YM1xt-AMQhTbbtoHU_8vKghPRKKrZGc3t1Jg-Tsfe4riPU1TI3lRvzm7cP7SuFdmFD-pyHU3zCB-WTXqgKsUMPFGylx-6ij1SIRi8Q3BW1MCAniNNvOcUX7VUAqPjU0MMmrysvlqDsD7LOBGU7Bcb__biYNbJ5Dgjud_SulsRKFbVA_lI186WA_SVezuSzTTc",
+                        "authorization": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTE3ZGZmZmY0NjI3Mzk0YWQ2NGUzYTIiLCJlbWFpbCI6IiBkdXlob2FuZ2F3c0BnbWFpbC5jb20iLCJpYXQiOjE2OTY0NjA0NTMsImV4cCI6MTY5NjU0Njg1M30.jf0yHvjlMr1rlj1wqLCg-RsG7EWfH0-z6WXrBHOfyaTiLP2wAEoVJhSMeUbypmMwwPn4cE4x_NQv8q61WjWAR6GshguMCh-KodbnPMEVgOZDw027YrCQylwIYU1aV5i4BFJVJ1VCpSpvQe62AWgEBJT364KvDYcbIg5W6WXpA_dKO1Eub1zGDFrLDKALJ0ZGkVpUng3_9Btsrxd38DDbIDeAwE0ZC7p_Y7ATOaXK06cDTcZLUIyXuukOse2x-uzS99MUYml79FWofVNp3z0ZUMntI7KP6Uw61wg5O0lFThJdonVSLqTy8pMhSQUmslof0PJF-XeSU7zguNInIhH9eEuWwcS4caWWC372bfdu5yiTLTH3kNnA5e5vkH7cCgUN74i8F5d13V4y4jv12CeFFUFP7vdRd-NqHnQKdX6VWOvz5LQH-iZBw3G3HrPit02DxzHMmbx-XmfUNx1WjXVf10UaVYmQzlFmm450YPWL274R5xU6erzb2e2R6Nu2tbnCLa02gHmJmGkn_8-cj4T6tfWu0mYk9X78tzQzDdAmVYIQn8T2yTUkQXcOXV7d-i-PeQH9qDE-EgmzJjbHMF4lS4uG0zLqAggZnXUs8C238cwbynm4vmKKHYFyEtuhEjsN9PuAUOjgz1LdUykOPdoGROprW-u5gV6YuXsWg0ljl1A"
+                    }
+                },
+                RequestLogin: {
+                    type: 'object',
+                    required: ['email', 'password'],
+                    properties: {
+                        email: {
+                            type: 'string',
+                            description: 'The email of the shop'
+                        },
+                        password: {
+                            type: 'string',
+                            description: 'The password of the shop'
+                        },
+                    },
+                    example: {
+                        "email": "duyhoangaws@gmail.com",
+                        "password": "123123a@"
+                    }
+                },
                 Product: {
                     type: 'object',
                     required: ['product_name', 'product_thumb', 'product_price', 'product_quality', 'product_type', 'product_attributes'],
