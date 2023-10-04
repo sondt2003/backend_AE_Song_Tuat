@@ -62,6 +62,12 @@ router.use(authenticationV2)
  *     post:
  *       summary: Shop logout
  *       tags: [Auth]
+ *       requestBody:
+ *          description: Request login info
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      $ref: '#/components/schemas/RequestLogout'
  *       responses:
  *         "400":
  *           $ref: '#/components/responses/400'
