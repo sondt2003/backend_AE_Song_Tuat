@@ -5,6 +5,8 @@ const router = express.Router()
 // health check application
 router.use('/healthcheck', require('./health'))
 
+router.use('/zone', require('./zone'))
+
 // check apiKey
 router.use(apiKey)
 
