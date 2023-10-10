@@ -1,4 +1,4 @@
-const {Schema,model} = require("mongoose");
+const { Schema, model } = require("mongoose");
 const slugify = require('slugify')
 
 const DOCUMENT_NAME = 'Product';
@@ -6,12 +6,17 @@ const COLLECTION_NAME = 'Products';
 const COLLECTION_CLOTHING_NAME = 'Clothings';
 const COLLECTION_ELECTRON_NAME = 'Electrons';
 const COLLECTION_FURNITURE_NAME = 'Furnitures';
+const COLLECTION_FOOD_NAME = 'Food';
 
 const productSchema = new Schema({
     product_name: {
         type: String,
         trim: true,
         maxLength: 150
+    },
+    image: {
+        type: String,
+        default: "https://img5.thuthuatphanmem.vn/uploads/2021/11/09/anh-do-an-dep-nhat_095144754.jpg",
     },
     product_thumb: {
         type: String,
@@ -33,7 +38,7 @@ const productSchema = new Schema({
     product_type: {
         type: String,
         required: true,
-        enum: ["Electronics", "Clothing", "Furniture"]
+        enum: ["Electronics", "Clothing", "Furniture", "Food"]
     },
     product_shop: {
         type: Schema.Types.ObjectId,
@@ -73,7 +78,7 @@ const productSchema = new Schema({
 });
 
 const electronicsSchema = new Schema({
-    manufacturer: { type: String, required: true},
+    manufacturer: { type: String, required: true },
     model: String,
     color: String,
     product_shop: {
@@ -86,7 +91,7 @@ const electronicsSchema = new Schema({
 })
 
 const clothingSchema = new Schema({
-    brand: { type: String, required: true},
+    brand: { type: String, required: true },
     size: String,
     material: String,
     product_shop: {
@@ -98,8 +103,8 @@ const clothingSchema = new Schema({
     timestamps: true
 })
 
-const furnitureSchema  = new Schema({
-    brand: { type: String, required: true},
+const furnitureSchema = new Schema({
+    brand: { type: String, required: true },
     size: String,
     material: String,
     product_shop: {
@@ -110,7 +115,28 @@ const furnitureSchema  = new Schema({
     collection: COLLECTION_FURNITURE_NAME,
     timestamps: true
 })
-
+const foodSchema = new Schema({
+    brand: { type: String, required: true },
+    size: String,
+    ingredients: String,
+    allergens: String,
+    nutritionalValue: String,
+    availability: Date,
+    images: {
+        type: [String],
+        default: [
+            "https://img5.thuthuatphanmem.vn/uploads/2021/11/09/anh-do-an-dep-nhat_095144754.jpg",
+            "https://img5.thuthuatphanmem.vn/uploads/2021/11/09/anh-do-an-dep-nhat_095144754.jpg"
+        ]
+    },
+    product_shop: {
+        type: Schema.Types.ObjectId,
+        ref: 'Shop'
+    }
+}, {
+    collection: COLLECTION_FOOD_NAME,
+    timestamps: true
+})
 // create index for search
 productSchema.index({
     product_name: 'text',
@@ -119,7 +145,7 @@ productSchema.index({
 
 // Document middleware runs before .save and .create...
 productSchema.pre('save', function (next) {
-    this.product_slug = slugify(this.product_name, {lower: true})
+    this.product_slug = slugify(this.product_name, { lower: true })
     next()
 })
 
@@ -127,5 +153,6 @@ module.exports = {
     product: model(DOCUMENT_NAME, productSchema),
     electronic: model("Electronic", electronicsSchema),
     clothing: model("Clothing", clothingSchema),
-    furniture: model("Furniture", furnitureSchema)
+    furniture: model("Furniture", furnitureSchema),
+    food: model("Food", foodSchema),
 }
