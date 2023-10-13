@@ -80,6 +80,19 @@ class Product {
     async createProduct(product_id) {
         return await product.create({ ...this, _id: product_id })
     }
+    removeProperty(newProduct) {
+		const Product = { ...newProduct._doc, _id: null, createdAt: null, updatedAt: null, __v: null };
+		delete Product['_id'];
+		delete Product['product_shop'];
+		delete Product['createdAt'];
+		delete Product['updatedAt'];
+		delete Product['__v'];
+		this.product_attributes = Product;
+
+
+		console.log("=============================== removeProperty ============================");
+		console.log({ ...this.product_attributes });
+	}
 }
 class Clothing extends Product {
     async createProduct() {
@@ -87,6 +100,7 @@ class Clothing extends Product {
             ...this.product_attributes,
             product_shop: this.product_shop
         })
+        super.removeProperty(newClothing);
         if (!newClothing) throw new BusinessLogicError("Create new Clothing failed");
         const newProduct = await super.createProduct(newClothing._id);
         if (!newProduct) throw new BusinessLogicError("Create new Product failed");
@@ -104,6 +118,8 @@ class Food extends Product {
             ...this.product_attributes,
             product_shop: this.product_shop
         })
+        super.removeProperty(newFood);
+
         if (!newFood) throw new BusinessLogicError("Create new Clothing failed");
         const newProduct = await super.createProduct(newFood._id);
         if (!newProduct) throw new BusinessLogicError("Create new Product failed");

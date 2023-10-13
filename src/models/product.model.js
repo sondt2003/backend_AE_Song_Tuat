@@ -1,4 +1,4 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model, } = require("mongoose");
 const slugify = require('slugify')
 
 const DOCUMENT_NAME = 'Product';
@@ -132,6 +132,16 @@ const foodSchema = new Schema({
     product_shop: {
         type: Schema.Types.ObjectId,
         ref: 'Shop'
+    },
+    available_time_starts:{
+        type:String,
+        required:true,
+        default:"01:00:00"
+    },
+    available_time_ends:{
+        type:String,
+        required:true,
+        default:"23:59:00"
     }
 }, {
     collection: COLLECTION_FOOD_NAME,
