@@ -135,12 +135,12 @@ const foodSchema = new Schema({
     },
     available_time_starts:{
         type:String,
-        required:true,
+        // required:true,
         default:"01:00:00"
     },
     available_time_ends:{
         type:String,
-        required:true,
+        // required:true,
         default:"23:59:00"
     }
 }, {
