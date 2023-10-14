@@ -3,6 +3,7 @@ const router = express.Router()
 const discountController = require('../../controllers/discount.controller')
 const {authenticationV2} = require("../../auth/authUtils");
 
+router.use(authenticationV2)
 
 
 /**
@@ -49,7 +50,6 @@ router.post('/amount', discountController.getDiscountAmount)
 router.get('/list-product-code', discountController.getAllDiscountCodeWithProduct)
 
 // authentication
-router.use(authenticationV2)
 
 /**
  * @swagger
