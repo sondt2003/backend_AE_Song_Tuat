@@ -20,6 +20,7 @@ class DiscountController {
     })
 
     getAllDiscountCodeWithProduct = catchAsync(async (req, res) => {
+        console.log(req.body.userId);
         OK(res,  "Get Discount Code success",
             DiscountService.getAllDiscountCodeWithProduct({
                 ...req.body,

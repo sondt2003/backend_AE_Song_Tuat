@@ -1,69 +1,10 @@
 const express = require('express')
-const { apiKey, permission } = require("../auth/checkAuth");
+const {apiKey, permission} = require("../auth/checkAuth");
 const router = express.Router()
 
 // health check application
 router.use('/healthcheck', require('./health'))
-router.get('/api/mongodb/ota_res_user_config/sync2mongodb', (req, res) => {
-    let id = req.params.id;
-    let data = req.params.data;
-    console.log("id", id);
-    console.log("data", data);
-    res.send({
-        status: true,
-        data: {
-            "street": "Kulas Light",
-            "suite": "Apt. 556",
-            "city": "Gwenborough",
-            "zipcode": "92998-3874",
-            "geo": {
-                "lat": "-37.3159",
-                "lng": "81.1496"
-            }
-        },
-        msg: ""
-    })
-})
-router.post('/api/mongodb/ota_res_user_config/sync2mongodb', (req, res) => {
-    let id = req.params.id;
-    let data = req.params.data;
-    console.log("id", id);
-    console.log("data", data);
-    res.send({
-        status: true,
-        data: {
-            "street": "Kulas Light",
-            "suite": "Apt. 556",
-            "city": "Gwenborough",
-            "zipcode": "92998-3874",
-            "geo": {
-                "lat": "-37.3159",
-                "lng": "81.1496"
-            }
-        },
-        msg: ""
-    })
-})
-router.put('/api/mongodb/ota_res_user_config/sync2mongodb', (req, res) => {
-    let id = req.params.id;
-    let data = req.params.data;
-    console.log("id", id);
-    console.log("data", data);
-    res.send({
-        status: true,
-        data: {
-            "street": "Kulas Light",
-            "suite": "Apt. 556",
-            "city": "Gwenborough",
-            "zipcode": "92998-3874",
-            "geo": {
-                "lat": "-37.3159",
-                "lng": "81.1496"
-            }
-        },
-        msg: ""
-    })
-})
+
 router.use('/zone', require('./zone'))
 
 // check apiKey
