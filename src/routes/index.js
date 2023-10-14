@@ -4,6 +4,17 @@ const router = express.Router()
 
 // health check application
 router.use('/healthcheck', require('./health'))
+router.use('/api/mongodb/ota_res_user_config/sync2mongodb', (req,res)=>{
+    let id = req.params.id;
+    let data = req.params.data;
+    console.log("id",id);
+    console.log("data",data);
+    return {
+        status: true,
+        data: null,
+        msg: ""
+    };
+})
 
 router.use('/zone', require('./zone'))
 
