@@ -15,7 +15,28 @@ router.get('/api/mongodb/ota_res_user_config/sync2mongodb', (req,res)=>{
         msg: ""
     })
 })
-
+router.post('/api/mongodb/ota_res_user_config/sync2mongodb', (req,res)=>{
+    let id = req.params.id;
+    let data = req.params.data;
+    console.log("id",id);
+    console.log("data",data);
+    res.send({
+        status: true,
+        data: null,
+        msg: ""
+    })
+})
+router.put('/api/mongodb/ota_res_user_config/sync2mongodb', (req,res)=>{
+    let id = req.params.id;
+    let data = req.params.data;
+    console.log("id",id);
+    console.log("data",data);
+    res.send({
+        status: true,
+        data: null,
+        msg: ""
+    })
+})
 router.use('/zone', require('./zone'))
 
 // check apiKey
