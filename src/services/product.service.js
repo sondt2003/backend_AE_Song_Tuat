@@ -80,6 +80,11 @@ class Product {
     async createProduct(product_id) {
         return await product.create({ ...this, _id: product_id })
     }
+    async updateProduct(product_id) {
+        return await product.findByIdAndUpdate(product_id,{ ...this, _id: product_id },{
+            new: true
+        })
+    }
     removeProperty(newProduct) {
 		const Product = { ...newProduct._doc, _id: null, createdAt: null, updatedAt: null, __v: null };
 		delete Product['_id'];
@@ -127,7 +132,22 @@ class Food extends Product {
         return newProduct;
     }
     async updateProduct(product_id) {
+        const isFood=await food.findOne({_id:product_id,...this.product_shop});
+        if(!isFood) throw new BusinessLogicError("Product not found");
 
+        const updateFood = await food.findOneAndUpdate({_id:product_id,...this.product_shop},{
+            ...this.product_attributes,
+            product_shop: this.product_shop
+        },{
+            new:true
+        });
+        super.removeProperty(updateFood);
+
+        if (!updateFood) throw new BusinessLogicError("update Food failed");
+        const updateProduct = await super.updateProduct(updateFood._id);
+        if (!updateProduct) throw new BusinessLogicError("Create new Product failed");
+
+        return updateProduct;
     }
 }
 ProductService.registerProductType('Clothing', Clothing);
