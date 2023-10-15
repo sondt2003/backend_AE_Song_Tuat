@@ -1,10 +1,10 @@
 const catchAsync = require('../helpers/catch.async')
-const {OK} = require("../core/success.response");
-const {DiscountService} = require("../services/discount.service");
+const { OK } = require("../core/success.response");
+const { DiscountService } = require("../services/discount.service");
 
 class DiscountController {
     createDiscountCode = catchAsync(async (req, res, next) => {
-        OK(res,  "Create discount success",
+        OK(res, "Create discount success",
             await DiscountService.createDiscountCode({
                 ...req.body,
                 shopId: req.user.userId
@@ -12,7 +12,7 @@ class DiscountController {
     })
 
     updateDiscountCode = catchAsync(async (req, res) => {
-        OK(res,  "Update discount success",
+        OK(res, "Update discount success",
             await DiscountService.updateDiscountCode({
                 ...req.body,
                 shopId: req.user.userId
@@ -20,16 +20,15 @@ class DiscountController {
     })
 
     getAllDiscountCodeWithProduct = catchAsync(async (req, res) => {
-        console.log(req.body.userId);
-        OK(res,  "Get Discount Code success",
-            DiscountService.getAllDiscountCodeWithProduct({
+        OK(res, "Get Discount Code success",
+            await DiscountService.getAllDiscountCodeWithProduct({
                 ...req.body,
                 shopId: req.user.userId,
             }));
     })
 
     getAllDiscountCodesByShop = catchAsync(async (req, res) => {
-        OK(res,  "Get all discount codes success",
+        OK(res, "Get all discount codes success",
             await DiscountService.getAllDiscountCodesByShop({
                 ...req.query,
                 shopId: req.user.userId
@@ -37,7 +36,7 @@ class DiscountController {
     })
 
     getDiscountAmount = catchAsync(async (req, res) => {
-        OK(res,  "Get discount amount success",
+        OK(res, "Get discount amount success",
             await DiscountService.getDiscountAmount({
                 ...req.body,
                 shopId: req.user.userId
@@ -45,7 +44,7 @@ class DiscountController {
     })
 
     deleteDiscountCode = catchAsync(async (req, res) => {
-        OK(res,  "Delete discount success",
+        OK(res, "Delete discount success",
             await DiscountService.deleteDiscountCode({
                 ...req.body,
                 shopId: req.user.userId
@@ -53,7 +52,7 @@ class DiscountController {
     })
 
     cancelDiscountCode = catchAsync(async (req, res) => {
-        OK(res,  "Cancel discount success",
+        OK(res, "Cancel discount success",
             await DiscountService.cancelDiscountCode({
                 ...req.body,
                 shopId: req.user.userId
