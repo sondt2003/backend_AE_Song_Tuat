@@ -1,5 +1,6 @@
 const { BusinessLogicError } = require("../core/error.response");
 const { product, food, clothing } = require("../models/product.model");
+const { insertInventory } = require("../models/repositories/inventory.repo");
 const { findAllDraftsForShop, findAllPublishForShop, publishProductByShop, searchProductByUser, findAllProducts, findById, getProductById,
     advancedSearch
 } = require("../models/repositories/product.repo")
@@ -16,7 +17,6 @@ class ProductService {
     static async createProduct(type, payload) {
         const productClass = ProductService.productRegistry[type]
         if (!productClass) throw new BusinessLogicError("Product type %s không hợp lệ")
-
         return new productClass(payload).createProduct()
     }
 
@@ -78,26 +78,34 @@ class Product {
         this.product_quality = product_quality;
     }
     async createProduct(product_id) {
-        return await product.create({ ...this, _id: product_id })
+        const newProduct = await product.create({ ...this, _id: product_id })
+        if (newProduct) {
+            await insertInventory({
+                productId: newProduct._id,
+                shopId: newProduct.product_shop,
+                stock: newProduct.product_quality
+            })
+        }
+        return newProduct;
     }
     async updateProduct(product_id) {
-        return await product.findByIdAndUpdate(product_id,{ ...this, _id: product_id },{
+        return await product.findByIdAndUpdate(product_id, { ...this, _id: product_id }, {
             new: true
         })
     }
     removeProperty(newProduct) {
-		const Product = { ...newProduct._doc, _id: null, createdAt: null, updatedAt: null, __v: null };
-		delete Product['_id'];
-		delete Product['product_shop'];
-		delete Product['createdAt'];
-		delete Product['updatedAt'];
-		delete Product['__v'];
-		this.product_attributes = Product;
+        const Product = { ...newProduct._doc, _id: null, createdAt: null, updatedAt: null, __v: null };
+        delete Product['_id'];
+        delete Product['product_shop'];
+        delete Product['createdAt'];
+        delete Product['updatedAt'];
+        delete Product['__v'];
+        this.product_attributes = Product;
 
 
-		console.log("=============================== removeProperty ============================");
-		console.log({ ...this.product_attributes });
-	}
+        console.log("=============================== removeProperty ============================");
+        console.log({ ...this.product_attributes });
+    }
 }
 class Clothing extends Product {
     async createProduct() {
@@ -132,14 +140,14 @@ class Food extends Product {
         return newProduct;
     }
     async updateProduct(product_id) {
-        const isFood=await food.findOne({_id:product_id,...this.product_shop});
-        if(!isFood) throw new BusinessLogicError("Product not found");
+        const isFood = await food.findOne({ _id: product_id, ...this.product_shop });
+        if (!isFood) throw new BusinessLogicError("Product not found");
 
-        const updateFood = await food.findOneAndUpdate({_id:product_id,...this.product_shop},{
+        const updateFood = await food.findOneAndUpdate({ _id: product_id, ...this.product_shop }, {
             ...this.product_attributes,
             product_shop: this.product_shop
-        },{
-            new:true
+        }, {
+            new: true
         });
         super.removeProperty(updateFood);
 
