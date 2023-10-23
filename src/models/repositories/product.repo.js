@@ -58,7 +58,8 @@ const findById = async ({ product_id, unSelect }) => {
     return await product.findById(product_id).select(unSelect)
 }
 const findByIdAndDiscount = async ({ product_id, unSelect, productShopId }) => {
-console.log("productShopId:::::::::::"+productShopId);
+    console.log("productShopId:::::::::::" + productShopId);
+    if (!productShopId) throw new BusinessLogicError("Don't have productShopId")
     const foundDiscount = await findAllDiscountCodesUnSelect(
         {
             filter: {
@@ -70,7 +71,7 @@ console.log("productShopId:::::::::::"+productShopId);
                     },
                     {
                         discount_product_ids: product_id,
-                        discount_is_active:true,
+                        discount_is_active: true,
                     },
                 ]
             },
@@ -79,7 +80,6 @@ console.log("productShopId:::::::::::"+productShopId);
         }
     )
     const foundFood = await product.findById(product_id).select(unSelect)
-    console.log(foundDiscount);
     return {
         ...foundFood._doc,
         discount: foundDiscount,
