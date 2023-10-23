@@ -17,7 +17,7 @@ const apiKeySchema = new Schema({
         default: 'fixed_amount' // percentage
     },
     discount_value: {
-        type: String,
+        type: Number,
         required: true,
     },
     discount_code: {
@@ -48,7 +48,7 @@ const apiKeySchema = new Schema({
         type: Number,
         required: true,
     },
-    discount_min_order_value: { // so discount da duoc su dung
+    discount_min_order_value: { // so min 
         type: Number,
         required: true,
     },
