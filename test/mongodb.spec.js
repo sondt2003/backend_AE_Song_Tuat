@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const connectString = 'mongodb://admin:admin@localhost:27017/shopDEV?authSource=admin'
+const connectString = 'mongodb+srv://dangtruongson:190011445@cluster0.xxidnko.mongodb.net/?retryWrites=true&w=majority'
 
 const TestSchema = new mongoose.Schema({name: String})
 const Test = mongoose.model('Test', TestSchema)

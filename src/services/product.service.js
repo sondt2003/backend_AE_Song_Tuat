@@ -2,7 +2,8 @@ const { BusinessLogicError } = require("../core/error.response");
 const { product, food, clothing } = require("../models/product.model");
 const { insertInventory } = require("../models/repositories/inventory.repo");
 const { findAllDraftsForShop, findAllPublishForShop, publishProductByShop, searchProductByUser, findAllProducts, findById, getProductById,
-    advancedSearch
+    advancedSearch,
+    findByIdAndDiscount
 } = require("../models/repositories/product.repo")
 const { getSelectData, unGetSelectData } = require("../utils");
 
@@ -53,7 +54,7 @@ class ProductService {
     }
 
     static async findOneProduct(product_id) {
-        return await findById({ product_id, unSelect: unGetSelectData(['__v', 'variations']) })
+        return await findByIdAndDiscount({ product_id, unSelect: unGetSelectData(['__v', 'variations']) })
     }
 
     static async findProductById(product_id) {

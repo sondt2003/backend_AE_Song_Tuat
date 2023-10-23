@@ -76,7 +76,10 @@ const productSchema = new Schema({
     timestamps: true,
     collection: COLLECTION_NAME
 });
-
+// PRICE thấp nhất và cao nhất
+// rating thấp nhất và cao nhất
+// lượt mua 
+// lượt mua 
 const electronicsSchema = new Schema({
     manufacturer: { type: String, required: true },
     model: String,
