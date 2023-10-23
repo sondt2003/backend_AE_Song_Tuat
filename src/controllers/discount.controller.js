@@ -9,7 +9,7 @@ class DiscountController {
                 ...req.body,
                 shopId: req.user.userId
             }));
-    })
+    })//done
 
     updateDiscountCode = catchAsync(async (req, res) => {
         OK(res, "Update discount success",
@@ -17,21 +17,19 @@ class DiscountController {
                 ...req.body,
                 shopId: req.user.userId
             }));
-    })
+    })//done
 
     getAllDiscountCodeWithProduct = catchAsync(async (req, res) => {
         OK(res, "Get Discount Code success",
             await DiscountService.getAllDiscountCodeWithProduct({
-                ...req.body,
-                shopId: req.user.userId,
+                ...req.query,
             }));
-    })
+    })//done and not done postman
 
     getAllDiscountCodesByShop = catchAsync(async (req, res) => {
         OK(res, "Get all discount codes success",
             await DiscountService.getAllDiscountCodesByShop({
                 ...req.query,
-                shopId: req.user.userId
             }));
     })
 
@@ -39,7 +37,7 @@ class DiscountController {
         OK(res, "Get discount amount success",
             await DiscountService.getDiscountAmount({
                 ...req.body,
-                shopId: req.user.userId
+                userId: req.user.userId
             }));
     })
 

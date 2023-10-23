@@ -122,7 +122,6 @@ router.get('/search/:keySearch', discountController.cancelDiscountCode)
  *           contents:
  *             application/json
  */
-router.get('/search/:keySearch', discountController.cancelDiscountCode)
 
 // router
 module.exports = router

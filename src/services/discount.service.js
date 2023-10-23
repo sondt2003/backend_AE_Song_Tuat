@@ -1,8 +1,8 @@
-const {BusinessLogicError} = require("../core/error.response");
-const {convert2ObjectId} = require("../utils");
+const { BusinessLogicError } = require("../core/error.response");
+const { convert2ObjectId } = require("../utils");
 const discountModel = require('../models/discount.model')
-const {findAllProducts} = require("../models/repositories/product.repo");
-const {findAllDiscountCodesUnSelect, checkDiscountExists} = require("../models/repositories/discount.repo");
+const { findAllProducts, getProductById } = require("../models/repositories/product.repo");
+const { findAllDiscountCodesUnSelect, checkDiscountExists } = require("../models/repositories/discount.repo");
 
 class DiscountService {
 
@@ -49,7 +49,7 @@ class DiscountService {
             discount_max_uses_per_user: max_uses_per_user,
             discount_is_active: is_active,
             discount_applies_to: applies_to,
-            discount_product_ids: applies_to === 'all'? [] : product_ids
+            discount_product_ids: applies_to === 'all' ? [] : product_ids
         })
     }
 
@@ -63,8 +63,8 @@ class DiscountService {
 
     }
 
-    static async getAllDiscountCodeWithProduct({code, shopId, userId, limit, page}) {
-        console.log("code::::::",code,"shopId::::::",shopId,"limit::::::",limit,"page::::::",page);
+    static async getAllDiscountCodeWithProduct({ code, shopId, userId, limit, page }) {
+        console.log("code::::::", code, "shopId::::::", shopId, "limit::::::", limit, "page::::::", page);
         // create index for discount_code
         const foundDiscount = await discountModel.findOne({
             discount_code: code,
@@ -75,7 +75,7 @@ class DiscountService {
             throw new BusinessLogicError('Discount not exists')
         }
 
-        const {discount_applies_to, discount_product_ids} = foundDiscount
+        const { discount_applies_to, discount_product_ids } = foundDiscount
         let filter
         if (discount_applies_to === 'all') {
             // get all
@@ -88,7 +88,7 @@ class DiscountService {
         if (discount_applies_to === 'specific') {
             // get by product ids
             filter = {
-                _id: {$in: discount_product_ids},
+                _id: { $in: discount_product_ids },
                 isPublished: true
             }
         }
@@ -104,7 +104,7 @@ class DiscountService {
 
     static async getAllDiscountCodesByShop({
         limit, page, shopId
-                                           }) {
+    }) {
         return await findAllDiscountCodesUnSelect(
             {
                 limit: +limit,
@@ -119,15 +119,14 @@ class DiscountService {
         )
     }
 
-    static async getDiscountAmount({codeId, userId, shopId, products}) {
+    static async getDiscountAmount({ codeId, userId, shopId, products }) {
         const foundDiscount = await checkDiscountExists({
             model: discountModel,
             filter: {
-                discount_code: code,
+                _id: codeId,
                 discount_shop_id: convert2ObjectId(shopId)
             }
         })
-
         if (!foundDiscount) {
             throw new BusinessLogicError('Discount not exists')
         }
@@ -141,7 +140,7 @@ class DiscountService {
             discount_max_order_value,
             discount_users_used,
             discount_type,
-            discount_value
+            discount_value,
         } = foundDiscount
         if (!discount_is_active) throw new BusinessLogicError('Discount expired')
         if (discount_max_uses === 0) throw new BusinessLogicError('Discount are out')
@@ -153,8 +152,12 @@ class DiscountService {
         let totalOrder = 0
         if (discount_min_order_value > 0) {
             // get total
-            totalOrder = products.reduce((acc, product) => {
-                return acc + (product.quantity * product.price)
+             totalOrder =await products.reduce(async (acc, product) => {
+                const foundProduct = await getProductById(product.productId);
+                if (!foundProduct) {
+                    throw new BusinessLogicError("Don't have product with product id")
+                }
+                return acc + (product.quantity * foundProduct.product_price)
             }, 0)
 
             if (totalOrder < discount_min_order_value) {
@@ -163,14 +166,16 @@ class DiscountService {
         }
 
         if (discount_max_order_value > 0) {
-            const userDiscount = discount_users_used.find(user => user.userId === userId)
-            if (userDiscount) {
-                // ..
-            }
+            discount_users_used.forEach(user => {
+                console.log("userId:::::::::::::::::::", user);
+                if (user === userId) {
+                    throw new BusinessLogicError(`Bạn Đã sử dụng mã giảm giá này`)
+                }
+            });
         }
 
         // check xem discount nay la fixed amount
-        const amount = discount_type  === 'fixed_amount' ? discount_value : (totalOrder * (discount_value / 100))
+        const amount = discount_type === 'fixed_amount' ? discount_value : (totalOrder * (discount_value / 100))
 
         return {
             totalOrder,
@@ -182,7 +187,7 @@ class DiscountService {
     // delete voucher
     static async deleteDiscountCode({
         shopId, codeId
-                                    }) {
+    }) {
         // kiem tra xem co dk su dung o dau khong, neu k co thi xoa
         return discountModel.findOneAndDelete({
             discount_code: codeId,
@@ -193,9 +198,9 @@ class DiscountService {
     //
     static async cancelDiscountCode({
         codeId, shopId, userId
-                                    }) {
+    }) {
         // check exists
-        const  foundDiscount = await checkDiscountExists({
+        const foundDiscount = await checkDiscountExists({
             model: discountModel,
             filter: {
                 discount_code: codeId,
