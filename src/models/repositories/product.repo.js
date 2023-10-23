@@ -57,15 +57,24 @@ const findAllProducts = async ({ limit, sort, page, filter, select }) => {
 const findById = async ({ product_id, unSelect }) => {
     return await product.findById(product_id).select(unSelect)
 }
-const findByIdAndDiscount = async ({ product_id, unSelect }) => {
-
-    const foundDiscount =await findAllDiscountCodesUnSelect(
+const findByIdAndDiscount = async ({ product_id, unSelect, productShopId }) => {
+console.log("productShopId:::::::::::"+productShopId);
+    const foundDiscount = await findAllDiscountCodesUnSelect(
         {
             filter: {
-                discount_product_ids: product_id,
-                discount_is_active:true
+                $or: [
+                    {
+                        discount_shop_id: productShopId,
+                        discount_is_active: true,
+                        discount_applies_to: "all"
+                    },
+                    {
+                        discount_product_ids: product_id,
+                        discount_is_active:true,
+                    },
+                ]
             },
-            unSelect: ['__v', 'discount_shop_id','discount_product_ids'],
+            unSelect: ['__v', 'discount_shop_id', 'discount_product_ids'],
             model: discountModel
         }
     )
@@ -73,7 +82,7 @@ const findByIdAndDiscount = async ({ product_id, unSelect }) => {
     console.log(foundDiscount);
     return {
         ...foundFood._doc,
-        discount:foundDiscount,
+        discount: foundDiscount,
     }
 }
 
