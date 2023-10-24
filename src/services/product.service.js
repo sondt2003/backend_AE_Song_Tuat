@@ -54,7 +54,7 @@ class ProductService {
     }
 
     static async findOneProduct(product_id,productShopId) {
-        return await findByIdAndDiscount({ product_id,productShopId, unSelect: unGetSelectData(['__v', 'variations']) })
+        return await findByIdAndDiscount({ product_id, unSelect: unGetSelectData(['__v', 'variations']) })
     }
 
     static async findProductById(product_id) {

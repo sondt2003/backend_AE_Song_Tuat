@@ -57,8 +57,10 @@ const findAllProducts = async ({ limit, sort, page, filter, select }) => {
 const findById = async ({ product_id, unSelect }) => {
     return await product.findById(product_id).select(unSelect)
 }
-const findByIdAndDiscount = async ({ product_id, unSelect, productShopId }) => {
-    console.log("productShopId:::::::::::" + productShopId);
+const findByIdAndDiscount = async ({ product_id, unSelect }) => {
+    const foundShop = await findById({ product_id });
+    const productShopId=foundShop.product_shop;
+    console.log("foundShop:::::::::::::::"+productShopId)
     if (!productShopId) throw new BusinessLogicError("Don't have productShopId")
     const foundDiscount = await findAllDiscountCodesUnSelect(
         {
