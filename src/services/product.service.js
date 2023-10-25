@@ -50,7 +50,7 @@ class ProductService {
     }
 
     static async findAllProducts({ limit = 50, sort = 'ctime', page = 1, filter = { isPublished: true } }) {
-        return await findAllProducts({ limit, sort, filter, page, select: getSelectData(['product_name', 'product_price', 'product_thumb', 'product_shop']) })
+        return await findAllProducts({ limit, sort, filter, page, select: getSelectData(['product_name', 'product_price', 'product_thumb', 'product_shop','image']) })
     }
 
     static async findOneProduct(product_id,productShopId) {

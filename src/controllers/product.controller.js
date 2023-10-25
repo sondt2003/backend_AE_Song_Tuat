@@ -56,6 +56,14 @@ class ProductController {
             }))
     })
 
+    getAllPublished = catchAsync(async (req, res) => {
+        console.log(req.params.shopId)
+        OK(res, "Find list published success",
+            await ProductService.findAllPublishForShop({
+                product_shop: req.params.shopId
+            }))
+    })
+
     searchProducts = catchAsync(async (req, res) => {
         OK(res, "Search product success",
             await ProductService.searchProducts(req.params))
