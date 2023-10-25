@@ -1,9 +1,9 @@
-const {findCartById} = require("../models/repositories/cart.repo");
-const {Api404Error, BusinessLogicError} = require("../core/error.response");
-const {checkProductByServer} = require("../models/repositories/product.repo");
-const {DiscountService} = require("./discount.service");
+const { findCartById } = require("../models/repositories/cart.repo");
+const { Api404Error, BusinessLogicError } = require("../core/error.response");
+const { checkProductByServer } = require("../models/repositories/product.repo");
+const { DiscountService } = require("./discount.service");
 
-class OrderService  {
+class OrderService {
 
     /*
         {
@@ -15,7 +15,6 @@ class OrderService  {
                     shop_discounts: [
                         {
                             shopId,
-                            discountId,
                             codeId
                         }
                     ],
@@ -32,8 +31,7 @@ class OrderService  {
      */
     static async checkoutReview({
         cartId, userId, shop_order_ids
-                                }) {
-
+    }) {
         // check cartId exists
         const foundCart = findCartById(cartId)
         if (!foundCart) throw new Api404Error(`Cart don't exists`)
@@ -46,12 +44,11 @@ class OrderService  {
         }, shop_order_ids_new = []
 
         // calculator bill
-        for (let i = 0; i<shop_order_ids.length; i++) {
-            const {shopId, shop_discounts = [], itemProducts = []} = shop_order_ids[i]
-
+        for (let i = 0; i < shop_order_ids.length; i++) {
+            const { shopId, shop_discounts = [], item_products = [] } = shop_order_ids[i]
             // check product available
-            const checkProductServer = await checkProductByServer(itemProducts)
-            if (!checkout_order[0]) throw new BusinessLogicError('Order invalid')
+            const checkProductServer = await checkProductByServer(item_products)
+            if (!checkProductServer[0]) throw new BusinessLogicError('Order invalid')
 
             // sum total order
             const checkoutPrice = checkProductServer.reduce((acc, product) => {
@@ -71,13 +68,13 @@ class OrderService  {
 
             // neu shop_discounts ton tai > 0, check valid
             if (shop_discounts.length > 0) {
-                const {totalPrice, discount = 0} = await DiscountService.getDiscountAmount({
+                const { totalPrice, discount = 0 } = await DiscountService.getDiscountAmount({
                     codeId: shop_discounts[0].codeId,
                     userId,
                     shopId,
                     products: checkProductServer
                 })
-                checkout_order.totalDiscount +=discount
+                checkout_order.totalDiscount += discount
                 if (discount > 0) {
                     itemCheckout.priceApplyDiscount = checkoutPrice - discount
                 }
@@ -104,18 +101,18 @@ class OrderService  {
     }) {
         const { checkout_order }
             = await OrderService.checkoutReview({
-            cartId,
-            userId,
-            shop_order_ids_new
-        })
+                cartId,
+                userId,
+                shop_order_ids_new
+            })
 
         // check lai mot lan nua xem ton kho hay k
         // get new array products
-        const products = shop_order_ids_new.flatMap( order => order.item_products)
+        const products = shop_order_ids_new.flatMap(order => order.item_products)
         console.log('[1]::', products)
 
         for (let i = 0; i < products.length; i++) {
-            const {productId, quantity} = products[i];
+            const { productId, quantity } = products[i];
         }
 
         return {
@@ -139,4 +136,4 @@ class OrderService  {
     }
 }
 
-module.exports = OrderService
+module.exports = { OrderService };

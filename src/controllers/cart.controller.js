@@ -21,7 +21,7 @@ class CartController {
      * @return {}
      */
     addToCart = catchAsync( async(req, res) => {
-        OK(res,  "Add to cart success", await CartService.addToCart(req.body))
+        OK(res,  "Add to cart success", await CartService.addToCart({userId: req.user.userId,...req.body}))
     })
 
     /**
@@ -33,7 +33,7 @@ class CartController {
      * @return {}
      */
     update = catchAsync( async(req, res) => {
-        OK(res,  "Update to cart success", await CartService.addToCartV2(req.body))
+        OK(res,  "Update to cart success", await CartService.addToCartV2({userId: req.user.userId,...req.body}))
     })
 
     /**
@@ -45,7 +45,7 @@ class CartController {
      * @return {}
      */
     delete = catchAsync( async(req, res) => {
-        OK(res,  "Delete cart success", await CartService.deleteItemInCart(req.body))
+        OK(res,  "Delete cart success", await CartService.deleteItemInCart({userId: req.user.userId,...req.params}))
     })
 
     /**
@@ -57,7 +57,7 @@ class CartController {
      * @return {}
      */
     listToCart = catchAsync( async(req, res) => {
-        OK(res,  "List cart success", await CartService.getListUserCart(req.query))
+        OK(res,  "List cart success", await CartService.getListUserCart({userId: req.user.userId}))
     })
 }
 

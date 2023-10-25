@@ -9,12 +9,12 @@ const apiKeySchema = new Schema({
         require: true,
         enum: ['active', 'completed', 'fail', 'pending', 'lock'],
         default: 'active'
-    },
+    }, //trạng thái giỏ hàng
     cart_products: {
         type: Array,
         require: true,
         default: []
-    },
+    },//sản phầm giỏ hàng
     /**
      * {
      *     productId,
@@ -27,12 +27,15 @@ const apiKeySchema = new Schema({
     cart_count_product: {
         type: Number,
         default: 0
-    },
+    },//số lượng sản phẩm trong rỏ hàng
+    // cart_user_id: {
+    //     type: Number,
+    //     require: true
+    // }
     cart_user_id: {
-        type: Number,
-        require: true
-    }
-
+        type: Schema.Types.ObjectId,
+        ref: 'Shop'
+    },
 }, {
     collection: COLLECTION_NAME,
     timestamps: {

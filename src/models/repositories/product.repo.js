@@ -57,6 +57,9 @@ const findAllProducts = async ({ limit, sort, page, filter, select }) => {
 const findById = async ({ product_id, unSelect }) => {
     return await product.findById(product_id).select(unSelect)
 }
+const getProductByIdUnselect = async ({ productId, select }) => {
+    return await product.findOne({ _id: convert2ObjectId(productId) }).select(select)
+}
 const findByIdAndDiscount = async ({ product_id, unSelect }) => {
     const foundShop = await findById({ product_id });
     const productShopId=foundShop.product_shop;
@@ -204,5 +207,6 @@ module.exports = {
     checkProductByServer,
     advancedSearch,
     advancedSearchV2,
-    findByIdAndDiscount
+    findByIdAndDiscount,
+    getProductByIdUnselect
 }
