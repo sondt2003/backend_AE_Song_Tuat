@@ -3,6 +3,8 @@ const router = express.Router()
 const productController = require('../../controllers/product.controller')
 const {authenticationV2} = require("../../auth/authUtils");
 
+router.get('/all/:shopId', productController.getAllPublished)
+
 /**
  * @swagger
  *   /api/v1/product/search/{keySearch}:
