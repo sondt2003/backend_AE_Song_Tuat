@@ -4,7 +4,7 @@ const cartController = require('../../controllers/cart.controller')
 const {authenticationV2} = require("../../auth/authUtils");
 
 // authentication
-// router.use(authenticationV2)
+router.use(authenticationV2)
 
 
 /**
@@ -55,7 +55,7 @@ router.post('', cartController.addToCart)
  *           contents:
  *             application/json
  */
-router.delete('', cartController.delete)
+router.delete('/:productId', cartController.delete)
 
 
 /**
