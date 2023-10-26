@@ -39,8 +39,31 @@ class CartService {
         }, options = { upsert: true, new: true }
 
         const cart = await cartModel.findOne(query);
-        if(!cart) throw new Api404Error('cart not found')
+        if (!cart) throw new Api404Error('cart not found')
         return await cartModel.findOneAndUpdate(query, updateSet, options)
+    }
+
+    static async addItemProductCart({ userId, product }) {
+        const { productId, quantity } = product;
+        const query = {
+            cart_user_id: userId,
+            'cart_products.productId': productId,
+            cart_state: 'active'
+        }
+        const cart = await cartModel.findOne(query);
+        if (!cart) {
+            const query = {
+                cart_user_id: userId, cart_state: 'active'
+            }
+            const updateOrInsert = {
+                $addToSet: {
+                    cart_products: product
+                }
+            }, options = { upsert: true, new: true }
+            return await cartModel.findOneAndUpdate(query, updateOrInsert, options)
+        } else {
+            return await CartService.updateUserCartQuantity({ userId, product })
+        }
     }
 
     static async addToCart({
@@ -70,9 +93,9 @@ class CartService {
             userCart.cart_products = [product]
             return await userCart.save()
         }
-
+        console.log("userCart::::::::::::", userCart.cart_products.length);
         // gio hang ton tai, va co san pham nay thi update quantity
-        return await CartService.updateUserCartQuantity({ userId, product })
+        return await CartService.addItemProductCart({ userId, product })
     }
 
     // update cart
@@ -118,9 +141,8 @@ class CartService {
     }
 
     static async deleteItemInCart({ userId, productId }) {
-        console.log("deleteItemInCart:::::::::::", userId, productId)
-
         const query = { cart_user_id: userId, cart_state: 'active' }
+        const queryCart = { cart_user_id: userId, 'cart_products.productId': productId, cart_state: 'active' }
         const updateSet = {
             $pull: {
                 cart_products: {
@@ -128,8 +150,9 @@ class CartService {
                 }
             }
         }
-
-        return await cartModel.updateOne(query, updateSet)
+        const cart = await cartModel.findOne(queryCart);
+        if (!cart) throw new Api404Error('cart not found')
+        return await cartModel.updateOne(query, updateSet);
     }
 
     static async getListUserCart({ userId }) {
