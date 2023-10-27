@@ -10,7 +10,7 @@ class OrderController {
 
     order = catchAsync(async (req, res, next) => {
         OK(res,  "Get cart info success",
-            await OrderService.orderByUser(req.body));
+            await OrderService.orderByUser({userId: req.user.userId,...req.body}));
     })
 }
 
