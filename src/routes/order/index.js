@@ -14,10 +14,12 @@ const {authenticationV2} = require("../../auth/authUtils");
  */
 router.use(authenticationV2)
 
+router.get('/', orderController.getOrderByUser)
 
 router.post('/review', orderController.checkoutReview)
 
-router.post('', orderController.order)
+router.post('/v1', orderController.order)
+router.post('/v2', orderController.orderV2)
 
 // router
 module.exports = router
