@@ -1,5 +1,5 @@
 const { findCartById } = require("../models/repositories/cart.repo");
-const { Api404Error, BusinessLogicError } = require("../core/error.response");
+const {  BusinessLogicError, Api401Error } = require("../core/error.response");
 const { checkProductByServer } = require("../models/repositories/product.repo");
 const { DiscountService } = require("./discount.service");
 const { acquireLockV2, releaseLockV2 } = require("./redis.service");
@@ -39,7 +39,7 @@ class OrderService {
     }) {
         // check cartId exists
         const foundCart = findCartById(cartId)
-        if (!foundCart) throw new Api404Error(`Cart don't exists`)
+        if (!foundCart) throw new Api401Error(`Cart don't exists`)
 
         const checkout_order = {
             totalPrice: 0, // tong tien hang
