@@ -53,8 +53,8 @@ class ProductService {
         return await findAllProducts({ limit, sort, filter, page, select: getSelectData(['product_name', 'product_price', 'product_thumb', 'product_shop','image']) })
     }
 
-    static async findOneProduct(product_id,productShopId) {
-        return await findByIdAndDiscount({ product_id, unSelect: unGetSelectData(['__v', 'variations']) })
+    static async findOneProduct(product_id,isDiscount=false) {
+        return await findByIdAndDiscount({ product_id,isDiscount, unSelect: unGetSelectData(['__v', 'variations']) })
     }
 
     static async findProductById(product_id) {

@@ -60,34 +60,43 @@ const findById = async ({ product_id, unSelect }) => {
 const getProductByIdUnselect = async ({ productId, select }) => {
     return await product.findOne({ _id: convert2ObjectId(productId) }).select(select)
 }
-const findByIdAndDiscount = async ({ product_id, unSelect }) => {
+const findByIdAndDiscount = async ({ product_id, unSelect, isDiscount }) => {
     const foundShop = await findById({ product_id });
-    const productShopId=foundShop.product_shop;
-    console.log("foundShop:::::::::::::::"+productShopId)
+    const productShopId = foundShop.product_shop;
+    console.log("foundShop:::::::::::::::" + productShopId)
     if (!productShopId) throw new BusinessLogicError("Don't have productShopId")
-    const foundDiscount = await findAllDiscountCodesUnSelect(
-        {
-            filter: {
-                $or: [
-                    {
-                        discount_shop_id: productShopId,
-                        discount_is_active: true,
-                        discount_applies_to: "all"
-                    },
-                    {
-                        discount_product_ids: product_id,
-                        discount_is_active: true,
-                    },
-                ]
-            },
-            unSelect: ['__v', 'discount_shop_id', 'discount_product_ids'],
-            model: discountModel
-        }
-    )
+
     const foundFood = await product.findById(product_id).select(unSelect)
-    return {
-        ...foundFood._doc,
-        discount: foundDiscount,
+
+    if (isDiscount) {
+        const foundDiscount = await findAllDiscountCodesUnSelect(
+            {
+                filter: {
+                    $or: [
+                        {
+                            discount_shop_id: productShopId,
+                            discount_is_active: true,
+                            discount_applies_to: "all"
+                        },
+                        {
+                            discount_product_ids: product_id,
+                            discount_is_active: true,
+                        },
+                    ]
+                },
+                unSelect: ['__v', 'discount_shop_id', 'discount_product_ids'],
+                model: discountModel
+            }
+        )
+
+        return {
+            ...foundFood._doc,
+            discount: foundDiscount,
+        }
+    } else{
+        return {
+            ...foundFood._doc,
+        }
     }
 }
 
