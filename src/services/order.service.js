@@ -1,5 +1,5 @@
 const { findCartById } = require("../models/repositories/cart.repo");
-const {  BusinessLogicError, Api401Error } = require("../core/error.response");
+const { BusinessLogicError, Api401Error } = require("../core/error.response");
 const { checkProductByServer } = require("../models/repositories/product.repo");
 const { DiscountService } = require("./discount.service");
 const { acquireLockV2, releaseLockV2 } = require("./redis.service");
@@ -35,7 +35,7 @@ class OrderService {
         }
      */
     static async checkoutReview({
-        cartId, userId, shop_order_ids
+        cartId, userId, shop_order_ids, isOrder = false
     }) {
         // check cartId exists
         const foundCart = findCartById(cartId)
@@ -77,8 +77,16 @@ class OrderService {
                     codeId: shop_discounts[0].codeId,
                     userId,
                     shopId,
-                    products: checkProductServer
+                    products: checkProductServer,
                 })
+
+                if(isOrder){
+                    const addUserUses = await DiscountService.pushUsersUsed({
+                        codeId: shop_discounts[0].codeId,
+                        userId,
+                        shopId,
+                    });
+                }
                 checkout_order.totalDiscount += discount
                 if (discount > 0) {
                     itemCheckout.priceApplyDiscount = checkoutPrice - discount
@@ -154,7 +162,8 @@ class OrderService {
         const { shop_order_ids_new, checkout_order } = await OrderService.checkoutReview({
             cartId,
             userId,
-            shop_order_ids
+            shop_order_ids,
+            isOrder: true
         })
 
         // // check lai mot lan nua xem ton kho hay k
@@ -164,14 +173,19 @@ class OrderService {
         const acquireProduct = [];
         for (let i = 0; i < products.length; i++) {
             const { productId, quantity } = products[i];
-            const isReservation=await reservationInventory({
+            const isReservation = await reservationInventory({
                 productId, quantity, cartId
             })
-            console.log("modifiedCount",isReservation.modifiedCount)
+            console.log("modifiedCount", isReservation.modifiedCount)
         }
         if (acquireProduct.includes(false)) {
             throw new BusinessLogicError("Một Số Sản Phẩm Đã Được Cập Nhật Vui Lòng Quay Lại Rỏ Hàng")
         }
+        for (let i = 0; i < products.length; i++) {
+            const { productId } = products[i];
+            await CartService.getItemInCart({ userId, productId });
+        }
+
         const newOrder = await orderModel.create({
             order_userId: userId,
             order_checkout: checkout_order,
@@ -189,8 +203,8 @@ class OrderService {
             throw new BusinessLogicError("Order không thành công")
         }
     }
-    static async getOrderByUser({userId}) {
-        const orderFound=await orderModel.find({order_userId:convert2ObjectId(userId)});
+    static async getOrderByUser({ userId }) {
+        const orderFound = await orderModel.find({ order_userId: convert2ObjectId(userId) });
         return orderFound;
     }
 

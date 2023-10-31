@@ -134,10 +134,10 @@ class DiscountService {
         const {
             discount_is_active,
             discount_max_uses,
-            discount_start_date,
+            discount_start_day,
             discount_end_date,
             discount_min_order_value,
-            discount_max_order_value,
+            discount_max_uses_per_user,
             discount_users_used,
             discount_type,
             discount_value,
@@ -145,14 +145,14 @@ class DiscountService {
         if (!discount_is_active) throw new BusinessLogicError('Discount expired')
         if (discount_max_uses === 0) throw new BusinessLogicError('Discount are out')
 
-        if (new Date() < new Date(discount_start_date)
+        if (new Date() < new Date(discount_start_day)
             || new Date() > new Date(discount_end_date)) throw new BusinessLogicError('Discount code has expired')
 
         // check xem cos et gia tri toi thieu hay k
         let totalOrder = 0
         if (discount_min_order_value > 0) {
             // get total
-             totalOrder =await products.reduce(async (acc, product) => {
+            totalOrder = await products.reduce(async (acc, product) => {
                 const foundProduct = await getProductById(product.productId);
                 if (!foundProduct) {
                     throw new BusinessLogicError("Don't have product with product id")
@@ -165,17 +165,24 @@ class DiscountService {
             }
         }
 
-        if (discount_max_order_value > 0) {
-            discount_users_used.forEach(user => {
-                console.log("userId:::::::::::::::::::", user);
+        if (discount_max_uses_per_user > 0) {
+            let count = 0;
+
+            console.log("userId:::::::::::::::::::", userId);
+            await discount_users_used.forEach(user => {
+                console.log("userId Discount uses:::::::::::::::::::", user);
                 if (user === userId) {
-                    throw new BusinessLogicError(`Bạn Đã sử dụng mã giảm giá này`)
+                    count++;
                 }
             });
+            if (count >= discount_max_uses_per_user) {
+                throw new BusinessLogicError(`Bạn Đã sử dụng mã giảm giá này với số lần ${count}`)
+            }
         }
 
         // check xem discount nay la fixed amount
         const amount = discount_type === 'fixed_amount' ? discount_value : (totalOrder * (discount_value / 100))
+
 
         return {
             totalOrder,
@@ -215,12 +222,38 @@ class DiscountService {
                 discount_users_used: userId,
             },
             $inc: {
-                discount_max_users: 1,
+                discount_max_uses: 1,
                 discount_uses_count: -1
             }
         });
     }
 
+
+
+    static async pushUsersUsed({
+        codeId, shopId, userId
+    }) {
+        // check exists
+        const foundDiscount = await checkDiscountExists({
+            model: discountModel,
+            filter: {
+                _id: codeId,
+                discount_shop_id: convert2ObjectId(shopId)
+            }
+        })
+
+        if (!discountModel) throw new BusinessLogicError('Discount not exists')
+
+        return discountModel.findByIdAndUpdate(foundDiscount._id, {
+            $push: {
+                discount_users_used: userId,
+            },
+            $inc: {
+                discount_max_uses: -1,
+                discount_uses_count: 1
+            }
+        });
+    }
 }
 
 module.exports = {
