@@ -154,6 +154,12 @@ class CartService {
         if (!cart) throw new Api404Error('cart not found')
         return await cartModel.updateOne(query, updateSet);
     }
+    
+    static async getItemInCart({ userId, productId }) {
+        const queryCart = { cart_user_id: userId, 'cart_products.productId': productId, cart_state: 'active' }
+        const cart = await cartModel.findOne(queryCart);
+        if (!cart) throw new Api404Error('cart not found')
+    }
 
     static async getListUserCart({ userId }) {
         return await cartModel.findOne({
