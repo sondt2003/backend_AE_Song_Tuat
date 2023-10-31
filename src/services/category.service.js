@@ -15,7 +15,7 @@ class CategoryService {
         });
     }
     static async getAllCategory({ limit = 50, skip = 0 }) {
-        return await category.find().limit(limit, skip);
+        return await category.find().populate('category_parent_id','category_name category_image category_priority',).limit(limit, skip);
     }
     static async updateCategory(type, categoryId, payload) {
         const categoryClass = CategoryService.categoryRegistry[type]
