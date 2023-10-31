@@ -7,7 +7,6 @@ const COLLECTION_CLOTHING_NAME = 'Clothings';
 const COLLECTION_ELECTRON_NAME = 'Electrons';
 const COLLECTION_FURNITURE_NAME = 'Furnitures';
 const COLLECTION_FOOD_NAME = 'Food';
-
 const productSchema = new Schema({
     product_name: {
         type: String,
@@ -22,6 +21,10 @@ const productSchema = new Schema({
         type: String,
         unique: true,
         trim: true
+    },
+    categoryId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Category',
     },
     product_description: {
         type: String,
@@ -136,20 +139,22 @@ const foodSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Shop'
     },
-    available_time_starts:{
-        type:String,
+    available_time_starts: {
+        type: String,
         // required:true,
-        default:"01:00:00"
+        default: "01:00:00"
     },
-    available_time_ends:{
-        type:String,
+    available_time_ends: {
+        type: String,
         // required:true,
-        default:"23:59:00"
+        default: "23:59:00"
     }
 }, {
     collection: COLLECTION_FOOD_NAME,
     timestamps: true
 })
+
+
 // create index for search
 productSchema.index({
     product_name: 'text',
@@ -161,6 +166,11 @@ productSchema.pre('save', function (next) {
     this.product_slug = slugify(this.product_name, { lower: true })
     next()
 })
+
+
+// hang ton kho
+
+
 
 module.exports = {
     product: model(DOCUMENT_NAME, productSchema),

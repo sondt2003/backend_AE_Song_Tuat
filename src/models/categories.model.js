@@ -1,4 +1,4 @@
-const {model, Schema} = require("mongoose");
+const { model, Schema } = require("mongoose");
 
 // hang ton kho
 const DOCUMENT_NAME = 'Category';
@@ -6,32 +6,45 @@ const COLLECTION_NAME = 'Categories';
 
 const categorySchema = new Schema({
     category_name: {
+        required: true,
         type: String,
-        default: 'unKnow'
+        unique: true,
+        trim: true
     },
     category_image: {
-        type: Number,
+        type: String,
         required: true
     },
     category_parent_id: {
         type: Schema.Types.ObjectId,
-        ref: 'Product'
+        ref: 'Category'
     },
-    category_position:{
+    category_position: {
         type: Number,
-       default:0,
-    },
-    category_status: {
-        type: Schema.Types.ObjectId,
-        ref: 'Shop'
+        default: 0,
     },
     category_priority: {
         type: Number,
-        default:0,
+        default: 0,
+    },
+    isDraft: {
+        type: Boolean,
+        default: false, // khong dk select ra
+        index: true,
+        select: false // khong lay field nay ra
+    },
+    isPublished: {
+        type: Boolean,
+        default: true, // khong dk select ra
+        index: true,
+        select: false // khong lay field nay ra
     },
 }, {
     timestamps: true,
     collection: COLLECTION_NAME
 });
 
-module.exports = model(DOCUMENT_NAME, categorySchema)
+
+module.exports = {
+    category: model('Category', categorySchema)
+}

@@ -3,9 +3,10 @@ const { product, food, clothing } = require("../models/product.model");
 const { insertInventory } = require("../models/repositories/inventory.repo");
 const { findAllDraftsForShop, findAllPublishForShop, publishProductByShop, searchProductByUser, findAllProducts, findById, getProductById,
     advancedSearch,
-    findByIdAndDiscount
+    findByIdAndDiscount,
+    findAllProductsCategory
 } = require("../models/repositories/product.repo")
-const { getSelectData, unGetSelectData } = require("../utils");
+const { getSelectData, unGetSelectData, convert2ObjectId } = require("../utils");
 
 class ProductService {
 
@@ -49,12 +50,21 @@ class ProductService {
         return await searchProductByUser({ keySearch })
     }
 
-    static async findAllProducts({ limit = 50, sort = 'ctime', page = 1, filter = { isPublished: true } }) {
-        return await findAllProducts({ limit, sort, filter, page, select: getSelectData(['product_name', 'product_price', 'product_thumb', 'product_shop','image']) })
+    static async findAllProducts({ limit = 50, sort = 'ctime', page = 1, filter = { isPublished: true } ,categoryId}) {
+        if (categoryId) {
+            return await findAllProductsCategory({ limit, sort, filter: { isPublished: true, categoryId: convert2ObjectId(categoryId) }, page, select: getSelectData(['product_name', 'product_price', 'product_thumb', 'product_shop', 'image']) })
+        } else {
+            return await findAllProducts({ limit, sort, filter, page, select: getSelectData(['product_name', 'product_price', 'product_thumb', 'product_shop', 'image',"categoryId"]) })
+        }
+
     }
 
-    static async findOneProduct(product_id,isDiscount=false) {
-        return await findByIdAndDiscount({ product_id,isDiscount, unSelect: unGetSelectData(['__v', 'variations']) })
+    // static async findAllProductsCategory({ limit = 50, sort = 'ctime', page = 1 ,categoryId}) {
+    //     return await findAllProductsCategory({ limit, sort, filter:{ isPublished: true,categoryId},categoryId, page, select: getSelectData(['product_name', 'product_price', 'product_thumb', 'product_shop','image']) })
+    // }
+
+    static async findOneProduct(product_id, isDiscount = false) {
+        return await findByIdAndDiscount({ product_id, isDiscount, unSelect: unGetSelectData(['__v', 'variations']) })
     }
 
     static async findProductById(product_id) {
@@ -67,7 +77,7 @@ class ProductService {
 }
 class Product {
     constructor({ product_name, product_thumb, product_description, product_price,
-        product_type, product_shop, product_attributes, product_quality,
+        product_type, product_shop, product_attributes, product_quality, categoryId
     }) {
         this.product_name = product_name;
         this.product_thumb = product_thumb;
@@ -77,6 +87,7 @@ class Product {
         this.product_shop = product_shop;
         this.product_attributes = product_attributes;
         this.product_quality = product_quality;
+        this.categoryId = categoryId;
     }
     async createProduct(product_id) {
         const newProduct = await product.create({ ...this, _id: product_id })
