@@ -17,7 +17,7 @@ class CommentService {
 
         const comment = new Comment({
             comment_product_id: productId,
-            comment_user_id: userId,
+            comment_user_id: convert2ObjectId(userId),
             comment_content: content,
             comment_parent_id: parentCommentId
         })
@@ -25,7 +25,7 @@ class CommentService {
         let rightValue = 0
         if (parentCommentId) {
             // reply comment
-            const parentComment = await Comment.findById(parentCommentId)
+            const parentComment = await Comment.findById(parentCommentId);
             if (!parentComment) throw new Api404Error('Parent comment not found')
 
             rightValue = parentComment.comment_right
@@ -105,7 +105,7 @@ class CommentService {
     static async validateProductExists(productId) {
         // check product exists in the database
         const foundProduct = await ProductService.findProductById(productId)
-        if (!foundProduct) throw Api404Error('Product not found')
+        if (!foundProduct) throw new Api404Error('Product not found')
     }
 
     static async deleteComment({
@@ -116,7 +116,7 @@ class CommentService {
 
         // detect left and right of commentId
         const comment  = await Comment.findById(commentId);
-        if (!comment) throw Api404Error('Comment not found')
+        if (!comment) throw new Api404Error('Comment not found')
 
         // get left, right
         const leftValue = comment.comment_left

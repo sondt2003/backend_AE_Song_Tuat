@@ -137,7 +137,7 @@ class AccessService {
         }
     }
 
-    signUp = async ({name, email, password, msisdn}) => {
+    signUp = async ({name, email, password, msisdn,address,latitude,longitude}) => {
         // step1: check email exists?
         const holderShop = await shopModel.findOne({email}).lean()
         if (holderShop) {
@@ -147,7 +147,7 @@ class AccessService {
         const passwordHash = await bcrypt.hash(password, 10)
 
         const newShop = await shopModel.create({
-            name, email, password: passwordHash, msisdn, roles: [RoleShop.SHOP]
+            name, email, password: passwordHash, msisdn, roles: [RoleShop.SHOP],address,latitude,longitude
         })
 
         if (!newShop) {
@@ -215,6 +215,33 @@ class AccessService {
                     fields: ['key'],
                     object: newKey
                 })
+        }
+    }
+
+
+    updateUser = async ({userId,name,avatar, email, password, msisdn,address,latitude,longitude}) => {
+        // step1: check email exists?
+        const holderShop = await shopModel.findOne({email}).lean()
+        if (!holderShop) {
+            throw new Api403Error("Thông tin shop đã Không Tồn Tại")
+        }
+
+        const passwordHash = await bcrypt.hash(password, 10)
+
+        const updateShop = await shopModel.findByIdAndUpdate(userId,{
+            name,avatar, email, password:passwordHash, msisdn,address,latitude,longitude
+        },{new:true})
+
+        if (!updateShop) {
+            return null;
+        }
+        return {
+            shop: getInfoData(
+                {
+                    fields: ['_id', 'name', 'email', 'msisdn',"address","avatar",'latitude','longitude'],
+                    object: updateShop
+                }
+            )
         }
     }
 }

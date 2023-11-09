@@ -4,7 +4,10 @@ const {OK} = require("../core/success.response");
 
 class CommentController {
     createComment = catchAsync(async(req, res, next) => {
-        OK(res,  "Create comment success", await CommentService.createComment(req.body))
+        OK(res,  "Create comment success", await CommentService.createComment({
+            ...req.body,
+            userId: req.user.userId
+        }))
     });
 
     getCommentsByParentId = catchAsync(async(req, res, next) => {

@@ -23,6 +23,10 @@ class AccessController {
     signUp = catchAsync(async (req, res) => {
         CREATED(res, "Register success", await accessService.signUp(req.body))
     })
+
+    updateUser = catchAsync(async (req, res) => {
+        CREATED(res, "Register success", await accessService.updateUser({userId: req.user.userId,...req.body}))
+    })
 }
 
 module.exports = new AccessController()
