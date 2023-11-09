@@ -1,10 +1,10 @@
 const express = require('express')
 const router = express.Router()
-const accessController = require('../../controllers/access.controller')
 const {authenticationV2} = require("../../auth/authUtils");
-const validation = require('../../middleware/validators/access.validator')
+const validation = require('../../middleware/validators/access.validator');
+const shopController = require('../../controllers/shop.controller');
 
 router.use(authenticationV2)
-router.patch('/', accessController.updateUser)
+router.patch('/', shopController.updateUser)
 
 module.exports = router
