@@ -1,6 +1,6 @@
 const fs = require('fs')
-const files = fs.readdirSync('./src/factories/notifications')
-const {NotificationService} = require('../../services/notification.service')
+const files = fs.readdirSync('../../factories/notifications')
+const {NotificationService} = require('../../services/shop/notification.service')
 const {AppConstant} = require("../../constants/app.constant");
 
 const capitalizeFirstLetter = (string) => {
