@@ -42,6 +42,15 @@ const shopSchema = new Schema(
       type: Array,
       default: [],
     },
+    address:{
+      type: String,
+    },
+    latitude:{
+      type: String,
+    },
+    longitude:{
+      type: String,
+    }
   },
   {
     timestamps: true,

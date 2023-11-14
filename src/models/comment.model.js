@@ -5,7 +5,8 @@ const COLLECTION_NAME = 'Comments';
 
 const apiKeySchema = new Schema({
     comment_product_id: {type: Schema.Types.ObjectId, ref: 'Product'},
-    comment_user_id: {type: Number, default: 1},
+    comment_user_id: {  type: Schema.Types.ObjectId,
+        ref: 'Shop'},
     comment_content: {type: String, default: 'text'},
     comment_left: {type: Number, default: 0},
     comment_right: {type: Number, default: 0},
