@@ -3,7 +3,6 @@ const router = express.Router()
 const accessController = require('../../../controllers/shop/access.controller')
 const {authenticationV2} = require("../../../auth/authUtils");
 const validation = require('../../../middleware/validators/access.validator')
-
 /**
  * @swagger
  *   /api/v1/auth/login:
