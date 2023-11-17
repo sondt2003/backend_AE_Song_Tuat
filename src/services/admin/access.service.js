@@ -63,6 +63,7 @@ class AdminAccessService {
         if (!foundAdmin) {
             throw new Api403Error("Admin information does not exist.");
         }
+        
 
         const match = await bcrypt.compare(password, foundAdmin.password);
 

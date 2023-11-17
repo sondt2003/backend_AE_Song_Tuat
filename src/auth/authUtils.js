@@ -8,6 +8,7 @@ const {
 const KeyTokenService = require("../services/keyToken.service");
 const { ignoreWhiteList } = require("./checkAuth");
 
+
 const HEADER = {
   API_KEY: "x-api-key",
   AUTHORIZATION: "authorization",

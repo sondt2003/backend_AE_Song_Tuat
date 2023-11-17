@@ -136,6 +136,7 @@ class AccessService {
           tokens,
         };
     }
+    
 
     signUp = async ({name, email, password, msisdn,address,latitude,longitude}) => {
         // step1: check email exists?
