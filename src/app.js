@@ -6,9 +6,9 @@ const compression = require("compression");
 const cookieParser = require("cookie-parser");
 const configs = require("./configs/config");
 const { checkEnable } = require("./utils");
-const cors = require('cors')
-// //app.js
-app.use(cors())
+// const cors = require('cors')
+// // //app.js
+// app.use(cors())
 app.use(express.static(__dirname + "/public"));
 app.set("views", __dirname + "/views");
 app.set("view engine", "ejs");
