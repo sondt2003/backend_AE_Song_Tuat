@@ -4,6 +4,7 @@ const {Api403Error, Api404Error, Api401Error} = require("../core/error.response"
 const KeyTokenService = require('../services/keyToken.service')
 const {ignoreWhiteList} = require('./checkAuth')
 
+
 const HEADER = {
     API_KEY: 'x-api-key',
     AUTHORIZATION: 'authorization',
