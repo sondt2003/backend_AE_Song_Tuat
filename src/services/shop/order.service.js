@@ -228,10 +228,14 @@ class OrderService {
     return orderFound;
   }
 
-  static async getOneOrderByUser({ userId }) {
+  static async getOneOrderByUser({ userId ,orderId}) {
     const foundOrder = await orderModel.findOne({
       order_userId: userId,
+      _id:orderId
     });
+    if (!foundOrder) {
+      throw new BusinessLogicError("Don't Have Order");
+    }
     return foundOrder;
   }
 
