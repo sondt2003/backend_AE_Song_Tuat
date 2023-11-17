@@ -107,6 +107,7 @@ app.use(
 
 // init routes
 app.use('', require('./routes/shop'))
+app.use('',require('./routes/admin'))
 
 
 // process handler
