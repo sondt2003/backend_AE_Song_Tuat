@@ -23,7 +23,7 @@ class OrderController {
 
     getOneOrderByUser = catchAsync(async (req, res, next) => {
         OK(res,  "Get one order by user success",
-            await OrderService.getOneOrderByUser({userId: req.params.userId}));
+            await OrderService.getOneOrderByUser({userId: req.user.userId,orderId:req.params.orderId}));
     })
 
     cancelOrderByUser = catchAsync(async (req, res, next) => {
