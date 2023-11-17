@@ -85,8 +85,8 @@ if (checkEnable(configs.redis.enable)) {
 }
 
 // init swagger
-const { openApi, configSwagger } = require("./configs/config.swagger");
-openApi(app);
+const {openApi, configSwagger} = require('./configs/config.swagger')
+openApi(app)
 
 // init logger
 const expressWinston = require("express-winston");
@@ -106,8 +106,7 @@ app.use(
 // }
 
 // init routes
-app.use("", require("./routes/shop"));
-app.use("", require("./routes/admin"));
+app.use('', require('./routes/shop'))
 
 
 // process handler
