@@ -35,12 +35,16 @@ const findAllPublishForShop = async ({ query, limit, skip }) => {
 // search full text
 const searchProductByUser = async ({ keySearch }) => {
     const regexSearch = new RegExp(keySearch)
+
+    console.log(`Searching : ${regexSearch}`)
     return await product.find({
         isPublished: true,
-        $text: { $search: regexSearch }
-    }, { score: { $meta: 'textScore' } })
-        .sort({ score: { $meta: 'textScore' } })
-        .lean()
+        // $text: { $search: regexSearch }
+        $or: [ 
+            { product_name: { $regex: keySearch, $options: "i" }}, 
+            { product_description: {$regex: keySearch, $options: "i" } } 
+        ]
+    }).sort().lean()
 }
 
 const findAllProducts = async ({ limit, sort, page, filter, select }) => {
