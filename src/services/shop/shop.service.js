@@ -1,7 +1,8 @@
 const shopModel = require("../../models/shop.model");
 const bcrypt = require("bcrypt");
 const { getInfoData } = require("../../utils");
-const { Api403Error } = require("../../core/error.response");
+const { Api403Error, Api404Error } = require("../../core/error.response");
+const addressModel = require("../../models/address.model");
 
 const findByEmail = async ({
   email,
@@ -13,7 +14,7 @@ const findByEmail = async ({
     name: 5,
   },
 }) => {
-  return await shopModel.findOne({ email }).select(select).lean();
+  return await shopModel.findOne({ email }).select(select).populate("address_id").lean();
 };
 class ShopService {
   static updateUser = async ({
@@ -23,15 +24,18 @@ class ShopService {
     email,
     password,
     msisdn,
-    address,
+    addressId,
     latitude,
     longitude,
   }) => {
     // step1: check email exists?
-    const holderShop = await shopModel.findOne({ email }).lean();
-    if (holderShop) {
+    const holderShop = await shopModel.findById(userId).lean();
+    if (!holderShop) {
       throw new Api403Error("Thông tin shop đã Tồn Tại");
     }
+    const foundAddress = await addressModel.findOne({_id:addressId,user_id:userId}).lean();
+    if (!foundAddress) throw new Api404Error('Address not found')
+ 
 
     const passwordHash = await bcrypt.hash(password, 10);
 
@@ -43,12 +47,12 @@ class ShopService {
         email,
         password: passwordHash,
         msisdn,
-        address,
         latitude,
         longitude,
+        address_id:addressId
       },
       { new: true }
-    );
+    ).populate("address_id");
 
     if (!updateShop) {
       return null;
@@ -60,10 +64,8 @@ class ShopService {
           "name",
           "email",
           "msisdn",
-          "address",
+          "address_id",
           "avatar",
-          "latitude",
-          "longitude",
         ],
         object: updateShop,
       }),

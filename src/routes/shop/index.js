@@ -23,5 +23,7 @@ router.use('/api/v1/comment', require('./comment'));
 router.use('/api/v1/auth', require('./auth'));
 router.use('/api/v1/user', require('./shop'));
 router.use('/api/v1/category', require('./category'));
+router.use('/api/v1/address', require('./address'));
+router.use('/api/v1/favorite', require('./favorite'));
 
 module.exports = router;

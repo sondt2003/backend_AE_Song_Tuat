@@ -129,14 +129,13 @@ class AccessService {
 
         //
         return {
-            shop: getInfoData({
-                fields: ['_id', 'name', 'email'],
-                object: foundShop
-            }),
-            tokens
-        }
+          shop: getInfoData({
+            fields: ["_id", "name", "email", "avatar","address_id"],
+            object: foundShop,
+          }),
+          tokens,
+        };
     }
-    
 
     signUp = async ({name, email, password, msisdn,address,latitude,longitude}) => {
         // step1: check email exists?

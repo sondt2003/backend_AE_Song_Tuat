@@ -166,6 +166,7 @@ router.patch('/:productId', productController.updateProduct)
  *             application/json
  */
 router.put('/publish/:id', productController.publishProductByShop)
+router.put('/draft/:id', productController.draftProductByShop)
 
 // query
 /**

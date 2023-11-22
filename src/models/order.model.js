@@ -19,7 +19,12 @@ const orderSchema = new Schema({
         state,
         country,
     }*/
-    order_payment:{type:Object,default:{}},
+    order_payment:{
+        type: String,
+        require: true,
+        enum: ['credit_card ', 'pay_pal', 'bank_transfer', 'cash_on_Delivery','cryptocurrency','e_wallets','cheque','mobile_payment'],
+        default: 'cash_on_Delivery'
+    },
     order_products:{type:Array,required:true},
     order_trackingNumber:{type:String,default:"#000011237128"},
     order_status: {
@@ -33,6 +38,11 @@ const orderSchema = new Schema({
     //shipped dơn hàng đã được vận chuyển và trên dường đến nơi
     //canceled dơn hàng đã bị hủy bởi khác hàng hoặc người bán
     //delivered đơn hàng đã giao tới khách hàng
+
+    isBasket:{
+        type: Schema.Types.Boolean,
+        default: 'false'
+    }
 }, {
     collection: COLLECTION_NAME,
     timestamps: {
