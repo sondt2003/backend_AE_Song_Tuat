@@ -1,7 +1,7 @@
 const { product } = require("../product.model")
 const { Types } = require("mongoose")
 const { convert2ObjectId } = require("../../utils");
-const { BusinessLogicError } = require("../../core/error.response");
+const { BusinessLogicError, Api404Error } = require("../../core/error.response");
 const ApiFeatures = require("./../../utils/api-feature.util");
 const discountModel = require("../discount.model");
 const { findAllDiscountCodesSelect, findAllDiscountCodesUnSelect } = require("./discount.repo");
@@ -18,6 +18,24 @@ const publishProductByShop = async ({ product_shop, product_id }) => {
     // update isDraft, isPublish
     foundShop.isDraft = false
     foundShop.isPublished = true
+
+    const { modifiedCount } = await foundShop.update(foundShop)
+
+    return modifiedCount;
+}
+
+const draftProductByShop = async ({ product_shop, product_id }) => {
+    // find one
+    const foundShop = await product.findOne({
+        product_shop: new Types.ObjectId(product_shop),
+        _id: new Types.ObjectId(product_id),
+    })
+
+    if (!foundShop) return foundShop
+
+    // update isDraft, isPublish
+    foundShop.isDraft = true
+    foundShop.isPublished = false
 
     const { modifiedCount } = await foundShop.update(foundShop)
 
@@ -78,10 +96,11 @@ const getProductByIdUnselect = async ({ productId, select }) => {
 const findByIdAndDiscount = async ({ product_id, unSelect, isDiscount }) => {
     const foundShop = await findById({ product_id });
     const productShopId = foundShop.product_shop;
-    console.log("foundShop:::::::::::::::" + productShopId)
     if (!productShopId) throw new BusinessLogicError("Don't have productShopId")
 
-    const foundFood = await product.findById(product_id).select(unSelect)
+    const foundFood = await product.findOne({_id:product_id,isDraft:false,isPublished:true}).select(unSelect).lean();
+
+    if (!foundFood) throw new Api404Error('shop not found')
 
     if (isDiscount) {
         const foundDiscount = await findAllDiscountCodesUnSelect(
@@ -105,13 +124,11 @@ const findByIdAndDiscount = async ({ product_id, unSelect, isDiscount }) => {
         )
 
         return {
-            ...foundFood._doc,
+            ...foundFood,
             discount: foundDiscount,
         }
     } else{
-        return {
-            ...foundFood._doc,
-        }
+        return foundFood;
     }
 }
 
@@ -233,5 +250,6 @@ module.exports = {
     advancedSearchV2,
     findByIdAndDiscount,
     getProductByIdUnselect,
-    findAllProductsCategory
+    findAllProductsCategory,
+    draftProductByShop
 }

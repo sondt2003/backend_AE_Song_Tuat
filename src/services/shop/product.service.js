@@ -4,7 +4,8 @@ const { insertInventory } = require("../../models/repositories/inventory.repo");
 const { findAllDraftsForShop, findAllPublishForShop, publishProductByShop, searchProductByUser, findAllProducts, findById, getProductById,
     advancedSearch,
     findByIdAndDiscount,
-    findAllProductsCategory
+    findAllProductsCategory,
+    draftProductByShop
 } = require("../../models/repositories/product.repo")
 const { getSelectData, unGetSelectData, convert2ObjectId } = require("../../utils");
 
@@ -59,10 +60,9 @@ class ProductService {
 
     }
 
-    // static async findAllProductsCategory({ limit = 50, sort = 'ctime', page = 1 ,categoryId}) {
-    //     return await findAllProductsCategory({ limit, sort, filter:{ isPublished: true,categoryId},categoryId, page, select: getSelectData(['product_name', 'product_price', 'product_thumb', 'product_shop','image']) })
-    // }
-
+    static async draftProductByShop({ product_shop, product_id }) {
+        return await draftProductByShop({ product_shop, product_id })
+    }
     static async findOneProduct(product_id, isDiscount = false) {
         return await findByIdAndDiscount({ product_id, isDiscount, unSelect: unGetSelectData(['__v', 'variations']) })
     }

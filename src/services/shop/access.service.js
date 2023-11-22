@@ -130,7 +130,7 @@ class AccessService {
         //
         return {
           shop: getInfoData({
-            fields: ["_id", "name", "email", "avatar"],
+            fields: ["_id", "name", "email", "avatar","address_id"],
             object: foundShop,
           }),
           tokens,

@@ -1,5 +1,5 @@
 const { findCartById } = require("../../models/repositories/cart.repo");
-const { BusinessLogicError, Api401Error } = require("../../core/error.response");
+const { BusinessLogicError, Api401Error, Api404Error } = require("../../core/error.response");
 const { checkProductByServer } = require("../../models/repositories/product.repo");
 const { DiscountService } = require("./discount.service");
 const { acquireLockV2, releaseLockV2 } = require("../redis.service");
@@ -10,6 +10,7 @@ const {
 } = require("../../models/repositories/inventory.repo");
 const { convert2ObjectId } = require("../../utils");
 const { OrderUpdater } = require("../../models/repositories/order.repo");
+const addressModel = require("../../models/address.model");
 
 class OrderService {
   /*
@@ -169,8 +170,8 @@ class OrderService {
     shop_order_ids,
     cartId,
     userId,
-    order_shipping = {},
-    user_payment = {},
+    addressId,
+    user_payment,
   }) {
     const { shop_order_ids_new, checkout_order } =
       await OrderService.checkoutReview({
@@ -203,6 +204,8 @@ class OrderService {
       const { productId } = products[i];
       await CartService.getItemInCart({ userId, productId });
     }
+    const order_shipping = await addressModel.findOne({_id:addressId,user_id:userId}).lean();
+    if (!order_shipping) throw new Api404Error('Address not found')
 
     const newOrder = await orderModel.create({
       order_userId: userId,
