@@ -1,11 +1,14 @@
 const express = require("express");
 const morgan = require("morgan");
 const app = express();
+
 const compression = require("compression");
 const cookieParser = require("cookie-parser");
 const configs = require("./configs/config");
 const { checkEnable } = require("./utils");
-
+const cors = require('cors')
+// // //app.js
+app.use(cors())
 app.use(express.static(__dirname + "/public"));
 app.set("views", __dirname + "/views");
 app.set("view engine", "ejs");
@@ -82,8 +85,8 @@ if (checkEnable(configs.redis.enable)) {
 }
 
 // init swagger
-const { openApi, configSwagger } = require("./configs/config.swagger");
-openApi(app);
+const {openApi, configSwagger} = require('./configs/config.swagger')
+openApi(app)
 
 // init logger
 const expressWinston = require("express-winston");
@@ -103,8 +106,9 @@ app.use(
 // }
 
 // init routes
-app.use("", require("./routes/shop"));
-app.use("", require("./routes/admin"));
+app.use('', require('./routes/shop'))
+app.use('',require('./routes/admin'))
+
 
 // process handler
 require("./middleware/processHandler");

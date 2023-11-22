@@ -7,6 +7,7 @@ class AdminAccessController {
     OK(res, "Login success", await adminAccessService.signIn(req.body)); // Update service method name
   });
 
+  
   refreshToken = catchAsync(async (req, res) => {
     OK(
       res,
