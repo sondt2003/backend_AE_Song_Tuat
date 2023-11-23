@@ -242,7 +242,7 @@ class OrderService {
     return foundOrder;
   }
 
-  static async cancelOrderByUser({ userId, orderId }) {
+  static async cancelOrderByUser({ userId, orderId ,reason}) {
     const updateOrder = await new OrderUpdater()
       .setModel(orderModel)
       .setFilter({
@@ -252,6 +252,7 @@ class OrderService {
       })
       .setBodyUpdate({
         order_status: "canceled",
+        order_reason:reason
       })
       .executeUpdate();
     if (!updateOrder) {
