@@ -7,14 +7,9 @@ const {getInfoData} = require('../../utils')
 const {Api403Error, BusinessLogicError, Api401Error} = require("../../core/error.response");
 const {findByEmail} = require('./shop.service')
 const apiKeyModel = require('../../models/apikey.model')
+const RoleShop = require("../../utils/role.util")
 
-const RoleShop = {
-    SHOP: 'SHOP',
-    WRITER: '001',
-    READ: '002',
-    DELETE: '003',
-    ADMIN: '000'
-}
+
 
 class AccessService {
 
@@ -137,7 +132,7 @@ class AccessService {
         };
     }
 
-    signUp = async ({name, email, password, msisdn,address,latitude,longitude}) => {
+    signUp = async ({name, email, password, msisdn,address,latitude,longitude},role) => {
         // step1: check email exists?
         const holderShop = await shopModel.findOne({email}).lean()
         if (holderShop) {
@@ -147,7 +142,7 @@ class AccessService {
         const passwordHash = await bcrypt.hash(password, 10)
 
         const newShop = await shopModel.create({
-            name, email, password: passwordHash, msisdn, roles: [RoleShop.SHOP],address,latitude,longitude
+            name, email, password: passwordHash, msisdn, roles: role?[role]:[RoleShop.USER],address,latitude,longitude
         })
 
         if (!newShop) {
@@ -199,7 +194,7 @@ class AccessService {
         console.log('Created token success:: ', tokens)
         // apiKey
         const newKey = await apiKeyModel.create({
-            key: crypto.randomBytes(64).toString('hex'), permission: ['0000']
+            key: crypto.randomBytes(64).toString('hex'), permission: role?[role]:[RoleShop.USER]
         })
 
         return {

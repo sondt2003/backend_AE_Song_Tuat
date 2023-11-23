@@ -108,6 +108,7 @@ class AdminAccessService {
     }
 
     async signUp({ f_name, l_name, email, password, phone, image }) {
+                // signUp({ f_name, l_name, email, password, phone, image },RoleShop.ADMIN)
         const existingAdmin = await adminModel.findOne({ email });
         console.log("signUp")
         if (existingAdmin) {

@@ -30,24 +30,7 @@ router.use(authenticationV2)
  *           contents:
  *             application/json
  */
-router.post('/amount', discountController.getDiscountAmount)
-/**
- * @swagger
- *   /api/v1/discount/list-product-code:
- *     get:
- *       summary: Get discount by product
- *       tags: [Discount]
- *       responses:
- *         "400":
- *           $ref: '#/components/responses/400'
- *         "401":
- *           $ref: '#/components/responses/401'
- *         "200":
- *           description: List discount
- *           contents:
- *             application/json
- */
-router.get('/list-product-code', discountController.getAllDiscountCodeWithProduct)
+
 
 // authentication
 
@@ -86,7 +69,6 @@ router.post('', discountController.createDiscountCode)
  *           contents:
  *             application/json
  */
-router.get('', discountController.getAllDiscountCodesByShop)
 /**
  * @swagger
  *   /api/v1/discount/:
@@ -105,23 +87,5 @@ router.get('', discountController.getAllDiscountCodesByShop)
  *             application/json
  */
 router.get('/search/:keySearch', discountController.cancelDiscountCode)
-/**
- * @swagger
- *   /api/v1/discount/:
- *     post:
- *       summary: Create discount
- *       tags: [Discount]
- *       security: []
- *       responses:
- *         "400":
- *           $ref: '#/components/responses/400'
- *         "401":
- *           $ref: '#/components/responses/401'
- *         "200":
- *           description: Discount info
- *           contents:
- *             application/json
- */
 
-// router
 module.exports = router
