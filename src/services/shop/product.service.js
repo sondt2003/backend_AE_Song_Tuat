@@ -53,9 +53,9 @@ class ProductService {
 
     static async findAllProducts({ limit = 50, sort = 'ctime', page = 1, filter = { isPublished: true } ,categoryId}) {
         if (categoryId) {
-            return await findAllProductsCategory({ limit, sort, filter: { isPublished: true, categoryId: convert2ObjectId(categoryId) }, page, select: getSelectData(['product_name', 'product_price', 'product_thumb', 'product_shop', 'image']) })
+            return await findAllProductsCategory({ limit, sort, filter: { isPublished: true, categoryId: convert2ObjectId(categoryId) }, page, select: getSelectData(['product_name', 'product_price', 'product_thumb', 'product_shop', 'image','product_distance']) })
         } else {
-            return await findAllProducts({ limit, sort, filter, page, select: getSelectData(['product_name', 'product_price', 'product_thumb', 'product_shop', 'image',"categoryId"]) })
+            return await findAllProducts({ limit, sort, filter, page, select: getSelectData(['product_name','product_distance', 'product_price', 'product_thumb', 'product_shop', 'image',"categoryId"]) })
         }
 
     }
