@@ -38,6 +38,10 @@ const shopSchema = new Schema(
       type: Schema.Types.Boolean,
       default: false,
     },
+    profile:{
+      type: Schema.Types.ObjectId,
+      ref: "UserProfile",
+    },
     roles: {
       type: Array,
       default: [],
