@@ -9,7 +9,7 @@ class FavoriteService {
         const foundProduct =await product.findById(productId)
         if (!foundProduct) throw new Api404Error('Product not found')
 
-        return await favoriteModel.create({ product_id:productId, user_id:userId})
+        return (await favoriteModel.create({ product_id:productId, user_id:userId})).populate("product_id")
     }
 
     static async updateUserFavorite({ favoriteId, userId,productId}) {
@@ -19,11 +19,11 @@ class FavoriteService {
         const foundProduct =await product.findById(productId)
         if (!foundProduct) throw new Api404Error('Product not found')
 
-        return await favoriteModel.findOneAndUpdate({_id:favoriteId,user_id:userId},{ product_id:productId},{new:true}).lean();
+        return await favoriteModel.findOneAndUpdate({_id:favoriteId,user_id:userId},{ product_id:productId},{new:true}).populate("product_id").lean();
     }
 
     static async deleteFavorite({ favoriteId, userId,productId}) {
-        const deleteFavorite =await favoriteModel.findOneAndDelete({_id:favoriteId,product_id:productId,user_id:userId}).lean()
+        const deleteFavorite =await favoriteModel.findOneAndDelete({_id:favoriteId,product_id:productId,user_id:userId}).populate("product_id").lean()
         if (!deleteFavorite) throw new Api404Error('Favorite not found')
 
         return deleteFavorite;
@@ -31,11 +31,11 @@ class FavoriteService {
     static async getListUserFavorite(userId) {
         return await favoriteModel.find({
             user_id: userId
-        }).lean()
+        }).populate("product_id").lean()
     }
 
     static async getUserFavoriteDetails({ favoriteId ,userId}) {
-        const foundFavorite=await favoriteModel.findOne({_id:favoriteId,user_id:userId})
+        const foundFavorite=await favoriteModel.findOne({_id:favoriteId,user_id:userId}).populate("product_id").lean();
         if (!foundFavorite) throw new Api404Error('Favorite not found')
         return foundFavorite;
     }

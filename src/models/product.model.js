@@ -75,6 +75,9 @@ const productSchema = new Schema({
         index: true,
         select: false // khong lay field nay ra
     },
+    distance:{
+        type: String,
+    }
 }, {
     timestamps: true,
     collection: COLLECTION_NAME
