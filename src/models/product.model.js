@@ -75,7 +75,7 @@ const productSchema = new Schema({
         index: true,
         select: false // khong lay field nay ra
     },
-    distance:{
+    product_distance:{
         type: String,
     }
 }, {
@@ -166,8 +166,8 @@ productSchema.index({
 
 // Document middleware runs before .save and .create...
 productSchema.pre('save', function (next) {
-    this.product_slug = slugify(this.product_name, { lower: true })
-    this.distance = parseFloat((Math.random() * 10).toFixed(2))+"km";
+    this.product_slug = slugify(this.product_name, { lower: true });
+    this.product_distance = parseFloat((Math.random() * 10).toFixed(2))+"km";
     next()
 })
 
