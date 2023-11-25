@@ -25,7 +25,7 @@ router.use('/api/v1/product', require('./product/search'));
 router.use('/api/v1/category', require('./category/search'));
 router.use('/api/v1/discount', require('./discount/search'));
 router.use('/api/v1/transaction-history', require('./transaction-history'));
-
+router.use("/api/v1/profile",require('./profile'))
 
 
 // check permission

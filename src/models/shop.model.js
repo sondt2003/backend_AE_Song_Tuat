@@ -40,7 +40,7 @@ const shopSchema = new Schema(
     },
     profile:{
       type: Schema.Types.ObjectId,
-      ref: "UserProfile",
+      ref: "Profile",
     },
     roles: {
       type: Array,
