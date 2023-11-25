@@ -39,7 +39,7 @@ class AddressService {
     }
     static async getListUserAddress(userId) {
         return await addressModel.find({
-            shop_id: userId
+            user_id: userId
         }).lean()
     }
 

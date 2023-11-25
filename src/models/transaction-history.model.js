@@ -9,6 +9,10 @@ const transactionHistorySchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Order",
     },
+    user_id: {
+      type: Schema.Types.ObjectId,
+      ref: "Shop",
+    },
     // amount: {
     //     type: String,
     //     required: true,
