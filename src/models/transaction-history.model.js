@@ -6,36 +6,47 @@ const COLLECTION_NAME = "TransactionHistories";
 const transactionHistorySchema = new Schema(
   {
     order_id: {
-      type: String,
-      required: true,
+      type: Schema.Types.ObjectId,
+      ref: "Order",
     },
-    amount: {
-        type: String,
-        required: true,
-    },
+    // amount: {
+    //     type: String,
+    //     required: true,
+    // },
     currency: {
       type: String,
       required: true,
     },
     payment_method: {
       type: String,
-      required: true,
+      require: true,
+      enum: [
+        "credit_card ",
+        "pay_pal",
+        "bank_transfer",
+        "cash_on_Delivery",
+        "cryptocurrency",
+        "e_wallets",
+        "cheque",
+        "mobile_payment",
+      ],
+      default: "cash_on_Delivery",
     },
     payment_date_time: {
-      type: String,
+      type: Date,
       required: true,
     },
-    transaction_id: {
-      type: String,
-      required: true,
-    },
+    // transaction_id: {
+    //   type: String,
+    //   required: true,
+    // },
     billing_information: {
-      type: Schema.Types.ObjectId,
-      ref: "Shop",
+      type: String,
+      required: true,
     },
     comments: {
-      type: Schema.Types.ObjectId,
-      ref: "Shop",
+      type: String,
+      required: true,
     },
   },
   {

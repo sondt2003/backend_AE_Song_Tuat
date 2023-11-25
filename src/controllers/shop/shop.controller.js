@@ -7,6 +7,10 @@ class ShopController {
     updateUser = catchAsync(async (req, res) => {
         OK(res, "Register success", await ShopService.updateUser({userId: req.user.userId,...req.body}))
     })
+
+    listShop = catchAsync(async (req, res) => {
+        OK(res, "List Shop success", await ShopService.listShop(req.query))
+    })
 }
 
 module.exports = new ShopController()
