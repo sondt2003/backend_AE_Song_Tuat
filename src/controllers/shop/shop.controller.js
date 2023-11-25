@@ -7,7 +7,9 @@ class ShopController {
     updateUser = catchAsync(async (req, res) => {
         OK(res, "Register success", await ShopService.updateUser({userId: req.user.userId,...req.body}))
     })
-
+    updateUserV2 = catchAsync(async (req, res) => {
+        OK(res, "Register success", await ShopService.updateUserV2({userId: req.user.userId,...req.body}))
+    })
     listShop = catchAsync(async (req, res) => {
         OK(res, "List Shop success", await ShopService.listShop(req.query))
     })

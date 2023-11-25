@@ -6,4 +6,5 @@ const shopController = require('../../../controllers/shop/shop.controller');
 router.use(authenticationV2)
 router.get('/', shopController.listShop)
 
+
 module.exports = router
