@@ -1,6 +1,12 @@
 const { findCartById } = require("../../models/repositories/cart.repo");
-const { BusinessLogicError, Api401Error, Api404Error } = require("../../core/error.response");
-const { checkProductByServer } = require("../../models/repositories/product.repo");
+const {
+  BusinessLogicError,
+  Api401Error,
+  Api404Error,
+} = require("../../core/error.response");
+const {
+  checkProductByServer,
+} = require("../../models/repositories/product.repo");
 const { DiscountService } = require("./discount.service");
 const { acquireLockV2, releaseLockV2 } = require("../redis.service");
 const orderModel = require("../../models/order.model");
@@ -84,24 +90,26 @@ class OrderService {
 
       // neu shop_discounts ton tai > 0, check valid
       if (shop_discounts.length > 0) {
-        const { totalPrice, discount = 0 } =
-          await DiscountService.getDiscountAmount({
-            codeId: shop_discounts[0].codeId,
-            userId,
-            shopId,
-            products: checkProductServer,
-          });
+        for (let index = 0; index < shop_discounts.length; index++) {
+          const { totalPrice, discount = 0 } =
+            await DiscountService.getDiscountAmount({
+              codeId: shop_discounts[index].codeId,
+              userId,
+              shopId,
+              products: checkProductServer,
+            });
 
-        if (isOrder) {
-          const addUserUses = await DiscountService.pushUsersUsed({
-            codeId: shop_discounts[0].codeId,
-            userId,
-            shopId,
-          });
-        }
-        checkout_order.totalDiscount += discount;
-        if (discount > 0) {
-          itemCheckout.priceApplyDiscount = checkoutPrice - discount;
+          if (isOrder) {
+            await DiscountService.pushUsersUsed({
+              codeId: shop_discounts[index].codeId,
+              userId,
+              shopId,
+            });
+          }
+          checkout_order.totalDiscount += discount;
+          if (discount > 0) {
+            itemCheckout.priceApplyDiscount = checkoutPrice - discount;
+          }
         }
       }
 
@@ -204,8 +212,10 @@ class OrderService {
       const { productId } = products[i];
       await CartService.getItemInCart({ userId, productId });
     }
-    const order_shipping = await addressModel.findOne({_id:addressId,user_id:userId}).lean();
-    if (!order_shipping) throw new Api404Error('Address not found')
+    const order_shipping = await addressModel
+      .findOne({ _id: addressId, user_id: userId })
+      .lean();
+    if (!order_shipping) throw new Api404Error("Address not found");
 
     const newOrder = await orderModel.create({
       order_userId: userId,
@@ -231,10 +241,10 @@ class OrderService {
     return orderFound;
   }
 
-  static async getOneOrderByUser({ userId ,orderId}) {
+  static async getOneOrderByUser({ userId, orderId }) {
     const foundOrder = await orderModel.findOne({
       order_userId: userId,
-      _id:orderId
+      _id: orderId,
     });
     if (!foundOrder) {
       throw new BusinessLogicError("Don't Have Order");
@@ -242,7 +252,7 @@ class OrderService {
     return foundOrder;
   }
 
-  static async cancelOrderByUser({ userId, orderId ,reason}) {
+  static async cancelOrderByUser({ userId, orderId, reason }) {
     const updateOrder = await new OrderUpdater()
       .setModel(orderModel)
       .setFilter({
@@ -252,7 +262,7 @@ class OrderService {
       })
       .setBodyUpdate({
         order_status: "canceled",
-        order_reason:reason
+        order_reason: reason,
       })
       .executeUpdate();
     if (!updateOrder) {
