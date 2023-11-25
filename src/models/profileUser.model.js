@@ -1,14 +1,13 @@
 const { model, Schema } = require("mongoose");
 
-const DOCUMENT_NAME = "UserProfile";
-const COLLECTION_NAME = "UserProfile";
+const DOCUMENT_NAME = "Profile";
+const COLLECTION_NAME = "Profile";
 
-const userProfilesSchema = new Schema(
+const ProfileSchema = new Schema(
   {
-    birthday: { type: Date },
+    birthday: { type: String },
     gender: { type: String, enum: ["male", "female", "other"] },
     phone: { type: String },
-    // ... other fields for user profile
   },
   {
     collection: COLLECTION_NAME,
@@ -16,4 +15,4 @@ const userProfilesSchema = new Schema(
   }
 );
 
-module.exports = model(DOCUMENT_NAME, userSchema);
+module.exports = model(DOCUMENT_NAME, ProfileSchema);

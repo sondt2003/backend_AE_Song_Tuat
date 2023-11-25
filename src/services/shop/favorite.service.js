@@ -8,7 +8,6 @@ class FavoriteService {
     static async createUserFavorite({ productId, userId}) {
         const foundProduct =await product.findById(productId)
         if (!foundProduct) throw new Api404Error('Product not found')
-
         return (await favoriteModel.create({ product_id:productId, user_id:userId})).populate("product_id")
     }
 
