@@ -11,7 +11,7 @@ class TransactionHistoryController {
         OK(res,  "update User Transaction History success", await TransactionHistoryService.updateUserTransactionHistory({userId: req.user.userId,transactionHistoryId:req.params.transactionHistoryId,...req.body}))
     });
     deleteTransactionHistory = catchAsync(async(req, res, next) => {
-        OK(res,  "delete Transaction History success", await TransactionHistoryService.deleteTransactionHistory({transactionHistoryId:req.params.transactionHistoryId,...req.body}))
+        OK(res,  "delete Transaction History success", await TransactionHistoryService.deleteTransactionHistory({userId: req.user.userId,transactionHistoryId:req.params.transactionHistoryId,...req.body}))
     });
 
     getListUserTransactionHistory =  catchAsync(async(req, res, next) => {
