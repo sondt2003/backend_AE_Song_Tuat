@@ -15,6 +15,7 @@ const {authenticationV2} = require("../../../auth/authUtils");
 router.use(authenticationV2)
 
 router.get('/', orderController.getOrderByUser)
+router.get('/shop', orderController.listOrderStatusByShop)
 
 router.post('/review', orderController.checkoutReview)
 
@@ -24,6 +25,9 @@ router.post('/v2', orderController.orderV2)
 router.get('/:orderId', orderController.getOneOrderByUser)
 
 router.post('/cancel', orderController.cancelOrderByUser)
+
+router.patch('/confirmed/:userId', orderController.updateOrderStatusByShop)
+
 
 // router
 module.exports = router

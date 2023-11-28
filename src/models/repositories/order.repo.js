@@ -1,4 +1,5 @@
 const { BusinessLogicError } = require("../../core/error.response");
+const orderModel = require("../order.model");
 const { product } = require("../product.model");
 const { Types } = require("mongoose");
 const findById = async ({ product_id, unSelect }) => {
@@ -14,6 +15,16 @@ const findById = async ({ product_id, unSelect }) => {
 //         new: isNew
 //     })
 // }
+const findAllOrders = async ({ limit, sort, page, filter, select }) => {
+  const skip = (page - 1) * limit
+  const sortBy = sort === 'ctime' ? { _id: -1 } : { _id: 1 }
+  return await orderModel.find(filter)
+      .sort(sortBy)
+      .skip(skip)
+      .limit(limit)
+      .select(select)
+      .lean();
+}
 
 class OrderUpdater {
   constructor() {
@@ -56,4 +67,5 @@ class OrderUpdater {
 module.exports = {
   findById,
   OrderUpdater,
+  findAllOrders
 };
