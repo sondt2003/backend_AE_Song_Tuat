@@ -1,14 +1,25 @@
-const configVnPay = {};
 const moment = require("moment");
+
+const configVnPay = {
+ ipAddr : "127.0.0.1",
+ tmnCode : "EPRPY8HH",
+ secretKey : "NWVQKRZEKLYJSFJFADHDABKWCAOWEAUU",
+ vnpUrl : "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html",
+ returnUrl : "https://delifood.io.vn/api/v1/vnpay/vnpay_return",
+ version: "2.1.0"
+}
+
+
+
 class VnPayService {
   static async createPaymentUrl({ amount, bankCode }) {
     let date = new Date();
     let createDate = moment(date).format("YYYYMMDDHHmmss");
-    let ipAddr = "127.0.0.1";
-    let tmnCode = "EPRPY8HH";
-    let secretKey = "NWVQKRZEKLYJSFJFADHDABKWCAOWEAUU";
-    let vnpUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    let returnUrl = "http://localhost:8888/order/vnpay_return";
+    let ipAddr = configVnPay.ipAddr;
+    let tmnCode = configVnPay.tmnCode;
+    let secretKey =configVnPay.secretKey
+    let vnpUrl = configVnPay.vnpUrl
+    let returnUrl =configVnPay.returnUrl
     let orderId = moment(date).format("DDHHmmss");
 
     let locale = "vn";
@@ -17,7 +28,7 @@ class VnPayService {
     }
     let currCode = "VND";
     let vnp_Params = {};
-    vnp_Params["vnp_Version"] = "2.1.0";
+    vnp_Params["vnp_Version"] = configVnPay.version
     vnp_Params["vnp_Command"] = "pay";
     vnp_Params["vnp_TmnCode"] = tmnCode;
     vnp_Params["vnp_Locale"] = locale;
@@ -44,7 +55,35 @@ class VnPayService {
     vnpUrl += "?" + querystring.stringify(vnp_Params, { encode: false });
 
     return vnpUrl;
+  };
+
+static async checkMac(req){
+
+  let vnp_Params = req.query;
+
+  let secureHash = vnp_Params['vnp_SecureHash'];
+
+  delete vnp_Params['vnp_SecureHash'];
+  delete vnp_Params['vnp_SecureHashType'];
+
+  vnp_Params = sortObject(vnp_Params);
+
+  let tmnCode = configVnPay.tmnCode;
+  let secretKey = configVnPay.secretKey;
+
+ 
+  let signData = querystring.stringify(vnp_Params, { encode: false });
+  let crypto = require("crypto");     
+  let hmac = crypto.createHmac("sha512", secretKey);
+  let signed = hmac.update(new Buffer(signData, 'utf-8')).digest("hex");     
+
+  if(secureHash === signed){
+     return "Thanh toán thành công!"
+  } else{
+    throw new Api403Error("Sai chữ kí");
   }
+}
+
 }
 
 function sortObject(obj) {

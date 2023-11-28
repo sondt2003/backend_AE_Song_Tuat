@@ -8,7 +8,7 @@ const router = express.Router();
 router.use("/healthcheck", require("./health"));
 
 router.use("/zone", require("./zone"));
-
+router.use("/api/v1/vnpay", require("./vnpay"));
 // check apiKey
 router.use(apiKey);
 
@@ -26,7 +26,7 @@ router.use("/api/v1/discount", require("./discount/search"));
 router.use("/api/v1/transaction-history", require("./transaction-history"));
 router.use("/api/v1/profile", require("./profile"));
 router.use("/api/v1/wallet", require("./wallet"));
-router.use("/api/v1/vnpay", require("./vnpay"));
+
 // check permission
 router.use(permission(RoleShop.ADMIN));
 
