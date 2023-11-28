@@ -1,4 +1,6 @@
+
 const moment = require("moment");
+const { Api403Error } = require("../../core/error.response");
 
 const configVnPay = {
  ipAddr : "127.0.0.1",
@@ -57,32 +59,32 @@ class VnPayService {
     return vnpUrl;
   };
 
-static async checkMac(req){
+  static checkMac(req){
 
-  let vnp_Params = req.query;
+    let vnp_Params = req.query;
+    
+    let secureHash = vnp_Params['vnp_SecureHash'];
 
-  let secureHash = vnp_Params['vnp_SecureHash'];
+    delete vnp_Params['vnp_SecureHash'];
+    delete vnp_Params['vnp_SecureHashType'];
 
-  delete vnp_Params['vnp_SecureHash'];
-  delete vnp_Params['vnp_SecureHashType'];
+    vnp_Params = sortObject(vnp_Params);
 
-  vnp_Params = sortObject(vnp_Params);
+    let tmnCode = configVnPay.tmnCode;
+    let secretKey = configVnPay.secretKey;
 
-  let tmnCode = configVnPay.tmnCode;
-  let secretKey = configVnPay.secretKey;
+    let querystring = require('qs');
+    let signData = querystring.stringify(vnp_Params, { encode: false });
+    let crypto = require("crypto");
+    let hmac = crypto.createHmac("sha512", secretKey);
+    let signed = hmac.update(new Buffer(signData, 'utf-8')).digest("hex");
 
- 
-  let signData = querystring.stringify(vnp_Params, { encode: false });
-  let crypto = require("crypto");     
-  let hmac = crypto.createHmac("sha512", secretKey);
-  let signed = hmac.update(new Buffer(signData, 'utf-8')).digest("hex");     
-
-  if(secureHash === signed){
-     return "Thanh toán thành công!"
-  } else{
-    throw new Api403Error("Sai chữ kí");
+    if(secureHash === signed){
+      return "Thanh toán thành công!"
+    } else{
+      throw new Api403Error('sai chữ kí');
+    }
   }
-}
 
 }
 
