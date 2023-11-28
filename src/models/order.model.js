@@ -80,14 +80,16 @@ for (let i = 0; i < result.length; i++) {
 });
 
 orderSchema.post("findOne", async function (result, next) {
+  if(result) {
     for (let j = 0; j < result.order_products.length; j++) {
-        for (let x = 0; x < result.order_products[j].item_products.length; x++) {
-            const item_products=result.order_products[j].item_products[x];
-            const foundProduct=await product.findById(item_products.productId)
-            .select("-_id -price -product_quality -__v").lean(); 
-            result.order_products[j].item_products[x]={...foundProduct,...item_products}
-        }
-        }
-      next();
+      for (let x = 0; x < result.order_products[j].item_products.length; x++) {
+          const item_products=result.order_products[j].item_products[x];
+          const foundProduct=await product.findById(item_products.productId)
+          .select("-_id -price -product_quality -__v").lean(); 
+          result.order_products[j].item_products[x]={...foundProduct,...item_products}
+      }
+      }
+  }
+    next();
     });
 module.exports = model(DOCUMENT_NAME, orderSchema);

@@ -47,7 +47,7 @@ class CartService {
         const { productId, quantity } = product;
         const query = {
             cart_user_id: userId,
-            'cart_products.productId': productId,
+            'cart_products.shopId': userId,
             cart_state: 'active'
         }
         const cart = await cartModel.findOne(query);

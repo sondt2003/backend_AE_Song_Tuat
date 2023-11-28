@@ -15,7 +15,7 @@ const {
   reservationInventory,
 } = require("../../models/repositories/inventory.repo");
 const { convert2ObjectId } = require("../../utils");
-const { OrderUpdater } = require("../../models/repositories/order.repo");
+const { OrderUpdater, findAllOrders } = require("../../models/repositories/order.repo");
 const addressModel = require("../../models/address.model");
 
 class OrderService {
@@ -271,7 +271,13 @@ class OrderService {
     return updateOrder;
   }
 
-  static async updateOrderStatusByShop({ userId, orderId }) {
+  static async updateOrderStatusByShop({shopId, userId, orderId }) {
+    const foundOrder=await orderModel.findOne({'order_products.shopId': shopId,order_userId:userId,_id:orderId});
+   
+    if(!foundOrder){
+      throw new BusinessLogicError("Don't have order");
+    }
+
     const updateOrder = await new OrderUpdater()
       .setModel(orderModel)
       .setFilter({
@@ -284,9 +290,12 @@ class OrderService {
       })
       .executeUpdate();
     if (!updateOrder) {
-      throw new BusinessLogicError("Cancel Failed");
+      throw new BusinessLogicError("confirmed Failed");
     }
     return updateOrder;
+  }
+  static async listOrderStatusByShop({shopId, orderId ,limit = 50, sort = 'ctime', page = 1}) {
+    return await findAllOrders({ limit, sort, filter:{'order_products.shopId': shopId}, page});
   }
 }
 
