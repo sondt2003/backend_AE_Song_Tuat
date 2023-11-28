@@ -16,5 +16,10 @@ class VnPayController {
       )
     );
   };
+  vnPayReturn = async(req,res)=>{
+    catchAsync(OK(res,"Thanh toán thành công",await VnPayService.checkMac(req)))
+  } 
+
+
 }
 module.exports = new VnPayController();
