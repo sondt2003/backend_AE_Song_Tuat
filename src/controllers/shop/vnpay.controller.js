@@ -16,8 +16,8 @@ class VnPayController {
       )
     );
   };
-  vnPayReturn = async(req,res)=>{
-    catchAsync(OK(res,"Thanh toán thành công",await VnPayService.checkMac(req)))
+  vnPayReturn = (req,res)=>{
+    catchAsync(OK(res,"Thanh toán thành công", VnPayService.checkMac(req)))
   } 
 
 
