@@ -1,44 +1,44 @@
-
 const moment = require("moment");
 const { Api403Error } = require("../../core/error.response");
 const WalletService = require("./wallet.service");
 
 const configVnPay = {
- ipAddr : "127.0.0.1",
- tmnCode : "EPRPY8HH",
- secretKey : "NWVQKRZEKLYJSFJFADHDABKWCAOWEAUU",
- vnpUrl : "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html",
- returnUrl : "https://delifood.io.vn/api/v1/vnpay/vnpay_return",
- version: "2.1.0"
-}
-  const TypePayment = {
-    DEPOSIT: 'DEPOSIT',PAYMENT_ORDER:'PAYMENT ORDER'
+  ipAddr: "127.0.0.1",
+  tmnCode: "EPRPY8HH",
+  secretKey: "NWVQKRZEKLYJSFJFADHDABKWCAOWEAUU",
+  vnpUrl: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html",
+  returnUrl: "https://delifood.io.vn/api/v1/vnpay/vnpay_return",
+  version: "2.1.0",
+};
+const TypePayment = {
+  DEPOSIT: "DEPOSIT",
+  PAYMENT_ORDER: "PAYMENT ORDER",
+};
+class RequestPayment {
+  constructor(typePayment, signed, userId, amount) {
+    this.typePayment = typePayment;
+    this.signed = signed;
+    (this.userId = userId), (this.amount = amount);
   }
-class RequestPayment{
-    constructor(typePayment,signed,userId,amount){
-      this.typePayment = typePayment;
-      this.signed = signed;
-      this.userId=userId,this.amount = amount
-    }
 }
 
-const ListRequest = []
-
+const ListRequest = [];
 
 class VnPayService {
-  static async createPaymentUrl({ amount, bankCode,userId,typePayment }) {
-
-    if (typePayment!= TypePayment.DEPOSIT && typePayment!= TypePayment. PAYMENT_ORDER  ) {
-      
-     throw new  Api403Error("không có type thanh toán")
+  static async createPaymentUrl({ amount, bankCode, userId, typePayment }) {
+    if (
+      typePayment != TypePayment.DEPOSIT &&
+      typePayment != TypePayment.PAYMENT_ORDER
+    ) {
+      throw new Api403Error("không có type thanh toán");
     }
     let date = new Date();
     let createDate = moment(date).format("YYYYMMDDHHmmss");
     let ipAddr = configVnPay.ipAddr;
     let tmnCode = configVnPay.tmnCode;
-    let secretKey =configVnPay.secretKey
-    let vnpUrl = configVnPay.vnpUrl
-    let returnUrl =configVnPay.returnUrl
+    let secretKey = configVnPay.secretKey;
+    let vnpUrl = configVnPay.vnpUrl;
+    let returnUrl = configVnPay.returnUrl;
     let orderId = moment(date).format("DDHHmmss");
 
     let locale = "vn";
@@ -47,7 +47,7 @@ class VnPayService {
     }
     let currCode = "VND";
     let vnp_Params = {};
-    vnp_Params["vnp_Version"] = configVnPay.version
+    vnp_Params["vnp_Version"] = configVnPay.version;
     vnp_Params["vnp_Command"] = "pay";
     vnp_Params["vnp_TmnCode"] = tmnCode;
     vnp_Params["vnp_Locale"] = locale;
@@ -71,52 +71,53 @@ class VnPayService {
     let hmac = crypto.createHmac("sha512", secretKey);
     let signed = hmac.update(new Buffer(signData, "utf-8")).digest("hex");
     vnp_Params["vnp_SecureHash"] = signed;
-    
-    ListRequest.push(new RequestPayment(typePayment,signData,userId,amount))
-    
+
+    ListRequest = [...ListRequest ,new RequestPayment(typePayment, signData, userId, amount)];
+
     vnpUrl += "?" + querystring.stringify(vnp_Params, { encode: false });
 
-
     return vnpUrl;
-  };
+  }
 
-  static checkMac(req){
-
+  static checkMac(req) {
     let vnp_Params = req.query;
-    let secureHash = vnp_Params['vnp_SecureHash'];
+    let secureHash = vnp_Params["vnp_SecureHash"];
 
-    delete vnp_Params['vnp_SecureHash'];
-    delete vnp_Params['vnp_SecureHashType'];
+    delete vnp_Params["vnp_SecureHash"];
+    delete vnp_Params["vnp_SecureHashType"];
 
     vnp_Params = sortObject(vnp_Params);
 
     let tmnCode = configVnPay.tmnCode;
     let secretKey = configVnPay.secretKey;
 
-    let querystring = require('qs');
+    let querystring = require("qs");
     let signData = querystring.stringify(vnp_Params, { encode: false });
     let crypto = require("crypto");
     let hmac = crypto.createHmac("sha512", secretKey);
-    let signed = hmac.update(new Buffer(signData, 'utf-8')).digest("hex");
+    let signed = hmac.update(new Buffer(signData, "utf-8")).digest("hex");
 
-    if(secureHash === signed){
-      let indexDelete ;
-     let request= ListRequest.find((value,index) =>{
-        indexDelete = index
-      value.signed ===signed})
+    if (secureHash === signed) {
+      let indexDelete;
+      
+      let request = ListRequest.find((value, index) => {
+        indexDelete = index;
+        return value.signed === signed;
+      });
 
-     if(request.typePayment ==TypePayment.DEPOSIT){
-      WalletService.Depositing(request.userId,request.amount)
-      ListRequest = ListRequest.slice(indexDelete,1)
-     }else{
-     }
-
-      return "Thanh toán thành công!"
-    } else{
-      throw new Api403Error('sai chữ kí');
+      if (request) {
+        if (request.typePayment == TypePayment.DEPOSIT) {
+          WalletService.Depositing(request.userId, request.amount);
+          ListRequest = ListRequest.slice(indexDelete, 1);
+        } 
+        return "Thanh toán thành công!";
+      } else {
+        throw new Api403Error("sai chữ kí");
+      }
+    } else {
+      throw new Api403Error("sai chữ kí");
     }
   }
-
 }
 
 function sortObject(obj) {
