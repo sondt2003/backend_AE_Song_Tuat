@@ -1,6 +1,7 @@
 
 const moment = require("moment");
 const { Api403Error } = require("../../core/error.response");
+const WalletService = require("./wallet.service");
 
 const configVnPay = {
  ipAddr : "127.0.0.1",
@@ -10,11 +11,27 @@ const configVnPay = {
  returnUrl : "https://delifood.io.vn/api/v1/vnpay/vnpay_return",
  version: "2.1.0"
 }
+  const TypePayment = {
+    DEPOSIT: 'DEPOSIT',PAYMENT_ORDER:'PAYMENT ORDER'
+  }
+class RequestPayment{
+    constructor(typePayment,signed,userId,amount){
+      this.typePayment = typePayment;
+      this.signed = signed;
+      this.userId=userId,this.amount = amount
+    }
+}
 
+const ListRequest = []
 
 
 class VnPayService {
-  static async createPaymentUrl({ amount, bankCode }) {
+  static async createPaymentUrl({ amount, bankCode,userId,typePayment }) {
+
+    if (typePayment!= TypePayment.DEPOSIT && typePayment!= TypePayment. PAYMENT_ORDER  ) {
+      
+     throw new  Api403Error("không có type thanh toán")
+    }
     let date = new Date();
     let createDate = moment(date).format("YYYYMMDDHHmmss");
     let ipAddr = configVnPay.ipAddr;
@@ -54,7 +71,11 @@ class VnPayService {
     let hmac = crypto.createHmac("sha512", secretKey);
     let signed = hmac.update(new Buffer(signData, "utf-8")).digest("hex");
     vnp_Params["vnp_SecureHash"] = signed;
+    
+    ListRequest.push(new RequestPayment(typePayment,signData,userId,amount))
+    
     vnpUrl += "?" + querystring.stringify(vnp_Params, { encode: false });
+
 
     return vnpUrl;
   };
@@ -62,7 +83,6 @@ class VnPayService {
   static checkMac(req){
 
     let vnp_Params = req.query;
-    
     let secureHash = vnp_Params['vnp_SecureHash'];
 
     delete vnp_Params['vnp_SecureHash'];
@@ -80,6 +100,17 @@ class VnPayService {
     let signed = hmac.update(new Buffer(signData, 'utf-8')).digest("hex");
 
     if(secureHash === signed){
+      let indexDelete ;
+     let request= ListRequest.find((value,index) =>{
+        indexDelete = index
+      value.signed ===signed})
+
+     if(request.typePayment ==TypePayment.DEPOSIT){
+      WalletService.Depositing(request.userId,request.amount)
+      ListRequest = ListRequest.slice(indexDelete,1)
+     }else{
+     }
+
       return "Thanh toán thành công!"
     } else{
       throw new Api403Error('sai chữ kí');
