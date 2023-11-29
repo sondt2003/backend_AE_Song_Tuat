@@ -22,7 +22,7 @@ class RequestPayment {
   }
 }
 
-const ListRequest = [];
+var ListRequest = [];
 
 class VnPayService {
   static async createPaymentUrl({ amount, bankCode, userId, typePayment }) {
