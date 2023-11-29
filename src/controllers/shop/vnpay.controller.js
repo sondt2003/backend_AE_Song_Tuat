@@ -12,7 +12,8 @@ class VnPayController {
         await VnPayService.createPaymentUrl({
           amount: req.body.amount,
           code_bank: req.body.code_bank,
-        })
+          userId:req.body.userId,typePayment: req.body.typePayment
+        })  
       )
     );
   };
