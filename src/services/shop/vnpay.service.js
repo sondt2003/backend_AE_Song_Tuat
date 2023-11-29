@@ -15,10 +15,11 @@ const TypePayment = {
   PAYMENT_ORDER: "PAYMENT ORDER",
 };
 class RequestPayment {
-  constructor(typePayment, signed, userId, amount) {
+  constructor(typePayment, userId, amount , vnp_TxnRef) {
     this.typePayment = typePayment;
-    this.signed = signed;
-    (this.userId = userId), (this.amount = amount);
+    this.userId = userId; 
+    this.amount = amount;
+    this.vnp_TxnRef = vnp_TxnRef
   }
 }
 
@@ -72,7 +73,7 @@ class VnPayService {
     let signed = hmac.update(new Buffer(signData, "utf-8")).digest("hex");
     vnp_Params["vnp_SecureHash"] = signed;
 
-    ListRequest = [...ListRequest ,new RequestPayment(typePayment, signData, userId, amount)];
+    ListRequest = [...ListRequest ,new RequestPayment(typePayment, userId, amount ,orderId)];
 
     vnpUrl += "?" + querystring.stringify(vnp_Params, { encode: false });
 
@@ -82,7 +83,7 @@ class VnPayService {
   static checkMac(req) {
     let vnp_Params = req.query;
     let secureHash = vnp_Params["vnp_SecureHash"];
-
+    let vnp_TxnRef = vnp_Params["vnp_TxnRef"]
     delete vnp_Params["vnp_SecureHash"];
     delete vnp_Params["vnp_SecureHashType"];
 
@@ -97,22 +98,24 @@ class VnPayService {
     let hmac = crypto.createHmac("sha512", secretKey);
     let signed = hmac.update(new Buffer(signData, "utf-8")).digest("hex");
 
+
+    
+
     if (secureHash === signed) {
       let indexDelete;
-      
       let request = ListRequest.find((value, index) => {
         indexDelete = index;
-        return value.signed === signed;
+        return value.vnp_TxnRef === vnp_TxnRef;
       });
 
       if (request) {
         if (request.typePayment == TypePayment.DEPOSIT) {
           WalletService.Depositing(request.userId, request.amount);
           ListRequest = ListRequest.slice(indexDelete, 1);
-        } 
+        }
         return "Thanh toán thành công!";
       } else {
-        throw new Api403Error("sai chữ kí");
+        throw new Api403Error('Yêu cầu nạp tiền không thành công');
       }
     } else {
       throw new Api403Error("sai chữ kí");
