@@ -40,7 +40,7 @@ const orderSchema = new Schema(
     order_status: {
       type: String,
       require: true,
-      enum: ["pending", "confirmed", "shipped", "canceled", "delivered"],
+      enum: ["pending", "confirmed","shipping", "canceled", "delivered"],
       default: "pending",
     },
     //pending dơn hàng đang chờ  đã được tạo nhưng chưa được sử lý

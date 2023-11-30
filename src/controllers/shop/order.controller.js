@@ -32,11 +32,14 @@ class OrderController {
     })
 
 
-    updateOrderStatusByShop = catchAsync(async (req, res, next) => {
+    updateOrderConfirmByShop = catchAsync(async (req, res, next) => {
         OK(res,  "update Order Status By Shop success",
             await OrderService.updateOrderStatusByShop({shopId: req.user.userId,userId: req.params.userId,...req.body}));
     })
-
+    updateOrderShippingByShop = catchAsync(async (req, res, next) => {
+        OK(res,  "update Order Status By Shop success",
+            await OrderService.updateOrderStatusByShop({shopId: req.user.userId,userId: req.params.userId,...req.body},"shipping"));
+    })
 
     listOrderStatusByShop = catchAsync(async (req, res, next) => {
         OK(res,  "list Order Status By Shop success",
