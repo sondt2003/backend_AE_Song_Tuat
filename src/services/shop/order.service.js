@@ -292,6 +292,7 @@ class OrderService {
     const updateOrder = await new OrderUpdater()
       .setModel(orderModel)
       .setFilter({
+        order_status: preStatus,
         _id: orderId,
       })
       .setBodyUpdate({
