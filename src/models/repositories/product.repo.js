@@ -118,7 +118,7 @@ const findByIdAndDiscount = async ({ product_id, unSelect, isDiscount }) => {
                         },
                     ]
                 },
-                unSelect: ['__v', 'discount_shop_id', 'discount_product_ids'],
+                unSelect: ['__v', 'discount_product_ids','discount_users_used'],
                 model: discountModel
             }
         )
