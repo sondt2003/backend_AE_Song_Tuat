@@ -53,7 +53,7 @@ class OrderService {
     isOrder = false,
   }) {
     // check cartId exists
-    const foundCart =await findCartById(cartId);
+    const foundCart = await findCartById(cartId);
     if (!foundCart) throw new Api401Error(`Cart don't exists`);
 
     const checkout_order = {
@@ -282,8 +282,6 @@ class OrderService {
     preStatus = "pending",
   }) {
     const foundOrder = await orderModel.findOne({
-      "order_products.shopId": shopId,
-      order_userId: userId,
       _id: orderId,
     });
 
