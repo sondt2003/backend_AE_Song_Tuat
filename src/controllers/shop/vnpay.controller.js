@@ -12,15 +12,14 @@ class VnPayController {
         await VnPayService.createPaymentUrl({
           amount: req.body.amount,
           code_bank: req.body.code_bank,
-          userId:req.body.userId,typePayment: req.body.typePayment
-        })  
+          userId: req.body.userId,
+          typePayment: req.body.typePayment,
+        })
       )
     );
   };
-  vnPayReturn = (req,res)=>{
-    catchAsync(OK(res,"Thanh toán thành công", VnPayService.checkMac(req)))
-  } 
-
-
+  vnPayReturn = (req, res) => {
+    res.send(VnPayService.checkMac(req));
+  };
 }
 module.exports = new VnPayController();
