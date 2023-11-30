@@ -271,7 +271,7 @@ class OrderService {
     return updateOrder;
   }
 
-  static async updateOrderStatusByShop({shopId, userId, orderId },status = 'confirmed' ,preStatus = 'pending') {
+  static async updateOrderStatusByShop({shopId, userId, orderId,status = 'confirmed' ,preStatus = 'pending'}) {
     const foundOrder=await orderModel.findOne({'order_products.shopId': shopId,order_userId:userId,_id:orderId});
    
     if(!foundOrder){
