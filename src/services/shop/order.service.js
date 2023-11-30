@@ -53,7 +53,7 @@ class OrderService {
     isOrder = false,
   }) {
     // check cartId exists
-    const foundCart = findCartById(cartId);
+    const foundCart =await findCartById(cartId);
     if (!foundCart) throw new Api401Error(`Cart don't exists`);
 
     const checkout_order = {
