@@ -15,7 +15,10 @@ const {
   reservationInventory,
 } = require("../../models/repositories/inventory.repo");
 const { convert2ObjectId } = require("../../utils");
-const { OrderUpdater, findAllOrders } = require("../../models/repositories/order.repo");
+const {
+  OrderUpdater,
+  findAllOrders,
+} = require("../../models/repositories/order.repo");
 const addressModel = require("../../models/address.model");
 
 class OrderService {
@@ -271,10 +274,20 @@ class OrderService {
     return updateOrder;
   }
 
-  static async updateOrderStatusByShop({shopId, userId, orderId,status = 'confirmed' ,preStatus = 'pending'}) {
-    const foundOrder=await orderModel.findOne({'order_products.shopId': shopId,order_userId:userId,_id:orderId});
-   
-    if(!foundOrder){
+  static async updateOrderStatusByShop({
+    shopId,
+    userId,
+    orderId,
+    status = "confirmed",
+    preStatus = "pending",
+  }) {
+    const foundOrder = await orderModel.findOne({
+      "order_products.shopId": shopId,
+      order_userId: userId,
+      _id: orderId,
+    });
+
+    if (!foundOrder) {
       throw new BusinessLogicError("Don't have order");
     }
 
@@ -282,7 +295,7 @@ class OrderService {
       .setModel(orderModel)
       .setFilter({
         order_userId: userId,
-        order_status: "pending",
+        order_status: preStatus,
         _id: orderId,
       })
       .setBodyUpdate({
@@ -294,8 +307,19 @@ class OrderService {
     }
     return updateOrder;
   }
-  static async listOrderStatusByShop({shopId, orderId ,limit = 50, sort = 'ctime', page = 1}) {
-    return await findAllOrders({ limit, sort, filter:{'order_products.shopId': shopId}, page});
+  static async listOrderStatusByShop({
+    shopId,
+    orderId,
+    limit = 50,
+    sort = "ctime",
+    page = 1,
+  }) {
+    return await findAllOrders({
+      limit,
+      sort,
+      filter: { "order_products.shopId": shopId },
+      page,
+    });
   }
 }
 
