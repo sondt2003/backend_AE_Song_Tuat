@@ -1,7 +1,7 @@
 const { product } = require("../product.model")
 const { Types } = require("mongoose")
 const { convert2ObjectId } = require("../../utils");
-const { BusinessLogicError } = require("../../core/error.response");
+const { BusinessLogicError, Api404Error } = require("../../core/error.response");
 const ApiFeatures = require("./../../utils/api-feature.util");
 const discountModel = require("../discount.model");
 const { findAllDiscountCodesSelect, findAllDiscountCodesUnSelect } = require("./discount.repo");
@@ -24,6 +24,24 @@ const publishProductByShop = async ({ product_shop, product_id }) => {
     return modifiedCount;
 }
 
+const draftProductByShop = async ({ product_shop, product_id }) => {
+    // find one
+    const foundShop = await product.findOne({
+        product_shop: new Types.ObjectId(product_shop),
+        _id: new Types.ObjectId(product_id),
+    })
+
+    if (!foundShop) return foundShop
+
+    // update isDraft, isPublish
+    foundShop.isDraft = true
+    foundShop.isPublished = false
+
+    const { modifiedCount } = await foundShop.update(foundShop)
+
+    return modifiedCount;
+}
+
 const findAllDraftsForShop = async ({ query, limit, skip }) => {
     return await queryProduct({ query, limit, skip })
 }
@@ -35,12 +53,16 @@ const findAllPublishForShop = async ({ query, limit, skip }) => {
 // search full text
 const searchProductByUser = async ({ keySearch }) => {
     const regexSearch = new RegExp(keySearch)
+
+    console.log(`Searching : ${regexSearch}`)
     return await product.find({
         isPublished: true,
-        $text: { $search: regexSearch }
-    }, { score: { $meta: 'textScore' } })
-        .sort({ score: { $meta: 'textScore' } })
-        .lean()
+        // $text: { $search: regexSearch }
+        $or: [ 
+            { product_name: { $regex: keySearch, $options: "i" }}, 
+            { product_description: {$regex: keySearch, $options: "i" } } 
+        ]
+    }).sort().lean()
 }
 
 const findAllProducts = async ({ limit, sort, page, filter, select }) => {
@@ -74,10 +96,11 @@ const getProductByIdUnselect = async ({ productId, select }) => {
 const findByIdAndDiscount = async ({ product_id, unSelect, isDiscount }) => {
     const foundShop = await findById({ product_id });
     const productShopId = foundShop.product_shop;
-    console.log("foundShop:::::::::::::::" + productShopId)
     if (!productShopId) throw new BusinessLogicError("Don't have productShopId")
 
-    const foundFood = await product.findById(product_id).select(unSelect)
+    const foundFood = await product.findOne({_id:product_id,isDraft:false,isPublished:true}).select(unSelect).lean();
+
+    if (!foundFood) throw new Api404Error('shop not found')
 
     if (isDiscount) {
         const foundDiscount = await findAllDiscountCodesUnSelect(
@@ -101,13 +124,11 @@ const findByIdAndDiscount = async ({ product_id, unSelect, isDiscount }) => {
         )
 
         return {
-            ...foundFood._doc,
+            ...foundFood,
             discount: foundDiscount,
         }
     } else{
-        return {
-            ...foundFood._doc,
-        }
+        return foundFood;
     }
 }
 
@@ -229,5 +250,6 @@ module.exports = {
     advancedSearchV2,
     findByIdAndDiscount,
     getProductByIdUnselect,
-    findAllProductsCategory
+    findAllProductsCategory,
+    draftProductByShop
 }

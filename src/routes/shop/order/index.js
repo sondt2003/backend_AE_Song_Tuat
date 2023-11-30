@@ -15,15 +15,20 @@ const {authenticationV2} = require("../../../auth/authUtils");
 router.use(authenticationV2)
 
 router.get('/', orderController.getOrderByUser)
+router.get('/shop', orderController.listOrderStatusByShop)
 
 router.post('/review', orderController.checkoutReview)
 
 router.post('/v1', orderController.order)
 router.post('/v2', orderController.orderV2)
 
-router.get('/:userId', orderController.getOneOrderByUser)
+router.get('/:orderId', orderController.getOneOrderByUser)
 
 router.post('/cancel', orderController.cancelOrderByUser)
+
+router.patch('/confirmed/:userId', orderController.updateOrderConfirmByShop)
+
+router.patch('/shipping/:userId', orderController.updateOrderShippingByShop)
 
 // router
 module.exports = router

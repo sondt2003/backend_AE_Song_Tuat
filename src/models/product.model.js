@@ -75,6 +75,9 @@ const productSchema = new Schema({
         index: true,
         select: false // khong lay field nay ra
     },
+    product_distance:{
+        type: String,
+    }
 }, {
     timestamps: true,
     collection: COLLECTION_NAME
@@ -163,7 +166,8 @@ productSchema.index({
 
 // Document middleware runs before .save and .create...
 productSchema.pre('save', function (next) {
-    this.product_slug = slugify(this.product_name, { lower: true })
+    this.product_slug = slugify(this.product_name, { lower: true });
+    this.product_distance = parseFloat((Math.random() * 10).toFixed(2))+"km";
     next()
 })
 

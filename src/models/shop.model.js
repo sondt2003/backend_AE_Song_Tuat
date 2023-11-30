@@ -38,19 +38,22 @@ const shopSchema = new Schema(
       type: Schema.Types.Boolean,
       default: false,
     },
+    profile:{
+      type: Schema.Types.ObjectId,
+      ref: "Profile",
+    },
+    wallet:{
+      type: Schema.Types.ObjectId,
+      ref :'Wallet'
+    },
     roles: {
       type: Array,
       default: [],
     },
-    address:{
-      type: String,
+    address_id: {
+      type: Schema.Types.ObjectId,
+      ref: "Address",
     },
-    latitude:{
-      type: String,
-    },
-    longitude:{
-      type: String,
-    }
   },
   {
     timestamps: true,

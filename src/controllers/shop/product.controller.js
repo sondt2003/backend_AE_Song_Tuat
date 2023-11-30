@@ -22,6 +22,16 @@ class ProductController {
             }))
     })
 
+
+    draftProductByShop = catchAsync(async (req, res) => {
+        OK(res, "Update draft product success",
+            await ProductService.draftProductByShop({
+                product_shop: req.user.userId,
+                product_id: req.params.id
+            }))
+    })
+
+
     updateProduct = catchAsync(async (req, res) => {
         OK(res, "Update product success",
             await ProductService.updateProduct(req.body.product_type, req.params.productId, {
@@ -84,6 +94,13 @@ class ProductController {
             await ProductService.advancedSearch(req.query))
     })
 
+
+
+    
+    updateProduct = catchAsync(async (req, res) => {
+        OK(res, "set published successfully",
+            await ProductService.updateProduct(req.query))
+    })
 }
 
 module.exports = new ProductController()
