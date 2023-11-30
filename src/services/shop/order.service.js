@@ -271,7 +271,7 @@ class OrderService {
     return updateOrder;
   }
 
-  static async updateOrderStatusByShop({shopId, userId, orderId }) {
+  static async updateOrderStatusByShop({shopId, userId, orderId },status = 'confirmed') {
     const foundOrder=await orderModel.findOne({'order_products.shopId': shopId,order_userId:userId,_id:orderId});
    
     if(!foundOrder){
@@ -286,11 +286,11 @@ class OrderService {
         _id: orderId,
       })
       .setBodyUpdate({
-        order_status: "confirmed",
+        order_status: status,
       })
       .executeUpdate();
     if (!updateOrder) {
-      throw new BusinessLogicError("confirmed Failed");
+      throw new BusinessLogicError(`${status} failed `);
     }
     return updateOrder;
   }
