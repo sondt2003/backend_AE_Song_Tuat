@@ -114,8 +114,6 @@ const getProductByIdUnselect = async ({ productId, select }) => {
 };
 const findByIdAndDiscount = async ({ product_id, unSelect, isDiscount }) => {
   const foundShop = await findById({ product_id });
-  const productShopId = foundShop.product_shop;
-  if (!productShopId) throw new BusinessLogicError("Don't have productShopId");
 
   const foundFood = await product
     .findOne({ _id: product_id, isDraft: false, isPublished: true })
@@ -129,7 +127,6 @@ const findByIdAndDiscount = async ({ product_id, unSelect, isDiscount }) => {
       filter: {
         $or: [
           {
-            discount_shop_id: productShopId,
             discount_is_active: true,
             discount_applies_to: "all",
           },
