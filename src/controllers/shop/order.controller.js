@@ -32,7 +32,10 @@ class OrderController {
     OK(
       res,
       "Get order by user success",
-      await OrderService.getOrderByUser({ userId: req.user.userId })
+      await OrderService.getOrderByUser({
+        userId: req.user.userId,
+        status: req.body.status,
+      })
     );
   });
 

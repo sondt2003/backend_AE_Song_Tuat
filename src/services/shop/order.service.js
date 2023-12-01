@@ -237,9 +237,10 @@ class OrderService {
       throw new BusinessLogicError("Order không thành công");
     }
   }
-  static async getOrderByUser({ userId }) {
+  static async getOrderByUser({ userId, status }) {
     const orderFound = await orderModel.find({
       order_userId: convert2ObjectId(userId),
+      status,
     });
     return orderFound;
   }
