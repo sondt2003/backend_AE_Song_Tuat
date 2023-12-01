@@ -309,13 +309,16 @@ class OrderService {
     orderId,
     limit = 50,
     sort = "ctime",
-    page = 1,
+    page = 1,status
   }) {
+    
+
+
     return await findAllOrders({
       limit,
       sort,
-    
-      page,
+      filter: { "order_products.shopId": shopId },
+      page,status
     });
   }
 }
