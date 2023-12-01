@@ -240,7 +240,7 @@ class OrderService {
   static async getOrderByUser({ userId, status }) {
     const orderFound = await orderModel.find({
       order_userId: convert2ObjectId(userId),
-      status,
+      order_status: status,
     });
     return orderFound;
   }
