@@ -314,7 +314,7 @@ class OrderService {
     return await findAllOrders({
       limit,
       sort,
-      filter: { "order_products.shopId": shopId },
+    
       page,
     });
   }
