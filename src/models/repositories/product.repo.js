@@ -113,10 +113,8 @@ const getProductByIdUnselect = async ({ productId, select }) => {
     .select(select);
 };
 const findByIdAndDiscount = async ({ product_id, unSelect, isDiscount }) => {
-  const foundShop = await findById({ product_id });
-
   const foundFood = await product
-    .findOne({ _id: product_id, isDraft: false, isPublished: true })
+    .findOne({ _id: product_id, isPublished: true })
     .select(unSelect)
     .lean();
 
