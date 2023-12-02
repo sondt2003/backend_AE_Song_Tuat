@@ -36,7 +36,7 @@ class OrderController {
       "Get order by user success",
       await OrderService.getOrderByUser({
         userId: req.user.userId,
-        status: req.params.status,
+        status: req.query.status,
       })
     );
   });
