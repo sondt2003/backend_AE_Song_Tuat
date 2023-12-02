@@ -1,5 +1,5 @@
 const express = require("express");
-const controller = require("../../../controllers/admin/access.controller");
+const controller = require("../../../controllers/admin/auth/access.controller");
 
 const validation = require("../../../middleware/validators/access.validator");
 

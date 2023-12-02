@@ -1,6 +1,6 @@
-const adminAccessService = require("../../services/admin/access.service"); // Update the service import
-const catchAsync = require("../../helpers/catch.async");
-const { CREATED, OK } = require("../../core/success.response");
+const adminAccessService = require("../../../services/admin/access.service"); // Update the service import
+const catchAsync = require("../../../helpers/catch.async");
+const { CREATED, OK } = require("../../../core/success.response");
 
 class AdminAccessController {
   login = catchAsync(async (req, res) => {

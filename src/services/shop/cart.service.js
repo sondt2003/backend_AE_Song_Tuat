@@ -46,13 +46,7 @@ class CartService {
 
     const cart = await cartModel.findOne(query);
     if (!cart) throw new Api404Error("cart not found");
-    return await cartModel
-      .create({
-        cart_products: product,
-        cart_count_product: product.length,
-        cart_user_id: userId,
-      })
-      .lean();
+    return await cartModel.findOneAndUpdate(query, updateSet, options);
   }
 
   static async addItemProductCart({ userId, product }) {
@@ -84,6 +78,9 @@ class CartService {
     const userCart = await cartModel.findOne({
       cart_user_id: userId,
     });
+
+    console.log("product", product);
+
     const foundProduct = await getProductByIdUnselect({
       productId: product.productId,
       select: [
