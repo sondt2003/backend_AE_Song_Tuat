@@ -1,12 +1,13 @@
 const express = require("express");
 const morgan = require("morgan");
 const app = express();
-
 const compression = require("compression");
 const cookieParser = require("cookie-parser");
 const configs = require("./configs/config");
-const { checkEnable } = require("./utils");
+const {checkEnable} = require("./utils");
 const cors = require('cors')
+
+
 // // //app.js
 app.use(cors())
 app.use(express.static(__dirname + "/public"));
@@ -24,26 +25,26 @@ app.use(morgan("dev"));
 const helmet = require("helmet");
 // setting base
 app.use(
-  helmet.frameguard({
-    action: "deny",
-  })
+    helmet.frameguard({
+        action: "deny",
+    })
 );
 // strict transport security
 const reqDuration = 2629746000;
 app.use(
-  helmet.hsts({
-    maxAge: reqDuration,
-  })
+    helmet.hsts({
+        maxAge: reqDuration,
+    })
 );
 
 // content security policy
 app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'"],
-    },
-  })
+    helmet.contentSecurityPolicy({
+        directives: {
+            scriptSrc: ["'self'"],
+            styleSrc: ["'self'"],
+        },
+    })
 );
 // x content type options
 app.use(helmet.noSniff());
@@ -51,37 +52,37 @@ app.use(helmet.noSniff());
 app.use(helmet.xssFilter());
 // referrer policy
 app.use(
-  helmet.referrerPolicy({
-    policy: "no-referrer",
-  })
+    helmet.referrerPolicy({
+        policy: "no-referrer",
+    })
 );
 
 // downsize response
 app.use(
-  compression({
-    level: 6, // level compress
-    threshold: 100 * 1024, // > 100kb threshold to compress
-    filter: (req) => {
-      return !req.headers["x-no-compress"];
-    },
-  })
+    compression({
+        level: 6, // level compress
+        threshold: 100 * 1024, // > 100kb threshold to compress
+        filter: (req) => {
+            return !req.headers["x-no-compress"];
+        },
+    })
 );
 
 // setting body parser, cookie parser
-app.use(express.json({ limit: "10kb" }));
-app.use(express.urlencoded({ extended: true, limit: "10kb" }));
+app.use(express.json({limit: "10kb"}));
+app.use(express.urlencoded({extended: true, limit: "10kb"}));
 app.use(cookieParser());
 
 // init db
 if (checkEnable(configs.db.enable)) {
-  require("./configs/config.mongose");
-  const { checkOverload } = require("./helpers/check.connect");
-  checkOverload();
+    require("./configs/config.mongose");
+    const {checkOverload} = require("./helpers/check.connect");
+    checkOverload();
 }
 
 // init redis
 if (checkEnable(configs.redis.enable)) {
-  require("./configs/config.redis");
+    require("./configs/config.redis");
 }
 
 // init swagger
@@ -90,13 +91,13 @@ openApi(app)
 
 // init logger
 const expressWinston = require("express-winston");
-const { logger } = require("./configs/config.logger");
+const {logger} = require("./configs/config.logger");
 
 app.use(
-  expressWinston.logger({
-    winstonInstance: logger,
-    statusLevels: true,
-  })
+    expressWinston.logger({
+        winstonInstance: logger,
+        statusLevels: true,
+    })
 );
 
 // config i18n
@@ -107,19 +108,18 @@ app.use(
 
 // init routes
 app.use('', require('./routes/shop'))
-app.use('',require('./routes/admin'))
-
-
+app.use('', require('./routes/admin'))
 // process handler
 require("./middleware/processHandler");
 
 // handling errors
 const {
-  logErrorMiddleware,
-  returnError,
-  is404Handler,
-  isOperationalError,
+    logErrorMiddleware,
+    returnError,
+    is404Handler,
+    isOperationalError,
 } = require("./middleware/errorHandler");
+const {SocketInit} = require("./socket.io/config");
 app.use(is404Handler);
 app.use(logErrorMiddleware);
 app.use(returnError);
@@ -132,8 +132,8 @@ app.use(returnError);
 
 // init cron job
 if (checkEnable(configs.task.enable)) {
-  const task = require("./tasks/collect-issue.task");
-  task.execute().start();
+    const task = require("./tasks/collect-issue.task");
+    task.execute().start();
 }
 
 // export

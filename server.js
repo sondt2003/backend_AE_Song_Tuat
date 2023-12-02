@@ -12,7 +12,6 @@ const PORT = process.env.PORT || 3055;
 // start server nodejs
 const app = require("./src/app");
 
-
 /////
 const server = app.listen(PORT, () => {
     console.log(
@@ -26,5 +25,7 @@ process.on("SIGINT", () => {
     server.close("Exit server express");
     // notify send (ping....)
 });
+
+
 
 
