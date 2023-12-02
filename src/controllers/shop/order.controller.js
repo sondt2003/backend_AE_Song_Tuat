@@ -29,6 +29,8 @@ class OrderController {
     );
   });
   getOrderByUser = catchAsync(async (req, res, next) => {
+    console.log("params", req.params);
+
     OK(
       res,
       "Get order by user success",
