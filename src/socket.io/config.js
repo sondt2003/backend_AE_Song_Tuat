@@ -1,5 +1,10 @@
 const {Server} = require("socket.io"),
-    server = new Server(8000);
+    server = new Server(8000, {
+        cors: {
+            origin: "*",
+            methods: ["GET", "POST"]
+        }
+    });
 
 let
     sequenceNumberByClient = new Map();
@@ -16,7 +21,9 @@ server.on("connection", (socket) => {
     });
 });
 setInterval(() => {
-    server.emit('onordercreate', {})
+    server.emit('onordercreate', {
+        mes: 'tin nhắn'
+    })
 }, 1000)
 
 // sends each client its current sequence number
