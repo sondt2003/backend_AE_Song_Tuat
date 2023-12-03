@@ -17,6 +17,7 @@ const {
     OrderUpdater, findAllOrders,
 } = require("../../models/repositories/order.repo");
 const addressModel = require("../../models/address.model");
+const SocketEmitService = require("../../socket.io/EmitService")
 
 class OrderService {
     /*
@@ -178,7 +179,6 @@ class OrderService {
             .findOne({_id: addressId, user_id: userId})
             .lean();
         if (!order_shipping) throw new Api404Error("Address not found");
-
         const newOrder = await orderModel.create({
             order_userId: userId,
             order_checkout: checkout_order,
@@ -191,7 +191,9 @@ class OrderService {
                 const {productId} = products[i];
                 await CartService.deleteItemInCart({userId, productId});
             }
+            SocketEmitService.EmitNewOrder({order: newOrder, shopId: newOrder.order_products.shopId})
             return newOrder;
+
         } else {
             throw new BusinessLogicError("Order không thành công");
         }

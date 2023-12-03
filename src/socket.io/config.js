@@ -6,8 +6,7 @@ const {Server} = require("socket.io"),
         }
     });
 
-let
-    sequenceNumberByClient = new Map();
+let sequenceNumberByClient = new Map();
 // event fired every time a new client connects:
 server.on("connection", (socket) => {
     console.info(`Client connected [id=${socket.id}]`);
@@ -20,11 +19,7 @@ server.on("connection", (socket) => {
         console.info(`Client gone [id=${socket.id}]`);
     });
 });
-setInterval(() => {
-    server.emit('onordercreate', {
-        mes: 'tin nhắn'
-    })
-}, 1000)
+
 
 // sends each client its current sequence number
 setInterval(() => {
