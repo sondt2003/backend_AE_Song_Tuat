@@ -27,7 +27,7 @@ class CartService {
       },
       options = { upsert: true, new: true };
 
-    return await cartModel.findOneAndUpdate(query, updateOrInsert, options);
+    return cartModel.findOneAndUpdate(query, updateOrInsert, options);
   }
 
   static async updateUserCartQuantity({ userId, product }) {
@@ -46,7 +46,7 @@ class CartService {
 
     const cart = await cartModel.findOne(query);
     if (!cart) throw new Api404Error("cart not found");
-    return await cartModel.findOneAndUpdate(query, updateSet, options);
+    return cartModel.findOneAndUpdate(query, updateSet, options);
   }
 
   static async addItemProductCart({ userId, product }) {
@@ -68,7 +68,7 @@ class CartService {
           },
         },
         options = { upsert: true, new: true };
-      return await cartModel.findOneAndUpdate(query, updateOrInsert, options);
+      return cartModel.findOneAndUpdate(query, updateOrInsert, options);
     } else {
       return await CartService.updateUserCartQuantity({ userId, product });
     }
@@ -171,7 +171,7 @@ class CartService {
     };
     const cart = await cartModel.findOne(queryCart);
     if (!cart) throw new Api404Error("cart not found");
-    return await cartModel.updateOne(query, updateSet);
+    return cartModel.updateOne(query, updateSet);
   }
 
   static async getItemInCart({ userId, productId }) {
@@ -185,11 +185,11 @@ class CartService {
   }
 
   static async getListUserCart({ userId }) {
-    return await cartModel
-      .findOne({
-        cart_user_id: userId,
-      })
-      .lean();
+    return cartModel
+        .findOne({
+          cart_user_id: userId,
+        })
+        .lean();
   }
 }
 
