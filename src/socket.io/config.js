@@ -3,7 +3,6 @@ const {Server} = require("socket.io"),
 
 let
     sequenceNumberByClient = new Map();
-const cors = require('cors')
 // event fired every time a new client connects:
 server.on("connection", (socket) => {
     console.info(`Client connected [id=${socket.id}]`);
@@ -16,7 +15,6 @@ server.on("connection", (socket) => {
         console.info(`Client gone [id=${socket.id}]`);
     });
 });
-server.use(cors())
 setInterval(() => {
     server.emit('onordercreate', {})
 }, 1000)
