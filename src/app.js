@@ -8,7 +8,6 @@ const {checkEnable} = require("./utils");
 const cors = require('cors')
 
 
-// // //app.js
 app.use(cors())
 app.use(express.static(__dirname + "/public"));
 app.set("views", __dirname + "/views");
