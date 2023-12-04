@@ -14,7 +14,7 @@ class CategoryController {
         })
     });
     updateCategory = catchAsync(async (req, res, next) => {
-        OK(res, "Get Category success", await CategoryService.updateCategory(req.params.categoryId, req.body))
+        OK(res, "Update Category success", await CategoryService.updateCategory(req.params.categoryId, req.body))
     });
 
     deleteCategory = catchAsync(async (req, res, next) => {

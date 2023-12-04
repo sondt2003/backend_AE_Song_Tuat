@@ -4,7 +4,7 @@ const {convert2ObjectId} = require('../../utils');
 
 class CategoryService {
 
-    static async createCategory(type, payload) {
+    static async createCategory(payload) {
         // if (payload.category_parent_id) {
         //     const foundCategory = await category.findById(convert2ObjectId(payload.category_parent_id)).lean().exec();
         //     if (foundCategory.category_parent_id) {
@@ -27,7 +27,7 @@ class CategoryService {
         return Math.ceil(totalItem / limit);
     }
 
-    static async updateCategory(type, categoryId, payload) {
+    static async updateCategory(categoryId, payload) {
         return category.findByIdAndUpdate(categoryId, {
             ...payload
         }, {new: true}).lean();
