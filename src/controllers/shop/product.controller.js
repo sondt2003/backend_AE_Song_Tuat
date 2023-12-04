@@ -9,7 +9,6 @@ class ProductController {
         CREATED(res, "Create new product success",
             await ProductService.createProduct(req.body.product_type, {
                 ...req.body,
-                product_shop: req.user.userId
             }))
     })
 
@@ -36,7 +35,6 @@ class ProductController {
         OK(res, "Update product success",
             await ProductService.updateProduct(req.body.product_type, req.params.productId, {
                 ...req.body,
-                product_shop: req.user.userId
             }))
     })
 

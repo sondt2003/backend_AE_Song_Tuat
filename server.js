@@ -1,21 +1,31 @@
-require('dotenv').config()
+require("dotenv").config();
+const http = require('http')
 const nodeEnv = process.env.NODE_ENV;
-
 // config dotenv by environment
-require('dotenv').config({
-    path: `.env.${nodeEnv}`
-})
+require("dotenv").config({
+    path: `.env.${nodeEnv}`,
+});
 
-console.log('ENV:::', nodeEnv, ' PORT:::', process.env.PORT)
+console.log("ENV:::", nodeEnv, " PORT:::", process.env.PORT);
 const PORT = process.env.PORT || 3055;
 
 // start server nodejs
-const app = require('./src/app');
-const server =  app.listen(PORT, () => {
-    console.log(`------::----${process.env.SERVICE_NAME} start with port ${PORT}`);
-});
+const app = require("./src/app");
 
-process.on('SIGINT', () => {
-    server.close('Exit server express');
+/////
+const server = app.listen(PORT, () => {
+    console.log(
+        `------::----${process.env.SERVICE_NAME} start with port ${PORT}`
+    );
+});
+const path = app.getHttpServer();
+const router = path._events.request._router;
+console.log(expressListRoutes({}, "API:", router));
+process.on("SIGINT", () => {
+    server.close("Exit server express");
     // notify send (ping....)
 });
+
+
+
+

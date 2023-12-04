@@ -1,4 +1,4 @@
-const { Schema, model, } = require("mongoose");
+const {Schema, model,} = require("mongoose");
 const slugify = require('slugify')
 
 const DOCUMENT_NAME = 'Product';
@@ -13,6 +13,7 @@ const productSchema = new Schema({
         trim: true,
         maxLength: 150
     },
+
     image: {
         type: String,
         default: "https://img5.thuthuatphanmem.vn/uploads/2021/11/09/anh-do-an-dep-nhat_095144754.jpg",
@@ -75,7 +76,7 @@ const productSchema = new Schema({
         index: true,
         select: false // khong lay field nay ra
     },
-    product_distance:{
+    product_distance: {
         type: String,
     }
 }, {
@@ -87,7 +88,7 @@ const productSchema = new Schema({
 // lượt mua 
 // lượt mua 
 const electronicsSchema = new Schema({
-    manufacturer: { type: String, required: true },
+    manufacturer: {type: String, required: true},
     model: String,
     color: String,
     product_shop: {
@@ -100,7 +101,7 @@ const electronicsSchema = new Schema({
 })
 
 const clothingSchema = new Schema({
-    brand: { type: String, required: true },
+    brand: {type: String, required: true},
     size: String,
     material: String,
     product_shop: {
@@ -113,7 +114,7 @@ const clothingSchema = new Schema({
 })
 
 const furnitureSchema = new Schema({
-    brand: { type: String, required: true },
+    brand: {type: String, required: true},
     size: String,
     material: String,
     product_shop: {
@@ -125,7 +126,7 @@ const furnitureSchema = new Schema({
     timestamps: true
 })
 const foodSchema = new Schema({
-    brand: { type: String, required: true },
+    brand: {type: String, required: true},
     size: String,
     ingredients: String,
     allergens: String,
@@ -166,14 +167,13 @@ productSchema.index({
 
 // Document middleware runs before .save and .create...
 productSchema.pre('save', function (next) {
-    this.product_slug = slugify(this.product_name, { lower: true });
-    this.product_distance = parseFloat((Math.random() * 10).toFixed(2))+"km";
+    this.product_slug = slugify(this.product_name, {lower: true});
+    this.product_distance = parseFloat((Math.random() * 10).toFixed(2)) + "km";
     next()
 })
 
 
 // hang ton kho
-
 
 
 module.exports = {

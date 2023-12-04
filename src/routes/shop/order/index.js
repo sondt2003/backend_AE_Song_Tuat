@@ -26,8 +26,9 @@ router.get('/:orderId', orderController.getOneOrderByUser)
 
 router.post('/cancel', orderController.cancelOrderByUser)
 
-router.patch('/confirmed/:userId', orderController.updateOrderStatusByShop)
+router.patch('/confirmed/:userId', orderController.updateOrderConfirmByShop)
 
+router.patch('/shipping/:userId', orderController.updateOrderShippingByShop)
 
 // router
 module.exports = router
