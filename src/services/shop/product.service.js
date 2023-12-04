@@ -97,17 +97,9 @@ class ProductService {
 }
 
 class Product {
-    constructor({
-                    product_name,
-                    product_thumb,
-                    product_description,
-                    product_price,
-                    product_type,
-                    product_shop,
-                    product_attributes,
-                    product_quality,
-                    categoryId
-                }) {
+    constructor({ product_name, product_thumb, product_description, product_price,
+        product_type, product_shop, product_attributes, product_quality, categoryId,image
+    }) {
         this.product_name = product_name;
         this.product_thumb = product_thumb;
         this.product_description = product_description;
@@ -117,6 +109,7 @@ class Product {
         this.product_attributes = product_attributes;
         this.product_quality = product_quality;
         this.categoryId = categoryId;
+        this.image = image;
     }
 
     async createProduct(product_id) {
