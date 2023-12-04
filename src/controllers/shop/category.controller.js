@@ -4,7 +4,7 @@ const {OK} = require("../../core/success.response");
 
 class CategoryController {
     createCategory = catchAsync(async (req, res, next) => {
-        OK(res, "Create Category success", await CategoryService.createCategory(req.body.type, req.body))
+        OK(res, "Create Category success", await CategoryService.createCategory(req.body))
     });
 
     getAllCategory = catchAsync(async (req, res, next) => {
