@@ -35,6 +35,9 @@ const orderSchema = new Schema({
     //shipped dơn hàng đã được vận chuyển và trên dường đến nơi
     //canceled dơn hàng đã bị hủy bởi khác hàng hoặc người bán
     //delivered đơn hàng đã giao tới khách hàng
+    order_note: {
+        type: String,
+    },
     order_reason: {
         type: String,
     },

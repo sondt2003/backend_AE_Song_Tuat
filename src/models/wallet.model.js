@@ -11,7 +11,7 @@ const walletSchema = new Schema(
     },
     currency: {
       type: String,
-      default: "VND", // Thay đổi theo loại tiền tệ mà bạn đang sử dụng
+      default: "VND",
     },
   },
   {

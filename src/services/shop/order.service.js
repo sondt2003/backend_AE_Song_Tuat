@@ -151,7 +151,7 @@ class OrderService {
         }
     }
 
-    static async orderByUserV2({shop_order_ids, cartId, userId, addressId, user_payment,}) {
+    static async orderByUserV2({shop_order_ids, cartId, userId, addressId, user_payment, order_note}) {
         const {shop_order_ids_new, checkout_order} = await OrderService.checkoutReview({
             cartId, userId, shop_order_ids, isOrder: true,
         });
@@ -185,6 +185,8 @@ class OrderService {
             order_shipping: order_shipping,
             order_payment: user_payment,
             order_products: shop_order_ids_new,
+            order_note: order_note
+
         });
         if (newOrder) {
             for (let i = 0; i < products.length; i++) {
@@ -232,9 +234,7 @@ class OrderService {
         return updateOrder;
     }
 
-    static async updateOrderStatusByShop({
-                                             shopId, userId, orderId, status = "confirmed", preStatus = "pending",
-                                         }) {
+    static async updateOrderStatusByShop({shopId, userId, orderId, status = "confirmed", preStatus = "pending",}) {
         const foundOrder = await orderModel.findOne({
             _id: orderId,
         });
@@ -255,15 +255,25 @@ class OrderService {
         if (!updateOrder) {
             throw new BusinessLogicError(`${status} failed `);
         }
+        if (status === 'shipping') {
+            await this.shippingOrder(updateOrder)
+        }
         return updateOrder;
     }
 
-    static async listOrderStatusByShop({
-                                           shopId, orderId, limit = 50, sort = "ctime", page = 1, status,
-                                       }) {
+    static async listOrderStatusByShop({shopId, orderId, limit = 50, sort = "ctime", page = 1, status}) {
         return await findAllOrders({
             limit, sort, filter: {"order_products.shopId": shopId, order_status: status}, page,
         });
+    }
+
+    static async shippingOrder({orderID}) {
+        setTimeout(async () => {
+            await OrderUpdater().setBodyUpdate({
+                order_status: 'delivered',
+            }).executeUpdate();
+            //on order success
+        }, 10 * 1000)
     }
 }
 
