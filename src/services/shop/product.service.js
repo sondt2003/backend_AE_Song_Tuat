@@ -1,13 +1,20 @@
-const { BusinessLogicError } = require("../../core/error.response");
-const { product, food, clothing } = require("../../models/product.model");
-const { insertInventory } = require("../../models/repositories/inventory.repo");
-const { findAllDraftsForShop, findAllPublishForShop, publishProductByShop, searchProductByUser, findAllProducts, findById, getProductById,
+const {BusinessLogicError} = require("../../core/error.response");
+const {product, food, clothing} = require("../../models/product.model");
+const {insertInventory} = require("../../models/repositories/inventory.repo");
+const {
+    findAllDraftsForShop,
+    findAllPublishForShop,
+    publishProductByShop,
+    searchProductByUser,
+    findAllProducts,
+    findById,
+    getProductById,
     advancedSearch,
     findByIdAndDiscount,
     findAllProductsCategory,
     draftProductByShop
 } = require("../../models/repositories/product.repo")
-const { getSelectData, unGetSelectData, convert2ObjectId } = require("../../utils");
+const {getSelectData, unGetSelectData, convert2ObjectId} = require("../../utils");
 
 class ProductService {
 
@@ -31,40 +38,53 @@ class ProductService {
     }
 
     // PUT
-    static async publishProductByShop({ product_shop, product_id }) {
+    static async publishProductByShop({product_shop, product_id}) {
         // find one
-        return await publishProductByShop({ product_shop, product_id })
+        return await publishProductByShop({product_shop, product_id})
     }
 
     // query
-    static async findAllDraftsForShop({ product_shop, limit = 50, skip = 0 }) {
-        const query = { product_shop, isDraft: true }
-        return await findAllDraftsForShop({ query, limit, skip })
+    static async findAllDraftsForShop({product_shop, limit = 50, skip = 0}) {
+        const query = {product_shop, isDraft: true}
+        return await findAllDraftsForShop({query, limit, skip})
     }
 
-    static async findAllPublishForShop({ product_shop, limit = 50, skip = 0 }) {
-        const query = { product_shop, isPublished: true }
-        return await findAllPublishForShop({ query, limit, skip })
+    static async findAllPublishForShop({product_shop, limit = 50, skip = 0}) {
+        const query = {product_shop, isPublished: true}
+        return await findAllPublishForShop({query, limit, skip})
     }
 
-    static async searchProducts({ keySearch }) {
-        return await searchProductByUser({ keySearch })
+    static async searchProducts({keySearch}) {
+        return await searchProductByUser({keySearch})
     }
 
-    static async findAllProducts({ limit = 50, sort = 'ctime', page = 1, filter = { isPublished: true } ,categoryId}) {
+    static async findAllProducts({limit = 50, sort = 'ctime', page = 1, filter = {isPublished: true}, categoryId}) {
         if (categoryId) {
-            return await findAllProductsCategory({ limit, sort, filter: { isPublished: true, categoryId: convert2ObjectId(categoryId) }, page, select: getSelectData(['product_name', 'product_price', 'product_thumb', 'product_shop', 'image','product_distance']) })
+            return await findAllProductsCategory({
+                limit,
+                sort,
+                filter: {isPublished: true, categoryId: convert2ObjectId(categoryId)},
+                page,
+                select: getSelectData(['product_name', 'product_price', 'product_thumb', 'product_shop', 'image', 'product_distance'])
+            })
         } else {
-            return await findAllProducts({ limit, sort, filter, page, select: getSelectData(['product_name','product_distance', 'product_price', 'product_thumb', 'product_shop', 'image',"categoryId"]) })
+            return await findAllProducts({
+                limit,
+                sort,
+                filter,
+                page,
+                select: getSelectData(['product_name', 'product_distance', 'product_price', 'product_thumb', 'product_shop', 'image', "categoryId"])
+            })
         }
 
     }
 
-    static async draftProductByShop({ product_shop, product_id }) {
-        return await draftProductByShop({ product_shop, product_id })
+    static async draftProductByShop({product_shop, product_id}) {
+        return await draftProductByShop({product_shop, product_id})
     }
+
     static async findOneProduct(product_id, isDiscount = false) {
-        return await findByIdAndDiscount({ product_id, isDiscount, unSelect: unGetSelectData(['__v', 'variations']) })
+        return await findByIdAndDiscount({product_id, isDiscount, unSelect: unGetSelectData(['__v', 'variations'])})
     }
 
     static async findProductById(product_id) {
@@ -75,10 +95,19 @@ class ProductService {
         return await advancedSearch(query);
     }
 }
+
 class Product {
-    constructor({ product_name, product_thumb, product_description, product_price,
-        product_type, product_shop, product_attributes, product_quality, categoryId
-    }) {
+    constructor({
+                    product_name,
+                    product_thumb,
+                    product_description,
+                    product_price,
+                    product_type,
+                    product_shop,
+                    product_attributes,
+                    product_quality,
+                    categoryId
+                }) {
         this.product_name = product_name;
         this.product_thumb = product_thumb;
         this.product_description = product_description;
@@ -89,24 +118,25 @@ class Product {
         this.product_quality = product_quality;
         this.categoryId = categoryId;
     }
+
     async createProduct(product_id) {
-        const newProduct = await product.create({ ...this, _id: product_id })
+        const newProduct = await product.create({...this, _id: product_id})
         if (newProduct) {
             await insertInventory({
-                productId: newProduct._id,
-                shopId: newProduct.product_shop,
-                stock: newProduct.product_quality
+                productId: newProduct._id, shopId: newProduct.product_shop, stock: newProduct.product_quality
             })
         }
         return newProduct;
     }
+
     async updateProduct(product_id) {
-        return await product.findByIdAndUpdate(product_id, { ...this, _id: product_id }, {
+        return product.findByIdAndUpdate(product_id, {...this, _id: product_id}, {
             new: true
-        })
+        });
     }
+
     removeProperty(newProduct) {
-        const Product = { ...newProduct._doc, _id: null, createdAt: null, updatedAt: null, __v: null };
+        const Product = {...newProduct._doc, _id: null, createdAt: null, updatedAt: null, __v: null};
         delete Product['_id'];
         delete Product['product_shop'];
         delete Product['createdAt'];
@@ -116,14 +146,14 @@ class Product {
 
 
         console.log("=============================== removeProperty ============================");
-        console.log({ ...this.product_attributes });
+        console.log({...this.product_attributes});
     }
 }
+
 class Clothing extends Product {
     async createProduct() {
         const newClothing = await clothing.create({
-            ...this.product_attributes,
-            product_shop: this.product_shop
+            ...this.product_attributes, product_shop: this.product_shop
         })
         super.removeProperty(newClothing);
         if (!newClothing) throw new BusinessLogicError("Create new Clothing failed");
@@ -132,6 +162,7 @@ class Clothing extends Product {
 
         return newProduct;
     }
+
     async updateProduct(product_id) {
 
     }
@@ -140,29 +171,25 @@ class Clothing extends Product {
 class Food extends Product {
     async createProduct() {
         const newFood = await food.create({
-            ...this.product_attributes,
-            product_shop: this.product_shop
+            ...this.product_attributes, product_shop: this.product_shop
         })
         super.removeProperty(newFood);
-
-        if (!newFood) throw new BusinessLogicError("Create new Clothing failed");
+        if (!newFood) throw new BusinessLogicError("Create new Food failed");
         const newProduct = await super.createProduct(newFood._id);
-        if (!newProduct) throw new BusinessLogicError("Create new Product failed");
-
+        if (!newProduct) throw new BusinessLogicError("Create new Food failed");
         return newProduct;
     }
+
     async updateProduct(product_id) {
-        const isFood = await food.findOne({ _id: product_id, ...this.product_shop });
+        const isFood = await food.findOne({_id: product_id, ...this.product_shop});
         if (!isFood) throw new BusinessLogicError("Product not found");
 
-        const updateFood = await food.findOneAndUpdate({ _id: product_id, ...this.product_shop }, {
-            ...this.product_attributes,
-            product_shop: this.product_shop
+        const updateFood = await food.findOneAndUpdate({_id: product_id, ...this.product_shop}, {
+            ...this.product_attributes, product_shop: this.product_shop
         }, {
             new: true
         });
         super.removeProperty(updateFood);
-
         if (!updateFood) throw new BusinessLogicError("update Food failed");
         const updateProduct = await super.updateProduct(updateFood._id);
         if (!updateProduct) throw new BusinessLogicError("Create new Product failed");
@@ -170,6 +197,7 @@ class Food extends Product {
         return updateProduct;
     }
 }
+
 ProductService.registerProductType('Clothing', Clothing);
 ProductService.registerProductType('Food', Food);
 module.exports = {

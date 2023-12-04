@@ -13,5 +13,4 @@ router.post('', categoryController.createCategory)
 router.put('/:categoryId', categoryController.updateCategory)
 router.delete('/:categoryId', categoryController.deleteCategory)
 
-
 module.exports = router
