@@ -95,10 +95,10 @@ class ProductController {
 
 
     
-    updateProduct = catchAsync(async (req, res) => {
-        OK(res, "set published successfully",
-            await ProductService.updateProduct(req.query))
-    })
+    // updateProduct = catchAsync(async (req, res) => {
+    //     OK(res, "set published successfully",
+    //         await ProductService.updateProduct(req.query))
+    // })
 }
 
 module.exports = new ProductController()
