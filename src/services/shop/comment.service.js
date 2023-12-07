@@ -29,7 +29,6 @@ class CommentService {
             if (!parentComment) throw new Api404Error('Parent comment not found')
 
             rightValue = parentComment.comment_right
-
             // updateMany comments
             await Comment.updateMany({
                 comment_product_id: convert2ObjectId(productId),

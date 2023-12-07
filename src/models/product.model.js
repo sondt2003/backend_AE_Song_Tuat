@@ -78,6 +78,9 @@ const productSchema = new Schema({
     },
     product_distance: {
         type: String,
+    },
+    product_rating: {
+        type: String,
     }
 }, {
     timestamps: true,

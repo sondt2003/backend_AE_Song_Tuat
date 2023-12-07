@@ -17,32 +17,26 @@ const {
 const {getSelectData, unGetSelectData, convert2ObjectId} = require("../../utils");
 
 class ProductService {
-
     static productRegistry = {}
-
     static registerProductType(type, classRef) {
         ProductService.productRegistry[type] = classRef
     }
-
     static async createProduct(type, payload) {
         const productClass = ProductService.productRegistry[type]
         if (!productClass) throw new BusinessLogicError("Product type %s không hợp lệ")
         return new productClass(payload).createProduct()
     }
-
     static async updateProduct(type, productId, payload) {
         const productClass = ProductService.productRegistry[type]
         if (!productClass) throw new BusinessLogicError("Product type %s không hợp lệ")
 
         return new productClass(payload).updateProduct(productId)
     }
-
     // PUT
     static async publishProductByShop({product_shop, product_id}) {
         // find one
         return await publishProductByShop({product_shop, product_id})
     }
-
     // query
     static async findAllDraftsForShop({product_shop, limit = 50, skip = 0}) {
         const query = {product_shop, isDraft: true}
@@ -76,30 +70,26 @@ class ProductService {
                 select: getSelectData(['product_name', 'product_distance', 'product_price', 'product_thumb', 'product_shop', 'image', "categoryId"])
             })
         }
-
     }
-
     static async draftProductByShop({product_shop, product_id}) {
         return await draftProductByShop({product_shop, product_id})
     }
-
     static async findOneProduct(product_id, isDiscount = false) {
         return await findByIdAndDiscount({product_id, isDiscount, unSelect: unGetSelectData(['__v', 'variations'])})
     }
-
     static async findProductById(product_id) {
         return await getProductById(product_id);
     }
-
     static async advancedSearch(query) {
         return await advancedSearch(query);
     }
 }
 
 class Product {
-    constructor({ product_name, product_thumb, product_description, product_price,
-        product_type, product_shop, product_attributes, product_quality, categoryId,image
-    }) {
+    constructor({
+                    product_name, product_thumb, product_description, product_price,
+                    product_type, product_shop, product_attributes, product_quality, categoryId, image
+                }) {
         this.product_name = product_name;
         this.product_thumb = product_thumb;
         this.product_description = product_description;
@@ -136,8 +126,6 @@ class Product {
         delete Product['updatedAt'];
         delete Product['__v'];
         this.product_attributes = Product;
-
-
         console.log("=============================== removeProperty ============================");
         console.log({...this.product_attributes});
     }
@@ -190,6 +178,7 @@ class Food extends Product {
         return updateProduct;
     }
 }
+
 
 ProductService.registerProductType('Clothing', Clothing);
 ProductService.registerProductType('Food', Food);
