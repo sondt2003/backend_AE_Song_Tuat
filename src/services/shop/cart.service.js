@@ -185,11 +185,20 @@ class CartService {
   }
 
   static async getListUserCart({ userId }) {
-    return cartModel
-        .findOne({
-          cart_user_id: userId,
-        })
-        .lean();
+    const cart =await cartModel.findOne({cart_user_id: userId}).lean();
+    const {cart_products} = cart;
+    console.log("cart:",cart)
+    const transformedData = {};
+    cart_products.forEach((item) => {
+      const indexValue = item.index;
+      if (!transformedData[indexValue]) {
+        transformedData[indexValue] = [];
+      }
+      const { index, ...itemWithoutIndex } = item;
+      transformedData[indexValue].push(itemWithoutIndex);
+    });
+    cart.cart_products=transformedData;
+    return cart;
   }
 }
 
