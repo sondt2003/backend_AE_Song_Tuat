@@ -195,8 +195,8 @@ const checkProductByServer = async (products) => {
  * @return {Promise<void>}
  */
 const advancedSearch = async (queryInput) => {
-  const excludedFields = ["page", "sort", "size", "fields"];
-  excludedFields.forEach((el) => delete queryInput[el]);
+  // const excludedFields = ["page", "sort", "size", "fields"];
+  // excludedFields.forEach((el) => delete queryInput[el]);
 
   //1. advanced filtering
   let queryStr = JSON.stringify(queryInput);
@@ -226,7 +226,7 @@ const advancedSearch = async (queryInput) => {
   //4. paging
   // page=0&size=10
   const page = queryInput.page * 1 || 1;
-  const size = queryInput.size * 1 || 100;
+  const size = queryInput.limit * 1 || 100;
   const offset = (page - 1) * size;
 
   query = query.skip(offset).limit(size);

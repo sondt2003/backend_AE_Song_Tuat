@@ -40,7 +40,7 @@ const aliasSearch = (req, res, next) => {
 }
 
 
-router.get('/advanced-search', aliasSearch, productController.advancedSearch)
+router.get('/advanced-search', productController.advancedSearch)
 
 /**
  * @swagger
