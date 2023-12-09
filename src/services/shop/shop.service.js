@@ -14,6 +14,7 @@ const findByEmail = async ({
                                    status: 3,
                                    roles: 4,
                                    name: 5,
+                                   avatar:6
                                },
                            }) => {
     return await shopModel
@@ -32,8 +33,6 @@ class ShopService {
                                    password,
                                    msisdn,
                                    addressId,
-                                   latitude,
-                                   longitude,
                                }) => {
         // step1: check email exists?
         const holderShop = await shopModel.findById(userId).lean();
@@ -56,8 +55,6 @@ class ShopService {
                     email,
                     password: passwordHash,
                     msisdn,
-                    latitude,
-                    longitude,
                     address_id: addressId,
                 },
                 {new: true}
