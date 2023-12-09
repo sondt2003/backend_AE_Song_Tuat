@@ -3,7 +3,6 @@ const Shop = require("../../models/shop.model");
 const {
     Api404Error,
     Api409Error,
-    Api401Error,
 } = require("../../core/error.response");
 const {TransactionHistoryService} = require("./transaction-history.service");
 
