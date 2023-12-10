@@ -276,7 +276,7 @@ class OrderService {
 
     static async shippingOrder(orderID) {
         setTimeout(async () => {
-            await OrderUpdater().setFilter({_id: orderID}).setBodyUpdate({
+            await new OrderUpdater().setFilter({_id: orderID}).setBodyUpdate({
                 order_status: 'delivered',
             }).executeUpdate();
             //on order success
