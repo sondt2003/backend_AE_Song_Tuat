@@ -182,6 +182,7 @@ const checkProductByServer = async (products) => {
           price: foundProduct.product_price,
           quantity: product.quantity,
           productId: product.productId,
+          index: product.index
         };
       }
     })

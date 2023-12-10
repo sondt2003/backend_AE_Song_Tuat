@@ -55,7 +55,7 @@ router.post('', cartController.addToCart)
  *           contents:
  *             application/json
  */
-router.delete('/:productId', cartController.delete)
+router.delete('/:index', cartController.delete)
 
 
 /**
