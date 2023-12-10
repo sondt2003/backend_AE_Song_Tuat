@@ -44,7 +44,7 @@ class OrderService {
               ]
           }
        */
-    static async checkoutReview({cartId, userId, shop_order_ids, isOrder = false,}) {
+    static async checkoutReview({cartId, userId, shop_order_ids, isOrder = false}) {
         // check cartId exists
         const foundCart = await findCartById(cartId);
         if (!foundCart) throw new Api401Error(`Cart don't exists`);
@@ -95,7 +95,8 @@ class OrderService {
                     }
                     checkout_order.totalDiscount += discount;
                     if (discount > 0) {
-                        itemCheckout.priceApplyDiscount = checkoutPrice - discount;
+                        itemCheckout.priceApplyDiscount = await checkoutPrice - discount;
+                        console.log("itemCheckout::::::::",itemCheckout.priceApplyDiscount)
                     }
                 }
             }
@@ -172,13 +173,15 @@ class OrderService {
             throw new BusinessLogicError("Một Số Sản Phẩm Đã Được Cập Nhật Vui Lòng Quay Lại Rỏ Hàng");
         }
         for (let i = 0; i < products.length; i++) {
-            const {productId} = products[i];
-            await CartService.getItemInCart({userId, productId});
+            const {productId,index} = products[i];
+            console.log("CART:::::::",products[i])
+            await CartService.getItemInCart({userId, productId,index });
         }
         const order_shipping = await addressModel
             .findOne({_id: addressId, user_id: userId})
             .lean();
         if (!order_shipping) throw new Api404Error("Address not found");
+
         const newOrder = await orderModel.create({
             order_userId: userId,
             order_checkout: checkout_order,
@@ -186,12 +189,12 @@ class OrderService {
             order_payment: user_payment,
             order_products: shop_order_ids_new,
             order_note: order_note
-
         });
+
         if (newOrder) {
             for (let i = 0; i < products.length; i++) {
-                const {productId} = products[i];
-                await CartService.deleteItemInCart({userId, productId});
+                const {productId,index} = products[i];
+                await CartService.deleteItemInCart({userId, productId,index});
             }
             SocketEmitService.EmitNewOrder({order: newOrder, shopId: newOrder.order_products.shopId})
             return newOrder;

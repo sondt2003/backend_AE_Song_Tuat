@@ -31,9 +31,10 @@ class CartService {
   }
 
   static async updateUserCartQuantity({ userId, product }) {
-    const { productId, quantity } = product;
+    const { productId, quantity ,index} = product;
     const query = {
         cart_user_id: userId,
+        "cart_products.index": index,
         "cart_products.productId": productId,
         cart_state: "active",
       },
@@ -50,13 +51,15 @@ class CartService {
   }
 
   static async addItemProductCart({ userId, product }) {
-    const { productId, quantity } = product;
+    const { productId, quantity ,index} = product;
     const query = {
       cart_user_id: userId,
-      "cart_products.shopId": userId,
+      "cart_products.index": index,
+      "cart_products.productId": productId,
       cart_state: "active",
     };
     const cart = await cartModel.findOne(query);
+
     if (!cart) {
       const query = {
         cart_user_id: userId,
@@ -74,7 +77,7 @@ class CartService {
     }
   }
 
-  static async addToCart({ userId, product = {} }) {
+  static async addToCart({ userId, product = {}}) {
     const userCart = await cartModel.findOne({
       cart_user_id: userId,
     });
@@ -155,17 +158,17 @@ class CartService {
     });
   }
 
-  static async deleteItemInCart({ userId, productId }) {
+  static async deleteIndexInCart({ userId, index }) {
     const query = { cart_user_id: userId, cart_state: "active" };
     const queryCart = {
       cart_user_id: userId,
-      "cart_products.productId": productId,
+      "cart_products.index": parseInt(index),
       cart_state: "active",
     };
     const updateSet = {
       $pull: {
         cart_products: {
-          productId,
+          index:parseInt(index),
         },
       },
     };
@@ -174,10 +177,32 @@ class CartService {
     return cartModel.updateOne(query, updateSet);
   }
 
-  static async getItemInCart({ userId, productId }) {
+  static async deleteItemInCart({ userId, index ,productId}) {
+    const query = { cart_user_id: userId, cart_state: "active" };
+    const queryCart = {
+      cart_user_id: userId,
+      "cart_products.index": parseInt(index),
+      "cart_products.productId": productId,
+      cart_state: "active",
+    };
+    const updateSet = {
+      $pull: {
+        cart_products: {
+          index:parseInt(index),
+          productId
+        },
+      },
+    };
+    const cart = await cartModel.findOne(queryCart);
+    if (!cart) throw new Api404Error("cart not found");
+    return cartModel.updateOne(query, updateSet);
+  }
+
+  static async getItemInCart({ userId, productId ,index }) {
     const queryCart = {
       cart_user_id: userId,
       "cart_products.productId": productId,
+      "cart_products.index": index,
       cart_state: "active",
     };
     const cart = await cartModel.findOne(queryCart);

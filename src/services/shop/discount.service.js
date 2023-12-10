@@ -157,7 +157,7 @@ class DiscountService {
                 if (!foundProduct) {
                     throw new BusinessLogicError("Don't have product with product id")
                 }
-                return acc + (product.quantity * foundProduct.product_price)
+                return await acc + (product.quantity * foundProduct.product_price)
             }, 0)
 
             if (totalOrder < discount_min_order_value) {
@@ -167,10 +167,7 @@ class DiscountService {
 
         if (discount_max_uses_per_user > 0) {
             let count = 0;
-
-            console.log("userId:::::::::::::::::::", userId);
             await discount_users_used.forEach(user => {
-                console.log("userId Discount uses:::::::::::::::::::", user);
                 if (user === userId) {
                     count++;
                 }
@@ -182,8 +179,10 @@ class DiscountService {
 
         // check xem discount nay la fixed amount
         const amount = discount_type === 'fixed_amount' ? discount_value : (totalOrder * (discount_value / 100))
-
-
+        
+        console.log("amount",amount);
+        console.log("discount_value",discount_value);
+        console.log("totalOrder",totalOrder);
         return {
             totalOrder,
             discount: amount,
