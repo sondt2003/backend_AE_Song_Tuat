@@ -45,7 +45,7 @@ class CartController {
      * @return {}
      */
     delete = catchAsync( async(req, res) => {
-        OK(res,  "Delete cart success", await CartService.deleteItemInCart({userId: req.user.userId,...req.params}))
+        OK(res,  "Delete cart success", await CartService.deleteIndexInCart({userId: req.user.userId,...req.params}))
     })
 
     /**
