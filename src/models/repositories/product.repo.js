@@ -252,7 +252,7 @@ const updateProductRating = async (productId) => {
     }
     const totalRating = commentsFound.reduce((sum, comment) => sum + comment.comment_rating, 0);
     const averageRating = totalRating / commentsFound.length;
-    foundProduct.product_rating = Math.round(averageRating * 10) / 10;
+    foundProduct.product_ratingsAverage = Math.round(averageRating * 10) / 10;
     await foundProduct.save();
     return true
 
