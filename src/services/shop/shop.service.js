@@ -39,12 +39,16 @@ class ShopService {
         if (!holderShop) {
             throw new Api403Error("Thông tin shop đã Tồn Tại");
         }
-        const foundAddress = await addressModel
+        if(addressId){
+            const foundAddress = await addressModel
             .findOne({_id: addressId, user_id: userId})
             .lean();
-        if (!foundAddress) throw new Api404Error("Address not found");
-
-        const passwordHash = await bcrypt.hash(password, 10);
+         if (!foundAddress) throw new Api404Error("Address not found");
+        }
+        if(password){
+            password = await bcrypt.hash(password, 10);
+        }
+        
 
         const updateShop = await shopModel
             .findByIdAndUpdate(
@@ -53,7 +57,7 @@ class ShopService {
                     name,
                     avatar,
                     email,
-                    password: passwordHash,
+                    password,
                     msisdn,
                     address_id: addressId,
                 },
