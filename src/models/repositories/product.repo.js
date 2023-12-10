@@ -246,20 +246,14 @@ const updateProductRating = async (productId) => {
     if (!foundProduct) {
         throw new Api404Error('Product not found');
     }
-
-    const commentsfound = await Comment.find({comment_product_id: productId, is_deleted: false});
-
-    if (commentsfound.length === 0) {
+    const commentsFound = await Comment.find({comment_product_id: productId, is_deleted: false});
+    if (commentsFound.length === 0) {
         throw new Api404Error('No comments found for this product');
     }
-
-    const totalRating = commentsfound.reduce((sum, comment) => sum + comment.comment_rating, 0);
-    const averageRating = totalRating / commentsfound.length;
-
-    product.product_ratingsAverage = Math.round(averageRating * 10) / 10;
-
-    await product.save();
-
+    const totalRating = commentsFound.reduce((sum, comment) => sum + comment.comment_rating, 0);
+    const averageRating = totalRating / commentsFound.length;
+    foundProduct.product_rating = Math.round(averageRating * 10) / 10;
+    await foundProduct.save();
     return true
 
 };
