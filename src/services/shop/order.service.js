@@ -96,7 +96,7 @@ class OrderService {
                     checkout_order.totalDiscount += discount;
                     if (discount > 0) {
                         itemCheckout.priceApplyDiscount = await checkoutPrice - discount;
-                        console.log("itemCheckout::::::::",itemCheckout.priceApplyDiscount)
+                        console.log("itemCheckout::::::::", itemCheckout.priceApplyDiscount)
                     }
                 }
             }
@@ -173,9 +173,9 @@ class OrderService {
             throw new BusinessLogicError("Một Số Sản Phẩm Đã Được Cập Nhật Vui Lòng Quay Lại Rỏ Hàng");
         }
         for (let i = 0; i < products.length; i++) {
-            const {productId,index} = products[i];
-            console.log("CART:::::::",products[i])
-            await CartService.getItemInCart({userId, productId,index });
+            const {productId, index} = products[i];
+            console.log("CART:::::::", products[i])
+            await CartService.getItemInCart({userId, productId, index});
         }
         const order_shipping = await addressModel
             .findOne({_id: addressId, user_id: userId})
@@ -193,8 +193,8 @@ class OrderService {
 
         if (newOrder) {
             for (let i = 0; i < products.length; i++) {
-                const {productId,index} = products[i];
-                await CartService.deleteItemInCart({userId, productId,index});
+                const {productId, index} = products[i];
+                await CartService.deleteItemInCart({userId, productId, index});
             }
             console.log("--------------------------", newOrder)
             SocketEmitService.EmitNewOrder({order: newOrder, shopId: newOrder.order_products[0].shopId})
@@ -276,7 +276,7 @@ class OrderService {
 
     static async shippingOrder(orderID) {
         setTimeout(async () => {
-            await new OrderUpdater().setFilter({_id: orderID}).setBodyUpdate({
+            await new OrderUpdater().setModel(orderModel).setFilter({_id: orderID}).setBodyUpdate({
                 order_status: 'delivered',
             }).executeUpdate();
             //on order success

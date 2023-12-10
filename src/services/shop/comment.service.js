@@ -56,6 +56,8 @@ class CommentService {
         return comment
     }
 
+    //todo get comment by product id
+
     static async getCommentsByParentId({productId, parentCommentId = null, limit = 50, offset = 0}) {
         if (parentCommentId) {
             const parent = await Comment.findById(parentCommentId)
@@ -74,7 +76,6 @@ class CommentService {
                 comment_left: 1
             });
         }
-
         return Comment.find({
             comment_product_id: convert2ObjectId(productId),
             comment_parent_id: parentCommentId
