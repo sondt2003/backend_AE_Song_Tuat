@@ -62,6 +62,7 @@ class ProductService {
                 select: getSelectData(['product_name', 'product_price', 'product_thumb', 'product_shop', 'image', 'product_distance'])
             })
         } else {
+            console.log("---------------------------------", limit,page)
             return await findAllProducts({
                 limit,
                 sort,
@@ -83,6 +84,8 @@ class ProductService {
     static async advancedSearch(query) {
         return await advancedSearch(query);
     }
+
+
 }
 
 class Product {

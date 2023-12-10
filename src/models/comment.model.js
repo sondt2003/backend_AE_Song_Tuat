@@ -3,7 +3,7 @@ const {model, Schema} = require("mongoose");
 const DOCUMENT_NAME = 'Comment';
 const COLLECTION_NAME = 'Comments';
 
-const apiKeySchema = new Schema({
+const commentModel = new Schema({
     comment_product_id: {type: Schema.Types.ObjectId, ref: 'Product'},
     comment_user_id: {
         type: Schema.Types.ObjectId,
@@ -21,4 +21,4 @@ const apiKeySchema = new Schema({
     timestamps: true,
     collection: COLLECTION_NAME
 });
-module.exports = model(DOCUMENT_NAME, apiKeySchema)
+module.exports = model(DOCUMENT_NAME, commentModel)

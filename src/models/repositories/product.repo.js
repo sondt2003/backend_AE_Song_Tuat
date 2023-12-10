@@ -195,8 +195,8 @@ const checkProductByServer = async (products) => {
  * @return {Promise<void>}
  */
 const advancedSearch = async (queryInput) => {
-  // const excludedFields = ["page", "sort", "size", "fields"];
-  // excludedFields.forEach((el) => delete queryInput[el]);
+  const excludedFields = ["page", "sort", "size", "fields"];
+  excludedFields.forEach((el) => delete queryInput[el]);
 
   //1. advanced filtering
   let queryStr = JSON.stringify(queryInput);
@@ -226,7 +226,7 @@ const advancedSearch = async (queryInput) => {
   //4. paging
   // page=0&size=10
   const page = queryInput.page * 1 || 1;
-  const size = queryInput.limit * 1 || 100;
+  const size = queryInput.size * 1 || 100;
   const offset = (page - 1) * size;
 
   query = query.skip(offset).limit(size);
@@ -238,6 +238,29 @@ const advancedSearch = async (queryInput) => {
   }
 
   return await query;
+};
+const updateProductRating = async (productId) => {
+    let foundProduct = await product.findById(productId);
+
+    if (!foundProduct) {
+        throw new Api404Error('Product not found');
+    }
+
+    const comments = await comment.find({comment_product_id: productId, is_deleted: false});
+
+    if (comments.length === 0) {
+        throw new Api404Error('No comments found for this product');
+    }
+
+    const totalRating = comments.reduce((sum, comment) => sum + comment.comment_rating, 0);
+    const averageRating = totalRating / comments.length;
+
+    product.product_ratingsAverage = Math.round(averageRating * 10) / 10;
+
+    await product.save();
+
+    return true
+
 };
 
 const advancedSearchV2 = async (queryInput) => {
@@ -251,19 +274,19 @@ const advancedSearchV2 = async (queryInput) => {
 };
 
 module.exports = {
-  findAllDraftsForShop,
-  findAllPublishForShop,
-  publishProductByShop,
-  searchProductByUser,
-  findAllProducts,
-  findById,
-  updateProductById,
-  getProductById,
-  checkProductByServer,
-  advancedSearch,
-  advancedSearchV2,
-  findByIdAndDiscount,
-  getProductByIdUnselect,
-  findAllProductsCategory,
-  draftProductByShop,
+    findAllDraftsForShop,
+    findAllPublishForShop,
+    publishProductByShop,
+    searchProductByUser,
+    findAllProducts,
+    findById,
+    updateProductById,
+    getProductById,
+    checkProductByServer,
+    advancedSearch,
+    advancedSearchV2,
+    findByIdAndDiscount,
+    getProductByIdUnselect,
+    findAllProductsCategory,
+    draftProductByShop, updateProductRating
 };

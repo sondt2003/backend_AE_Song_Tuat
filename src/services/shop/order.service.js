@@ -3,7 +3,7 @@ const {
     BusinessLogicError, Api401Error, Api404Error,
 } = require("../../core/error.response");
 const {
-    checkProductByServer,
+    checkProductByServer, getProductById,
 } = require("../../models/repositories/product.repo");
 const {DiscountService} = require("./discount.service");
 const {acquireLockV2, releaseLockV2} = require("../redis.service");
@@ -202,10 +202,9 @@ class OrderService {
     }
 
     static async getOrderByUser({userId, status}) {
-        const orderFound = await orderModel.find({
+        return orderModel.find({
             order_userId: convert2ObjectId(userId), order_status: status,
         });
-        return orderFound;
     }
 
     static async getOneOrderByUser({userId, orderId}) {
@@ -234,6 +233,10 @@ class OrderService {
         return updateOrder;
     }
 
+    static async findOrderById(order_id) {
+        return await orderModel.findById(order_id);
+    }
+
     static async updateOrderStatusByShop({shopId, userId, orderId, status = "confirmed", preStatus = "pending",}) {
         const foundOrder = await orderModel.findOne({
             _id: orderId,
@@ -256,7 +259,7 @@ class OrderService {
             throw new BusinessLogicError(`${status} failed `);
         }
         if (status === 'shipping') {
-            await this.shippingOrder(updateOrder)
+            await this.shippingOrder(updateOrder._id)
         }
         return updateOrder;
     }
@@ -267,9 +270,9 @@ class OrderService {
         });
     }
 
-    static async shippingOrder({orderID}) {
+    static async shippingOrder(orderID) {
         setTimeout(async () => {
-            await OrderUpdater().setBodyUpdate({
+            await OrderUpdater().setFilter(orderID).setBodyUpdate({
                 order_status: 'delivered',
             }).executeUpdate();
             //on order success
