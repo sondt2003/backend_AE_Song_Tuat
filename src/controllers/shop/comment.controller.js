@@ -3,19 +3,27 @@ const catchAsync = require('../../helpers/catch.async')
 const {OK} = require("../../core/success.response");
 
 class CommentController {
-    createComment = catchAsync(async(req, res, next) => {
-        OK(res,  "Create comment success", await CommentService.createComment({
+    createComment = catchAsync(async (req, res, next) => {
+        OK(res, "Create comment success", await CommentService.createComment({
             ...req.body,
             userId: req.user.userId
         }))
     });
 
-    getCommentsByParentId = catchAsync(async(req, res, next) => {
-        OK(res,  "Get comment success", await CommentService.getCommentsByParentId(req.query))
+    getCommentByProductId = catchAsync(async (req, res, next) => {
+        OK(res, "Get comment by id product Success", await CommentService.getCommentByProductId({
+            ...req.body,
+            productId: req.param.productId
+        }))
+    })
+
+
+    getCommentsByParentId = catchAsync(async (req, res, next) => {
+        OK(res, "Get comment success", await CommentService.getCommentsByParentId(req.query))
     });
 
-    deleteComment =  catchAsync(async(req, res, next) => {
-        OK(res,  "Delete comment success", await CommentService.deleteComment(req.query))
+    deleteComment = catchAsync(async (req, res, next) => {
+        OK(res, "Delete comment success", await CommentService.deleteComment(req.query))
     });
 }
 

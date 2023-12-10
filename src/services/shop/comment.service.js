@@ -1,9 +1,11 @@
 const Comment = require('../../models/comment.model')
-const {convert2ObjectId} = require("../../utils");
+const {convert2ObjectId, getSelectData} = require("../../utils");
 const {Api404Error, Api403Error} = require("../../core/error.response");
 const {ProductService} = require("./product.service");
 const {OrderService} = require("./order.service");
 const {updateProductRating} = require("../../models/repositories/product.repo");
+const shopModel = require("../../models/shop.model");
+const RoleShop = require("../../utils/role.util");
 
 class CommentService {
     static async createComment({userId, content, parentCommentId = null, orderId, rate, productId}) {
@@ -56,7 +58,16 @@ class CommentService {
         return comment
     }
 
-    //todo get comment by product id
+    static async getCommentByProductId({productId, limit, page}) {
+
+        let skip = (page - 1) * limit;
+        return await Comment
+            .find({
+                comment_product_id:productId
+            })
+            .skip(skip)
+            .limit(limit);
+    }
 
     static async getCommentsByParentId({productId, parentCommentId = null, limit = 50, offset = 0}) {
         if (parentCommentId) {
@@ -98,17 +109,14 @@ class CommentService {
     static async validateOrderExists(productId, filter = {}) {
         // check product exists in the database
         const foundOrder = await OrderService.findOrderById(productId)
-        if (foundOrder.order_status != "delivered") throw new Api403Error('Order not delivered')
+        if (foundOrder.order_status !== "delivered") throw new Api403Error('Order not delivered')
 
         if (!foundOrder) throw new Api404Error('Order not found')
 
         return foundOrder
     }
 
-    static async deleteComment({
-                                   productId,
-                                   commentId
-                               }) {
+    static async deleteComment({productId, commentId}) {
         await this.validateProductExists(productId)
 
         // detect left and right of commentId
