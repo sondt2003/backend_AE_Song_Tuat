@@ -14,7 +14,8 @@ const findByEmail = async ({
                                    status: 3,
                                    roles: 4,
                                    name: 5,
-                                   avatar:6
+                                   avatar:6,
+                                   msisdn:7,
                                },
                            }) => {
     return await shopModel
