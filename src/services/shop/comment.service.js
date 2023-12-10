@@ -116,6 +116,11 @@ class CommentService {
         return foundOrder
     }
 
+    static  async getStatisticalCommentByForProductId(){
+        // todo getStatisticalCommentByForProductId
+    }
+
+
     static async deleteComment({productId, commentId}) {
         await this.validateProductExists(productId)
 
