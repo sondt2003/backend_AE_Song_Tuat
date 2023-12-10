@@ -193,7 +193,8 @@ class OrderService {
                 const {productId} = products[i];
                 await CartService.deleteItemInCart({userId, productId});
             }
-            SocketEmitService.EmitNewOrder({order: newOrder, shopId: newOrder.order_products.shopId})
+            console.log("--------------------------", newOrder)
+            SocketEmitService.EmitNewOrder({order: newOrder, shopId: newOrder.order_products[0].shopId})
             return newOrder;
 
         } else {
