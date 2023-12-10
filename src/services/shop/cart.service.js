@@ -34,8 +34,12 @@ class CartService {
     const { productId, quantity ,index} = product;
     const query = {
         cart_user_id: userId,
-        "cart_products.index": index,
-        "cart_products.productId": productId,
+        cart_products:{
+          $elemMatch:{
+            "index": index,
+            "productId": productId,
+          }
+        },
         cart_state: "active",
       },
       updateSet = {
@@ -54,8 +58,12 @@ class CartService {
     const { productId, quantity ,index} = product;
     const query = {
       cart_user_id: userId,
-      "cart_products.index": index,
-      "cart_products.productId": productId,
+      cart_products:{
+        $elemMatch:{
+          "index": index,
+          "productId": productId,
+        }
+      },
       cart_state: "active",
     };
     const cart = await cartModel.findOne(query);
@@ -181,8 +189,12 @@ class CartService {
     const query = { cart_user_id: userId, cart_state: "active" };
     const queryCart = {
       cart_user_id: userId,
-      "cart_products.index": parseInt(index),
-      "cart_products.productId": productId,
+      cart_products:{
+        $elemMatch:{
+          "index": index,
+          "productId": productId,
+        }
+      },
       cart_state: "active",
     };
     const updateSet = {
@@ -201,8 +213,12 @@ class CartService {
   static async getItemInCart({ userId, productId ,index }) {
     const queryCart = {
       cart_user_id: userId,
-      "cart_products.productId": productId,
-      "cart_products.index": index,
+      cart_products:{
+        $elemMatch:{
+          "index": index,
+          "productId": productId,
+        }
+      },
       cart_state: "active",
     };
     const cart = await cartModel.findOne(queryCart);
