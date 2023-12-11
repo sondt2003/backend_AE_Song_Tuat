@@ -16,7 +16,7 @@ class CommentService {
             comment_user_id: convert2ObjectId(userId),
             comment_content: content,
             comment_rating: rate,
-            productId: productId
+            comment_product_id: productId
         })
         // if (parentCommentId) {
         //     // reply comment
