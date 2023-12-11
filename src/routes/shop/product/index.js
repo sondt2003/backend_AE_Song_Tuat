@@ -8,51 +8,6 @@ const {authenticationV2} = require("../../../auth/authUtils");
 // authentication
 router.use(authenticationV2)
 
-// after auth
-// product
-/**
- * @swagger
- *   /api/v1/product:
- *     post:
- *       summary: Create product
- *       tags: [Product]
- *       responses:
- *         "400":
- *           $ref: '#/components/responses/400'
- *         "401":
- *           $ref: '#/components/responses/401'
- *         "200":
- *           description: Product info
- *           contents:
- *             application/json
- */
-router.post('', productController.createProduct)
-
-/**
- * @swagger
- *   /api/v1/product/{productId}:
- *     patch:
- *       summary: Update product
- *       tags: [Product]
- *       parameters:
- *         - in: path
- *           name: productId
- *           schema:
- *             type: string
- *           required: true
- *           description: productId value
- *       responses:
- *         "400":
- *           $ref: '#/components/responses/400'
- *         "401":
- *           $ref: '#/components/responses/401'
- *         "200":
- *           description: Product info
- *           contents:
- *             application/json
- */
-router.patch('/:productId', productController.updateProduct)
-
 /**
  * @swagger
  *   /api/v1/product/publish/{id}:

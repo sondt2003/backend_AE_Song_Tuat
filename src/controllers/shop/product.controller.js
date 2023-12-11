@@ -16,8 +16,10 @@ class ProductController {
     publishProductByShop = catchAsync(async (req, res) => {
         OK(res, "Update publish product success",
             await ProductService.publishProductByShop({
-                product_shop: req.user.userId,
-                product_id: req.params.id
+                // product_shop: req.user.userId,
+                product_id: req.params.id,
+                ...req.body,
+                ...req.query
             }))
     })
 
@@ -25,8 +27,10 @@ class ProductController {
     draftProductByShop = catchAsync(async (req, res) => {
         OK(res, "Update draft product success",
             await ProductService.draftProductByShop({
-                product_shop: req.user.userId,
-                product_id: req.params.id
+                // product_shop: req.user.userId,
+                product_id: req.params.id,
+                ...req.body,
+                ...req.query
             }))
     })
 
@@ -47,7 +51,9 @@ class ProductController {
     getAllDraftsForShop = catchAsync(async (req, res) => {
         OK(res, "Find list drafts success",
             await ProductService.findAllDraftsForShop({
-               product_shop: req.user.userId
+            //    product_shop: req.user.userId
+            ...req.body,
+            ...req.query
             }))
     })
 
@@ -60,15 +66,18 @@ class ProductController {
     getAllPublishedForShop = catchAsync(async (req, res) => {
         OK(res, "Find list published success",
             await ProductService.findAllPublishForShop({
-                product_shop: req.user.userId
+                // product_shop: req.user.userId,
+                ...req.body,
+                ...req.query
             }))
     })
 
     getAllPublished = catchAsync(async (req, res) => {
         console.log(req.params.shopId)
-        OK(res, "Find list published success",
+        OK(res, "Find all list published success",
             await ProductService.findAllPublishForShop({
-                product_shop: req.params.shopId
+                product_shop: req.params.shopId,
+                ...req.query
             }))
     })
 
@@ -91,14 +100,6 @@ class ProductController {
         OK(res, "advanced search product success",
             await ProductService.advancedSearch(req.query))
     })
-
-
-
-    
-    // updateProduct = catchAsync(async (req, res) => {
-    //     OK(res, "set published successfully",
-    //         await ProductService.updateProduct(req.query))
-    // })
 }
 
 module.exports = new ProductController()
