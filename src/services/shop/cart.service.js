@@ -228,7 +228,6 @@ class CartService {
   static async getListUserCart({ userId }) {
     const cart =await cartModel.findOne({cart_user_id: userId}).lean();
     const {cart_products} = cart;
-    console.log("cart:",cart)
     const transformedData = {};
     cart_products.forEach((item) => {
       const indexValue = item.index;
