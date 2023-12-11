@@ -13,7 +13,7 @@ class CommentController {
     getCommentByProductId = catchAsync(async (req, res, next) => {
         OK(res, "Get comment by id product Success", await CommentService.getCommentByProductId({
             ...req.body,
-            productId: req.param.productId
+            productId: req.params.productId
         }))
     })
 
