@@ -107,7 +107,7 @@ class VnPayService {
 
             if (request) {
                 if (request.typePayment === TypePayment.DEPOSIT) {
-
+                    console.log("-----------------------------------", request)
                     WalletService.Depositing(request.userId, request.amount);
                     ListRequest = ListRequest.slice(indexDelete, 1);
                 }
