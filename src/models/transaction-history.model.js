@@ -21,6 +21,11 @@ const transactionHistorySchema = new Schema(
             type: String,
             required: true,
         },
+        amount:{
+            type: String,
+            required: true,
+        }
+        ,
         payment_method: {
             type: String,
             require: true,

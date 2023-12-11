@@ -3,7 +3,7 @@ const {
     BusinessLogicError, Api401Error, Api404Error,
 } = require("../../core/error.response");
 const {
-    checkProductByServer,
+    checkProductByServer, getProductById,
 } = require("../../models/repositories/product.repo");
 const {DiscountService} = require("./discount.service");
 const {acquireLockV2, releaseLockV2} = require("../redis.service");
@@ -96,7 +96,7 @@ class OrderService {
                     checkout_order.totalDiscount += discount;
                     if (discount > 0) {
                         itemCheckout.priceApplyDiscount = await checkoutPrice - discount;
-                        console.log("itemCheckout::::::::",itemCheckout.priceApplyDiscount)
+                        console.log("itemCheckout::::::::", itemCheckout.priceApplyDiscount)
                     }
                 }
             }
@@ -173,9 +173,9 @@ class OrderService {
             throw new BusinessLogicError("Một Số Sản Phẩm Đã Được Cập Nhật Vui Lòng Quay Lại Rỏ Hàng");
         }
         for (let i = 0; i < products.length; i++) {
-            const {productId,index} = products[i];
-            console.log("CART:::::::",products[i])
-            await CartService.getItemInCart({userId, productId,index });
+            const {productId, index} = products[i];
+            console.log("CART:::::::", products[i])
+            await CartService.getItemInCart({userId, productId, index});
         }
         const order_shipping = await addressModel
             .findOne({_id: addressId, user_id: userId})
@@ -193,10 +193,11 @@ class OrderService {
 
         if (newOrder) {
             for (let i = 0; i < products.length; i++) {
-                const {productId,index} = products[i];
-                await CartService.deleteItemInCart({userId, productId,index});
+                const {productId, index} = products[i];
+                await CartService.deleteItemInCart({userId, productId, index});
             }
-            SocketEmitService.EmitNewOrder({order: newOrder, shopId: newOrder.order_products.shopId})
+            console.log("--------------------------", newOrder)
+            SocketEmitService.EmitNewOrder({order: newOrder, shopId: newOrder.order_products[0].shopId})
             return newOrder;
 
         } else {
@@ -205,10 +206,9 @@ class OrderService {
     }
 
     static async getOrderByUser({userId, status}) {
-        const orderFound = await orderModel.find({
+        return orderModel.find({
             order_userId: convert2ObjectId(userId), order_status: status,
         });
-        return orderFound;
     }
 
     static async getOneOrderByUser({userId, orderId}) {
@@ -237,6 +237,10 @@ class OrderService {
         return updateOrder;
     }
 
+    static async findOrderById(order_id) {
+        return await orderModel.findById(order_id);
+    }
+
     static async updateOrderStatusByShop({shopId, userId, orderId, status = "confirmed", preStatus = "pending",}) {
         const foundOrder = await orderModel.findOne({
             _id: orderId,
@@ -259,7 +263,7 @@ class OrderService {
             throw new BusinessLogicError(`${status} failed `);
         }
         if (status === 'shipping') {
-            await this.shippingOrder(updateOrder)
+            await this.shippingOrder(updateOrder._id)
         }
         return updateOrder;
     }
@@ -270,9 +274,9 @@ class OrderService {
         });
     }
 
-    static async shippingOrder({orderID}) {
+    static async shippingOrder(orderID) {
         setTimeout(async () => {
-            await OrderUpdater().setBodyUpdate({
+            await new OrderUpdater().setModel(orderModel).setFilter({_id: orderID}).setBodyUpdate({
                 order_status: 'delivered',
             }).executeUpdate();
             //on order success

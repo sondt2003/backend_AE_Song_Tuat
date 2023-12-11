@@ -55,10 +55,7 @@ const productSchema = new Schema({
     // more
     product_ratingsAverage: {
         type: Number,
-        default: 4.5,
-        min: [1, 'Rating must be above 1.0'],
-        max: [5, 'Rating must be above 5.0'],
-        set: (val) => Math.round(val * 10) / 10
+        default: 0,
     },
     product_variations: {
         type: Array,
@@ -78,7 +75,8 @@ const productSchema = new Schema({
     },
     product_distance: {
         type: String,
-    }
+    },
+
 }, {
     timestamps: true,
     collection: COLLECTION_NAME
