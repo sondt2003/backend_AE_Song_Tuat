@@ -6,6 +6,9 @@ class AddressController {
     createUserAddress = catchAsync(async(req, res, next) => {
         OK(res,  "create User Address success", await AddressService.createUserAddress({userId: req.user.userId,...req.body}))
     });
+    createShopAddress = catchAsync(async(req, res, next) => {
+        OK(res,  "create SHop Address success", await AddressService.createUserAddress({userId: req.params.shopId,...req.body}))
+    });
 
     updateUserAddress = catchAsync(async(req, res, next) => {
         OK(res,  "Update User Address success", await AddressService.updateUserAddress({userId: req.user.userId,addressId:req.params.addressId,...req.body}))
