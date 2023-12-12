@@ -15,10 +15,9 @@ const Comment = require("../comment.model")
 const publishProductByShop = async ({product_shop, product_id}) => {
     // find one
     const foundShop = await product.findOne({
-        product_shop: new Types.ObjectId(product_shop),
+        // product_shop: new Types.ObjectId(product_shop),
         _id: new Types.ObjectId(product_id),
     });
-
     if (!foundShop) return foundShop;
 
     // update isDraft, isPublish
@@ -30,10 +29,10 @@ const publishProductByShop = async ({product_shop, product_id}) => {
     return modifiedCount;
 };
 
-const draftProductByShop = async ({product_shop, product_id}) => {
+const draftProductByShop = async ({ product_id}) => {
     // find one
     const foundShop = await product.findOne({
-        product_shop: new Types.ObjectId(product_shop),
+        // product_shop: new Types.ObjectId(product_shop),
         _id: new Types.ObjectId(product_id),
     });
 

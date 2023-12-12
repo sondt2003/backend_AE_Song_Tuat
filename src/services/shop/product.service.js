@@ -38,13 +38,13 @@ class ProductService {
         return await publishProductByShop({product_shop, product_id})
     }
     // query
-    static async findAllDraftsForShop({product_shop, limit = 50, skip = 0}) {
-        const query = {product_shop, isDraft: true}
+    static async findAllDraftsForShop({ limit = 50, skip = 0}) {
+        const query = { isDraft: true}
         return await findAllDraftsForShop({query, limit, skip})
     }
 
     static async findAllPublishForShop({product_shop, limit = 50, skip = 0}) {
-        const query = {product_shop, isPublished: true}
+        const query = { isPublished: true}
         return await findAllPublishForShop({query, limit, skip})
     }
 
@@ -72,8 +72,8 @@ class ProductService {
             })
         }
     }
-    static async draftProductByShop({product_shop, product_id}) {
-        return await draftProductByShop({product_shop, product_id})
+    static async draftProductByShop({product_id}) {
+        return await draftProductByShop({product_id})
     }
     static async findOneProduct(product_id, isDiscount = false) {
         return await findByIdAndDiscount({product_id, isDiscount, unSelect: unGetSelectData(['__v', 'variations'])})
