@@ -7,7 +7,8 @@ class DiscountController {
         OK(res, "Create discount success",
             await DiscountService.createDiscountCode({
                 ...req.body,
-                shopId: req.user.userId
+                shopId: req.user.userId,
+                permissions: req.permissions
             }));
     })//done
 
