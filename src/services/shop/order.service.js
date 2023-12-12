@@ -205,9 +205,11 @@ class OrderService {
         }
     }
 
-    static async getOrderByUser({userId, status}) {
-        return orderModel.find({
-            order_userId: convert2ObjectId(userId), order_status: status,
+    static async getOrderByUser({userId, status, limit = 50, sort = "ctime", page = 1}) {
+
+
+        return findAllOrders({
+            limit, sort, filter: {order_status: status}, page,
         });
     }
 
