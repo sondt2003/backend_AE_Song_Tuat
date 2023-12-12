@@ -27,7 +27,7 @@ router.use("/api/v1/transaction-history", require("./transaction-history"));
 router.use("/api/v1/profile", require("./profile"));
 router.use("/api/v1/wallet", require("./wallet"));
 // check permission
-router.use(permission(RoleShop.ADMIN));
+router.use(permission([RoleShop.ADMIN,RoleShop.SHOP]));
 
 router.use("/api/v1/inventory", require("./inventory"));
 router.use("/api/v1/discount", require("./discount"));

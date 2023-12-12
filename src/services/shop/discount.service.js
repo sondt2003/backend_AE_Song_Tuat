@@ -3,6 +3,7 @@ const { convert2ObjectId } = require("../../utils");
 const discountModel = require('../../models/discount.model')
 const { findAllProducts, getProductById } = require("../../models/repositories/product.repo");
 const { findAllDiscountCodesUnSelect, checkDiscountExists } = require("../../models/repositories/discount.repo");
+const RoleShop = require("../../utils/role.util");
 
 class DiscountService {
 
@@ -10,7 +11,7 @@ class DiscountService {
         const {
             code, start_date, end_date, is_active, shopId, min_order_value,
             product_ids, applies_to, name, description, type, users_used,
-            value, max_value, max_users, users_count, max_uses_per_user
+            value, max_value, max_users, users_count, max_uses_per_user,permissions
         } = payload
 
         // validate
@@ -21,7 +22,8 @@ class DiscountService {
         if (new Date(end_date) < new Date(start_date)) {
             throw new BusinessLogicError('End date more than start date')
         }
-
+        const isPermission = permissions.includes(RoleShop.ADMIN);
+        
         // create index for discount code
         const foundDiscount = discountModel.findOne({
             discount_code: code,
@@ -49,7 +51,8 @@ class DiscountService {
             discount_max_uses_per_user: max_uses_per_user,
             discount_is_active: is_active,
             discount_applies_to: applies_to,
-            discount_product_ids: applies_to === 'all' ? [] : product_ids
+            discount_product_ids: applies_to === 'all' ? [] : product_ids,
+            discount_is_admin:isPermission
         })
     }
 
@@ -123,8 +126,14 @@ class DiscountService {
         const foundDiscount = await checkDiscountExists({
             model: discountModel,
             filter: {
-                _id: codeId,
-                discount_shop_id: convert2ObjectId(shopId)
+                $or:[
+                   { _id: codeId,
+                    discount_shop_id: convert2ObjectId(shopId)},
+                {
+                        discount_is_admin:true,
+                        _id: codeId,
+                    }
+                ]
             }
         })
         if (!foundDiscount) {

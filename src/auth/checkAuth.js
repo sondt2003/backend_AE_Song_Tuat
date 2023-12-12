@@ -39,13 +39,23 @@ const permission = (permissions) => {
         if (!req.objKey.permissions) {
             return returnPermissionDenied(res);
         }
+        var hasAnyPermission = req.objKey.permissions.filter(function(permission) {
+            return permissions.includes(permission);
+        });
 
-        console.log("permissions::", req.objKey.permissions)
-        const validPermission = req.objKey.permissions.includes(permissions)
-
-        if (!validPermission) {
+        if (hasAnyPermission.length > 0) {
+            console.log("Có những quyền chung:", hasAnyPermission);
+            req.permissions = hasAnyPermission;
+        } else {
+            console.log("Không có quyền chung nào!");
             return returnPermissionDenied(res);
         }
+
+        // console.log("permissions::", req.objKey.permissions)
+        // const validPermission = req.objKey.permissions.includes(permissions)
+        // if (!validPermission) {
+        //     return returnPermissionDenied(res);
+        // }
 
         return next()
     }
