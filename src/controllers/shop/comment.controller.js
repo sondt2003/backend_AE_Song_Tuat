@@ -14,7 +14,9 @@ class CommentController {
         OK(res, "Get comment by id product Success", await CommentService.getCommentByProductId({
             ...req.body,
             productId: req.params.productId
-        }))
+        }), {
+            statistical_rate: await CommentService.getStatisticalCommentByForProductId(req.params.productId)
+        })
     })
 
 

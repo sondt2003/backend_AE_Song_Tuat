@@ -61,10 +61,7 @@ class CommentService {
     static async getCommentByProductId({productId, limit, page}) {
 
         let skip = (page - 1) * limit;
-        return await Comment
-            .find({
-                comment_product_id:productId
-            })
+        return Comment.find({comment_product_id: productId})
             .skip(skip)
             .limit(limit);
     }
@@ -116,8 +113,45 @@ class CommentService {
         return foundOrder
     }
 
-    static  async getStatisticalCommentByForProductId(){
-        // todo getStatisticalCommentByForProductId
+    static async getStatisticalCommentByForProductId(productId) {
+
+            // Find all comments for the given product
+            const comments = await Comment.find({comment_product_id: productId});
+
+            if (!comments){
+                throw new Api404Error('Comment not found')
+            }
+            // Initialize an object to store the count of each rating
+            const ratingCount = {
+                1: 0,
+                2: 0,
+                3: 0,
+                4: 0,
+                5: 0,
+            };
+
+            // Count the number of each rating
+            comments.forEach((comment) => {
+                const rating = comment.comment_rating;
+                if (rating >= 1 && rating <= 5) {
+                    ratingCount[rating]++;
+                }
+            });
+
+            // Calculate the total number of ratings
+            const totalRatings = comments.length;
+
+            // Calculate the percentage distribution
+            const ratingPercentage = {};
+            for (let i = 1; i <= 5; i++) {
+                const percentage = (ratingCount[i] / totalRatings) * 100;
+                ratingPercentage[i] = percentage.toFixed(2); // Round to 2 decimal places
+            }
+
+            return ratingPercentage;
+
+
+
     }
 
 
