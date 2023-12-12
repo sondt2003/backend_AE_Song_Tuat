@@ -5,7 +5,10 @@ const { findAllProducts, getProductById } = require("../../models/repositories/p
 const { findAllDiscountCodesUnSelect, checkDiscountExists } = require("../../models/repositories/discount.repo");
 
 class DiscountService {
-
+    static async countDiscount(){
+        let totalDiscount = await discountModel.countDocuments()
+        return  totalDiscount
+    }
     static async createDiscountCode(payload) {
         const {
             code, start_date, end_date, is_active, shopId, min_order_value,
