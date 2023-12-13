@@ -25,6 +25,25 @@ const findByEmail = async ({
         .lean();
 };
 
+const findByIdShop = async ({
+    _id,
+    select = {
+        // email: 1,
+        // password: 2,
+        // status: 3,
+        // roles: 4,
+        name: 5,
+        avatar:6,
+        msisdn:7,
+    },
+}) => {
+return await shopModel
+.findOne({_id:_id})
+.select(select)
+// .populate("address_id")
+.lean();
+};
+
 class ShopService {
     static updateUser = async ({
                                    userId,
@@ -161,6 +180,6 @@ class ShopService {
 }
 
 module.exports = {
-    findByEmail,
+    findByEmail,findByIdShop,
     ShopService,
 };

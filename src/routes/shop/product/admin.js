@@ -52,6 +52,9 @@ router.put('/draft/:id', productController.draftProductByShop)
  *           contents:
  *             application/json
  */
+router.post('', productController.createProduct)
+router.patch('/:productId', productController.updateProduct)
+
 router.get('/drafts/all', productController.getAllDraftsForShop)
 /**
  * @swagger

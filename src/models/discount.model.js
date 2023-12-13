@@ -56,7 +56,10 @@ const apiKeySchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Shop'
     },
-
+    discount_is_admin: {
+        type: Schema.Types.Boolean,
+        default: false
+    },
     discount_is_active: {
         type: Boolean,
         required: true,

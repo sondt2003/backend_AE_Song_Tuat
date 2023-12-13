@@ -22,7 +22,11 @@ router.post('/review', orderController.checkoutReview)
 router.post('/v1', orderController.order)
 router.post('/v2', orderController.orderV2)
 
+router.get('/top-order', orderController.topOrder);
+router.get('/top-product', orderController.topProduct);
+
 router.get('/:orderId', orderController.getOneOrderByUser)
+
 
 router.post('/cancel', orderController.cancelOrderByUser)
 
