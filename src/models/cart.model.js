@@ -45,17 +45,5 @@ const apiKeySchema = new Schema({
     },
 });
 
-apiKeySchema.post("findOne", async function (result, next) {
-    if(result){
-        for (let i = 0; i < result.cart_products.length; i++) {
-            const item_products = result.cart_products[i];
-            const foundProduct = await product.findById(item_products.productId)
-                .select("image -_id").lean();
-
-                result.cart_products[i] = {...foundProduct, ...item_products}
-        }
-    }
-    next();
-});
 
 module.exports = model(DOCUMENT_NAME, apiKeySchema)

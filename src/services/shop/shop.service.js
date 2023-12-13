@@ -1,6 +1,6 @@
 const shopModel = require("../../models/shop.model");
 const bcrypt = require("bcrypt");
-const {getInfoData, getSelectData} = require("../../utils");
+const {getInfoData, getSelectData, deleteImage} = require("../../utils");
 const {Api403Error, Api404Error} = require("../../core/error.response");
 const addressModel = require("../../models/address.model");
 const RoleShop = require("../../utils/role.util");
@@ -68,14 +68,14 @@ class ShopService {
         if(password){
             password = await bcrypt.hash(password, 10);
         }
-        
 
+        const image = await saveBase64Image(avatar);
         const updateShop = await shopModel
             .findByIdAndUpdate(
                 userId,
                 {
                     name,
-                    avatar,
+                    avatar:image,
                     email,
                     password,
                     msisdn,
@@ -88,6 +88,7 @@ class ShopService {
         if (!updateShop) {
             return null;
         }
+        await deleteImage(holderShop.avatar);
         return {
             shop: getInfoData({
                 fields: ["_id", "name", "email", "msisdn", "address_id", "avatar"],
@@ -137,12 +138,13 @@ class ShopService {
 
         const passwordHash = await bcrypt.hash(password, 10);
 
+        const image = await saveBase64Image(avatar);
         const updateShop = await shopModel
             .findByIdAndUpdate(
                 userId,
                 {
                     name,
-                    avatar,
+                    avatar:image,
                     email,
                     password: passwordHash,
                     msisdn,
@@ -156,6 +158,8 @@ class ShopService {
         if (!updateShop) {
             return null;
         }
+
+        await deleteImage(holderShop.avatar);
         return {
             shop: getInfoData({
                 fields: ["_id", "name", "email", "msisdn", "address_id", "avatar"],
