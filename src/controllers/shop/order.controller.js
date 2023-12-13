@@ -71,6 +71,15 @@ class OrderController {
         );
     });
 
+    topProduct = catchAsync(async (req, res, next) => {
+        OK(
+            res,
+            "Top Product By Shop success",
+            await OrderService.topProduct(req.query)
+        );
+    });
+
+
     updateOrderConfirmByShop = catchAsync(async (req, res, next) => {
         OK(
             res,

@@ -23,6 +23,7 @@ router.post('/v1', orderController.order)
 router.post('/v2', orderController.orderV2)
 
 router.get('/top-order', orderController.topOrder);
+router.get('/top-product', orderController.topProduct);
 
 router.get('/:orderId', orderController.getOneOrderByUser)
 
