@@ -15,10 +15,9 @@ const Comment = require("../comment.model")
 const publishProductByShop = async ({product_shop, product_id}) => {
     // find one
     const foundShop = await product.findOne({
-        product_shop: new Types.ObjectId(product_shop),
+        // product_shop: new Types.ObjectId(product_shop),
         _id: new Types.ObjectId(product_id),
     });
-
     if (!foundShop) return foundShop;
 
     // update isDraft, isPublish
@@ -30,10 +29,10 @@ const publishProductByShop = async ({product_shop, product_id}) => {
     return modifiedCount;
 };
 
-const draftProductByShop = async ({product_shop, product_id}) => {
+const draftProductByShop = async ({ product_id}) => {
     // find one
     const foundShop = await product.findOne({
-        product_shop: new Types.ObjectId(product_shop),
+        // product_shop: new Types.ObjectId(product_shop),
         _id: new Types.ObjectId(product_id),
     });
 
@@ -252,10 +251,9 @@ const updateProductRating = async (productId) => {
     }
     const totalRating = commentsFound.reduce((sum, comment) => sum + comment.comment_rating, 0);
     const averageRating = totalRating / commentsFound.length;
-    foundProduct.product_ratingsAverage = Math.round(averageRating * 10) / 10;
+    foundProduct.product_ratingsAverage = Math.round(averageRating) ;
     await foundProduct.save();
     return true
-
 };
 
 const advancedSearchV2 = async (queryInput) => {

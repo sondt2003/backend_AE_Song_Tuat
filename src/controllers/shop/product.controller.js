@@ -18,7 +18,6 @@ class ProductController {
             await ProductService.publishProductByShop({
                 // product_shop: req.user.userId,
                 product_id: req.params.id,
-                ...req.body,
                 ...req.query
             }))
     })
@@ -29,7 +28,7 @@ class ProductController {
             await ProductService.draftProductByShop({
                 // product_shop: req.user.userId,
                 product_id: req.params.id,
-                ...req.body,
+                // ...req.body,
                 ...req.query
             }))
     })
@@ -52,7 +51,7 @@ class ProductController {
         OK(res, "Find list drafts success",
             await ProductService.findAllDraftsForShop({
             //    product_shop: req.user.userId
-            ...req.body,
+            // ...req.body,
             ...req.query
             }))
     })

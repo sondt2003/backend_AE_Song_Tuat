@@ -9,6 +9,8 @@ router.use("/healthcheck", require("./health"));
 
 router.use("/zone", require("./zone"));
 router.use("/api/v1/vnpay", require("./vnpay"));
+router.use("/api/v1/notify", require("./notify_user"))
+
 // check apiKey
 router.use(apiKey);
 

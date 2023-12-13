@@ -107,13 +107,16 @@ class VnPayService {
 
             if (request) {
                 if (request.typePayment === TypePayment.DEPOSIT) {
-
                     WalletService.Depositing(request.userId, request.amount);
                     ListRequest = ListRequest.slice(indexDelete, 1);
+                    return "Thanh toán thành công!";
+                }else
+                {
+                    throw new Api403Error('Lỗi giao dịch ,vui lòng thao tác lại');
                 }
-                return "Thanh toán thành công!";
+
             } else {
-                throw new Api403Error('Yêu cầu nạp tiền không thành công');
+                throw new Api403Error('Lỗi giao dịch ,vui lòng thao tác lại');
             }
         } else {
             throw new Api403Error("sai chữ kí");

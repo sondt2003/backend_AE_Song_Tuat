@@ -37,6 +37,8 @@ class OrderController {
             await OrderService.getOrderByUser({
                 userId: req.user.userId,
                 status: req.query.status,
+                page: req.query.page,
+                limit: req.query.limit
             })
         );
     });

@@ -15,7 +15,9 @@ const commentModel = new Schema({
     comment_parent_id: {type: Schema.Types.ObjectId, ref: DOCUMENT_NAME},
     is_deleted: {type: Boolean, default: false},
     comment_rating: {
+        default: 0,
         type: Schema.Types.Number
+        , require: true
     }
 }, {
     timestamps: true,
