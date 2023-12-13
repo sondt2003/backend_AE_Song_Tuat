@@ -4,6 +4,7 @@ const {
   getProductByIdUnselect,
 } = require("../../models/repositories/product.repo");
 const { Api404Error } = require("../../core/error.response");
+const { product } = require("../../models/product.model");
 
 /**
  * - Add product to cart - user
@@ -98,7 +99,6 @@ class CartService {
         "product_price",
         "product_name",
         "product_shop",
-        "product_price",
       ],
     });
     product = {
@@ -226,7 +226,16 @@ class CartService {
   }
 
   static async getListUserCart({ userId }) {
-    const cart =await cartModel.findOne({cart_user_id: userId}).lean();
+    const cart =await cartModel.findOne({cart_user_id: userId}).lean().then(async (result)=>{
+      for (let i = 0; i < result.cart_products.length; i++) {
+        const item_products = result.cart_products[i];
+        const foundProduct = await product.findById(item_products.productId)
+            .select("image -_id").lean();
+
+            result.cart_products[i] = {...foundProduct, ...item_products}
+       }
+        return result;
+    });
     const {cart_products} = cart;
     const transformedData = {};
     cart_products.forEach((item) => {
