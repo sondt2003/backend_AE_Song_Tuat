@@ -4,6 +4,30 @@ const shopservice = require("../../services/shop/shop.service")
 const {Api404Error} = require("../../core/error.response");
 const notifyModel = require("../../models/native_notify.model")
 
+const NotifyTemplate =
+    Object.freeze({
+            pending: {
+                message: "Hãy chờ shop xác nhận đơn hàng của bạn",
+                title: "Đơn hàng của bạn đã được đặt"
+            }, confirmed: {
+                message: "Hãy chờ shop chuẩn bị đơn hàng của bạn",
+                title: "Đơn hàng của bạn đã được xác nhận"
+            }, shipping: {
+                message: "Đơn hàng sẽ sớm đến thôi, hãy kiên nhẫn nhé!!!",
+                title: "Đơn hàng của bạn đang được giao đi"
+            }, delivered: {
+                message: "Chúc ngon miệng ,hãy nhớ để lại đánh giá để những người khác biết về trải nghiệm của bạn nhé",
+                title: "Đơn hàng đã được giao đến"
+            }, canceled: {
+                message: "Đơn hàng đã bị huỷ,Thật tiếc",
+                title: "Đơn hàng bị huỷ"
+            },
+
+
+        }
+    )
+
+
 class NotifyUserService {
 
     static async createNotification({userId, title, message, typeNotify, orderId}) {
@@ -54,7 +78,8 @@ class NotifyUserService {
         return foundNotification;
     }
 
-    static async putNotify({user_id, title = "Thông báo", message = "Đây là thông báo test của hệ thống", type_notify
+    static async putNotify({
+                               user_id, title = "Thông báo", message = "Đây là thông báo test của hệ thống", type_notify
                            }) {
         let user = await shopservice.findByIdShop({_id: user_id})
         if (!user) {
@@ -68,6 +93,31 @@ class NotifyUserService {
             message: message,
         });
         await this.createNotification({userId: user_id, title, message, typeNotify: type_notify})
+        return true
+    }
+
+    static async notifyOrder({user_id, type_notify, order_id}) {
+        let user = await shopservice.findByIdShop({_id: user_id})
+        if (!user) {
+            throw new Api404Error("Không tìm thấy shop")
+        }
+        const contentNotify = NotifyTemplate[`${type_notify}`]
+        if (!contentNotify) {
+            throw new Api404Error("Không tìm thấy nội dung notify phù hợp")
+        }
+        axios.post(native_notify_config.url_indie, {
+            subID: `${user_id}`,
+            appId: native_notify_config.appId,
+            appToken: native_notify_config.appToken,
+            title: contentNotify.title,
+            message: contentNotify.message,
+        });
+        await this.createNotification({
+            userId: user_id,
+            title: contentNotify.title,
+            message: contentNotify.message,
+            typeNotify: type_notify
+        })
         return true
     }
 }

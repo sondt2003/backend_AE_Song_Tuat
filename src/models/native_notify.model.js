@@ -1,12 +1,16 @@
-const mongoose = require('mongoose');
+const {model, Schema} = require('mongoose');
 
-const notifySchema = new mongoose.Schema({
-    userId: {type: Number, required: true},
+const notifySchema = new Schema({
+    userId: {type: Schema.Types.ObjectId, ref: "Shop", required: true},
     title: {type: String, required: true},
     message: {type: String, required: true},
-    typeNotify: {type: String, enum: ["pending", "confirmed", "shipping", "canceled", "delivered","normal"], required: true},
-    orderId: {type: Number}
+    typeNotify: {
+        type: String,
+        enum: ["pending", "confirmed", "shipping", "canceled", "delivered", "normal"],
+        required: true
+    },
+    orderId: {type: Schema.Types.ObjectId, ref: "Order"}
 });
-const NotifyModel = mongoose.model('Notify', notifySchema);
+const NotifyModel = model('Notify', notifySchema);
 
 module.exports = NotifyModel;
