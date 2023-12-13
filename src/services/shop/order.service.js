@@ -1,6 +1,6 @@
 const {findCartById} = require("../../models/repositories/cart.repo");
 const {
-    BusinessLogicError, Api401Error, Api404Error,
+    BusinessLogicError, Api401Error, Api404Error, Api403Error,
 } = require("../../core/error.response");
 const {
     checkProductByServer, getProductById,
@@ -181,6 +181,13 @@ class OrderService {
             .findOne({_id: addressId, user_id: userId})
             .lean();
         if (!order_shipping) throw new Api404Error("Address not found");
+        if (!user_payment) {
+            throw new Api403Error("Don't have tpe payment")
+        }
+
+
+
+
 
         const newOrder = await orderModel.create({
             order_userId: userId,
@@ -197,6 +204,8 @@ class OrderService {
                 await CartService.deleteItemInCart({userId, productId, index});
             }
             console.log("--------------------------", newOrder)
+
+
             SocketEmitService.EmitNewOrder({order: newOrder, shopId: newOrder.order_products[0].shopId})
             return newOrder;
 
