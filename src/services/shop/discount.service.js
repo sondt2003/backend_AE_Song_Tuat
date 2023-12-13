@@ -248,8 +248,14 @@ class DiscountService {
         const foundDiscount = await checkDiscountExists({
             model: discountModel,
             filter: {
-                _id: codeId,
-                discount_shop_id: convert2ObjectId(shopId)
+                $or:[
+                   { _id: codeId,
+                    discount_shop_id: convert2ObjectId(shopId)},
+                {
+                        discount_is_admin:true,
+                        _id: codeId,
+                    }
+                ]
             }
         })
 
