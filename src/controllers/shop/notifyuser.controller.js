@@ -4,12 +4,9 @@ const {OK} = require("../../core/success.response");
 
 class NotifyUserController {
     putNotify = catchAsync(async (req, res, next) => {
-
-        OK(res, "Notify thành công", NotifyUserService.putNotify({
+        OK(res, "Notify thành công",await NotifyUserService.putNotify({
            ...req.body
         }))
-
-
     })
 
 

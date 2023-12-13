@@ -58,7 +58,7 @@ class VnPayService {
         vnp_Params["vnp_TxnRef"] = orderId;
         vnp_Params["vnp_OrderInfo"] = "Thanh toan cho ma GD:" + orderId;
         vnp_Params["vnp_OrderType"] = "other";
-        vnp_Params["vnp_Amount"] = amount * 100;
+        vnp_Params["vnp_Amount"] = amount;
         vnp_Params["vnp_ReturnUrl"] = returnUrl;
         vnp_Params["vnp_IpAddr"] = ipAddr;
         vnp_Params["vnp_CreateDate"] = createDate;
@@ -110,8 +110,7 @@ class VnPayService {
                     WalletService.Depositing(request.userId, request.amount);
                     ListRequest = ListRequest.slice(indexDelete, 1);
                     return "Thanh toán thành công!";
-                }else
-                {
+                } else {
                     throw new Api403Error('Lỗi giao dịch ,vui lòng thao tác lại');
                 }
 
