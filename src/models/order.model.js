@@ -20,7 +20,7 @@ const orderSchema = new Schema({
     order_payment: {
         type: String,
         require: true,
-        enum: ["credit_card ", "pay_pal", "bank_transfer", "cash_on_Delivery", "cryptocurrency", "e_wallets", "cheque", "mobile_payment",],
+        enum: ["credit_card", "pay_pal", "bank_transfer", "cash_on_Delivery", "cryptocurrency", "e_wallets", "cheque", "mobile_payment",],
         default: "cash_on_Delivery",
     },
     order_products: {type: Array, required: true},
