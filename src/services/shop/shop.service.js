@@ -25,18 +25,15 @@ const findByEmail = async ({
         .lean();
 };
 
-const findByIdShop = async ({
-    _id,
-    select = {
-        // email: 1,
-        // password: 2,
-        // status: 3,
-        // roles: 4,
-        name: 5,
-        avatar:6,
-        msisdn:7,
-    },
-}) => {
+const findByIdShop = async ({_id, select = {
+    // email: 1,
+    // password: 2,
+    // status: 3,
+    // roles: 4,
+    name: 5,
+    avatar:6,
+    msisdn:7,
+    },}) => {
 return await shopModel
 .findOne({_id:_id})
 .select(select)
@@ -68,7 +65,6 @@ class ShopService {
         if(password){
             password = await bcrypt.hash(password, 10);
         }
-
         const image = await saveBase64Image(avatar);
         const updateShop = await shopModel
             .findByIdAndUpdate(
