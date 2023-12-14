@@ -14,7 +14,7 @@ router.use("/api/v1/notify", require("./notify_user"))
 router.use('/api/v1/image', require("./image"))
 
 // check apiKey
-// router.use(apiKey);
+router.use(apiKey);
 
 router.use("/api/v1/cart", require("./cart"));
 router.use("/api/v1/order", require("./order"));
@@ -31,7 +31,7 @@ router.use("/api/v1/transaction-history", require("./transaction-history"));
 router.use("/api/v1/profile", require("./profile"));
 router.use("/api/v1/wallet", require("./wallet"));
 // check permission
-// router.use(permission([RoleShop.ADMIN,RoleShop.SHOP]));
+router.use(permission([RoleShop.ADMIN,RoleShop.SHOP]));
 
 router.use("/api/v1/inventory", require("./inventory"));
 router.use("/api/v1/discount", require("./discount"));
