@@ -233,10 +233,10 @@ class OrderService {
       });
 
         if (newOrder) {
-            for (let i = 0; i < products.length; i++) {
-                const {productId, index} = products[i];
-                await CartService.deleteItemInCart({userId, productId, index});
-            }
+            // for (let i = 0; i < products.length; i++) {
+            //     const {productId, index} = products[i];
+            //     await CartService.deleteItemInCart({userId, productId, index});
+            // }
             console.log("--------------------------", newOrder);
             NotifyUserService.notifyOrder({user_id: userId, type_notify: "pending"})
 
