@@ -338,7 +338,7 @@ class OrderService {
         if (status === "shipping") {
             await this.shippingOrder(updateOrder._id);
         }
-        NotifyUserService.notifyOrder({user_id: userId, type_notify: status})
+        await NotifyUserService.notifyOrder({user_id: userId, type_notify: status})
 
 
         return updateOrder;

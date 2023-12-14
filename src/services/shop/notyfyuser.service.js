@@ -22,8 +22,6 @@ const NotifyTemplate =
                 message: "Đơn hàng đã bị huỷ,Thật tiếc",
                 title: "Đơn hàng bị huỷ"
             },
-
-
         }
     )
 
@@ -60,11 +58,40 @@ class NotifyUserService {
         return await notifyModel.findOneAndDelete({_id: notificationId, userId}).lean();
     }
 
-    static async getUserNotifications(userId) {
-        // Your logic for getting user notifications goes here
-        return await notifyModel.find({
-            userId: userId
-        }).lean();
+    static async getUserNotifications({userId, limit, page, sort}) {
+        const skip = (page - 1) * limit;
+        const sortBy = sort === 'ctime' ? {_id: -1} : {_id: 1};
+
+        const notifications = await notifyModel
+            .find({userId: userId})
+            .limit(limit)
+            .skip(skip)
+            .sort(sortBy)
+            .lean();
+
+        // Tính thời gian kể từ thời điểm tạo và thêm vào mỗi thông báo
+        const currentTime = new Date();
+        const notificationsWithTimeDifference = notifications.map((notification) => {
+            const createdAt = new Date(notification.createdAt);
+            const timeDifference = currentTime - createdAt;
+
+            // Chuyển đổi timeDifference thành giây, phút và giờ
+            const seconds = Math.floor(timeDifference / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+
+            return {
+                ...notification,
+                timeDifference: {
+                    milliseconds: timeDifference,
+                    seconds: seconds,
+                    minutes: minutes,
+                    hours: hours,
+                },
+            };
+        });
+
+        return notificationsWithTimeDifference;
     }
 
     static async getNotificationDetails({notificationId, userId}) {
@@ -79,7 +106,10 @@ class NotifyUserService {
     }
 
     static async putNotify({
-                               user_id, title = "Thông báo", message = "Đây là thông báo test của hệ thống", type_notify
+                               user_id,
+                               title = "Thông báo",
+                               message = "Đây là thông báo test của hệ thống",
+                               type_notify
                            }) {
         let user = await shopservice.findByIdShop({_id: user_id})
         if (!user) {
@@ -101,7 +131,7 @@ class NotifyUserService {
         if (!user) {
             throw new Api404Error("Không tìm thấy shop")
         }
-        const contentNotify = NotifyTemplate[`${type_notify}`]
+        const contentNotify = NotifyTemplate[type_notify]
         if (!contentNotify) {
             throw new Api404Error("Không tìm thấy nội dung notify phù hợp")
         }
@@ -116,7 +146,8 @@ class NotifyUserService {
             userId: user_id,
             title: contentNotify.title,
             message: contentNotify.message,
-            typeNotify: type_notify
+            typeNotify: type_notify,
+            orderId: order_id
         })
         return true
     }
