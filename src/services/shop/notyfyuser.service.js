@@ -8,13 +8,13 @@ const NotifyTemplate =
     Object.freeze({
             pending: {
                 message: "Hãy chờ shop xác nhận đơn hàng của bạn",
-                title: "Đơn hàng của bạn đã được đặt"
+                title: "Đơn hàng được đặt"
             }, confirmed: {
                 message: "Hãy chờ shop chuẩn bị đơn hàng của bạn",
-                title: "Đơn hàng của bạn đã được xác nhận"
+                title: "Đơn hàng được xác nhận"
             }, shipping: {
                 message: "Đơn hàng sẽ sớm đến thôi, hãy kiên nhẫn nhé!!!",
-                title: "Đơn hàng của bạn đang được giao đi"
+                title: "Đơn hàng đang được giao đi"
             }, delivered: {
                 message: "Chúc ngon miệng ,hãy nhớ để lại đánh giá để những người khác biết về trải nghiệm của bạn nhé",
                 title: "Đơn hàng đã được giao đến"
@@ -58,12 +58,12 @@ class NotifyUserService {
         return await notifyModel.findOneAndDelete({_id: notificationId, userId}).lean();
     }
 
-    static async getUserNotifications({userId, limit, page, sort}) {
+    static async getUserNotifications({ userId, limit, page, sort }) {
         const skip = (page - 1) * limit;
-        const sortBy = sort === 'ctime' ? {_id: -1} : {_id: 1};
+        const sortBy = sort === 'ctime' ? { _id: -1 } : { _id: 1 };
 
         const notifications = await notifyModel
-            .find({userId: userId})
+            .find({ userId: userId })
             .limit(limit)
             .skip(skip)
             .sort(sortBy)
@@ -73,21 +73,14 @@ class NotifyUserService {
         const currentTime = new Date();
         const notificationsWithTimeDifference = notifications.map((notification) => {
             const createdAt = new Date(notification.createdAt);
-            const timeDifference = currentTime - createdAt;
+            const formattedHours = ('0' + createdAt.getHours()).slice(-2); // Ensure two characters
+            const formattedMinutes = ('0' + createdAt.getMinutes()).slice(-2); // Ensure two characters
 
-            // Chuyển đổi timeDifference thành giây, phút và giờ
-            const seconds = Math.floor(timeDifference / 1000);
-            const minutes = Math.floor(seconds / 60);
-            const hours = Math.floor(minutes / 60);
+            const formattedCreatedAt = `${formattedHours}:${formattedMinutes} | ${createdAt.getDate()}-${createdAt.getMonth() + 1}-${createdAt.getFullYear()}`;
 
             return {
                 ...notification,
-                timeDifference: {
-                    milliseconds: timeDifference,
-                    seconds: seconds,
-                    minutes: minutes,
-                    hours: hours,
-                },
+                time: formattedCreatedAt,
             };
         });
 
