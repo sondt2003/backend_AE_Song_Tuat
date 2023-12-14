@@ -10,6 +10,7 @@ const {
   checkDiscountExists,
 } = require("../../models/repositories/discount.repo");
 const RoleShop = require("../../utils/role.util");
+const { forEach } = require("lodash");
 
 class DiscountService {
   static async countDiscount() {
@@ -195,6 +196,8 @@ class DiscountService {
       discount_users_used,
       discount_type,
       discount_value,
+      discount_applies_to,
+      discount_product_ids
     } = foundDiscount;
     if (!discount_is_active) throw new BusinessLogicError("Discount expired");
     if (discount_max_uses === 0)
@@ -208,20 +211,44 @@ class DiscountService {
 
     // check xem cos et gia tri toi thieu hay k
     let totalOrder = 0;
-    if (discount_min_order_value > 0) {
-      // get total
-      totalOrder = await products.reduce(async (acc, product) => {
-        const foundProduct = await getProductById(product.productId);
-        if (!foundProduct) {
-          throw new BusinessLogicError("Don't have product with product id");
-        }
-        return (await acc) + product.quantity * foundProduct.product_price;
-      }, 0);
 
-      if (totalOrder < discount_min_order_value) {
-        throw new BusinessLogicError(
-          `Discount requires a minium order value of ${discount_min_order_value}`
-        );
+    if(discount_applies_to=="all"){
+      if (discount_min_order_value > 0) {
+        // get total
+        totalOrder = await products.reduce(async (acc, product) => {
+          const foundProduct = await getProductById(product.productId);
+          if (!foundProduct) {
+            throw new BusinessLogicError("Don't have product with product id");
+          }
+          return (await acc) + product.quantity * foundProduct.product_price;
+        }, 0);
+  
+        if (totalOrder < discount_min_order_value) {
+          throw new BusinessLogicError(
+            `Discount requires a minium order value of ${discount_min_order_value}`
+          );
+        }
+      }
+    } else{
+      const allProductsInDiscount = products.every(product => discount_product_ids.includes(product.productId));
+      if(!allProductsInDiscount){
+        throw new BusinessLogicError("Phiếu giảm giá không áp dụng với");
+      }
+      if (discount_min_order_value > 0) {
+        // get total
+        totalOrder = await products.reduce(async (acc, product) => {
+          const foundProduct = await getProductById(product.productId);
+          if (!foundProduct) {
+            throw new BusinessLogicError("Don't have product with product id");
+          }
+          return (await acc) + product.quantity * foundProduct.product_price;
+        }, 0);
+  
+        if (totalOrder < discount_min_order_value) {
+          throw new BusinessLogicError(
+            `Discount requires a minium order value of ${discount_min_order_value}`
+          );
+        }
       }
     }
 
