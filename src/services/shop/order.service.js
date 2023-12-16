@@ -85,7 +85,9 @@ class OrderService {
       }, 0);
 
       // total before
-      checkout_order.totalPrice = +checkoutPrice;
+      checkout_order.totalPrice +=checkoutPrice;
+      console.log("Total::::::::::::::::",checkoutPrice)
+      console.log("checkout_order::::::::::::::::",checkout_order.totalPrice)
 
       const itemCheckout = {
         shopId,
@@ -233,10 +235,10 @@ class OrderService {
       });
 
         if (newOrder) {
-            // for (let i = 0; i < products.length; i++) {
-            //     const {productId, index} = products[i];
-            //     await CartService.deleteItemInCart({userId, productId, index});
-            // }
+            for (let i = 0; i < products.length; i++) {
+                const {productId, index} = products[i];
+                await CartService.deleteItemInCart({userId, productId, index});
+            }
             console.log("--------------------------", newOrder);
             NotifyUserService.notifyOrder({user_id: userId, type_notify: "pending"})
 
