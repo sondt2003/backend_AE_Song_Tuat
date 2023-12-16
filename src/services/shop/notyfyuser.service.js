@@ -58,12 +58,12 @@ class NotifyUserService {
         return await notifyModel.findOneAndDelete({_id: notificationId, userId}).lean();
     }
 
-    static async getUserNotifications({ userId, limit, page, sort }) {
+    static async getUserNotifications({userId, limit, page, sort = 'ctime'}) {
         const skip = (page - 1) * limit;
-        const sortBy = sort === 'ctime' ? { _id: -1 } : { _id: 1 };
+        const sortBy = sort === 'ctime' ? {createdAt: -1} : {createdAt: 1};
 
         const notifications = await notifyModel
-            .find({ userId: userId })
+            .find({userId: userId})
             .limit(limit)
             .skip(skip)
             .sort(sortBy)
