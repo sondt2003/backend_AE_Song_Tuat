@@ -10,6 +10,8 @@ const notifySchema = new Schema({
         required: true
     },
     orderId: {type: Schema.Types.ObjectId, ref: "Order"}
+}, {
+    timestamps: true
 });
 const NotifyModel = model('Notify', notifySchema);
 

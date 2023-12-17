@@ -12,7 +12,7 @@ class CommentController {
 
     getCommentByProductId = catchAsync(async (req, res, next) => {
         OK(res, "Get comment by id product Success", await CommentService.getCommentByProductId({
-            ...req.body,
+            ...req.query,
             productId: req.params.productId
         }), {
             statistical_rate: await CommentService.getStatisticalCommentByForProductId(req.params.productId)

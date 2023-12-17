@@ -109,7 +109,7 @@ class OrderController {
     listOrderStatusByShop = catchAsync(async (req, res, next) => {
         OK(
             res,
-            "list Order Status By Shop success",
+            "List Order Status By Shop success",
             await OrderService.listOrderStatusByShop({
                 shopId: req.user.userId,
                 ...req.body,
@@ -117,6 +117,18 @@ class OrderController {
             })
         );
     });
+     countOrderStatusByShop = catchAsync(async (req, res, next) => {
+        OK(
+            res,
+            "Count Order Status By Shop success",
+            await OrderService.CountOrderStatusByShop({
+                shopId: req.user.userId,
+                ...req.body,
+                ...req.query,
+            })
+        );
+    });
+
 }
 
 module.exports = new OrderController();
