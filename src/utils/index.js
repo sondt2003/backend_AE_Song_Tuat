@@ -3,6 +3,7 @@ const { Types } = require("mongoose");
 const fs = require("fs").promises;
 const path = require("path");
 const { BusinessLogicError } = require("../core/error.response");
+const sharp = require("sharp");
 
 const getInfoData = ({ fields = [], object = {} }) => {
   return _.pick(object, fields);
@@ -33,19 +34,43 @@ const removeAttrUndefined = (object) => {
 };
 
 const publicFolderPath = path.resolve(__dirname, "../../public");
+
 const saveBase64Image = async (base64Data,index) => {
   try {
     const ImageName = `image_${Date.now()}_${index}.png`;
-
     const filePath = path.join(publicFolderPath, ImageName);
     await fs.writeFile(filePath, base64Data.split(";base64,").pop(), "base64");
-
     console.log("Ảnh đã được lưu tại:", filePath);
     return ImageName;
   } catch (error) {
     throw new BusinessLogicError("Error Save Image");
   }
 };
+
+
+const saveBase64ImageSharp = async ({ base64Data, index, width = 360, height = 360 }) => {
+  try {
+    const imageBuffer = Buffer.from(base64Data, 'base64');
+    const resizedBuffer = await sharp(imageBuffer)
+      .resize(width, height)
+      .toFormat('jpeg')   // Đặt định dạng mong muốn (ví dụ: PNG)
+      .toBuffer();
+
+    const resizedBase64 = resizedBuffer.toString('base64');
+
+    const ImageName = `image_${Date.now()}_${index}.png`;
+    const filePath = path.join(publicFolderPath, ImageName);
+
+    await fs.promises.writeFile(filePath, resizedBuffer);
+
+    console.log("Ảnh đã được lưu tại:", filePath);
+    return ImageName;
+  } catch (err) {
+    console.error("Error Save Image:", err);
+    // throw new BusinessLogicError("Error Save Image");
+  }
+};
+
 async function deleteImage(imageName) {
   const imagePath = path.join(publicFolderPath, imageName);
 
@@ -82,5 +107,6 @@ module.exports = {
   updateNestedObjectParser,
   convert2ObjectId,
   saveBase64Image,
-  deleteImage
+  deleteImage,
+  saveBase64ImageSharp
 };

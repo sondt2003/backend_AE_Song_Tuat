@@ -68,6 +68,8 @@ class OrderService {
       },
       shop_order_ids_new = [];
 
+    if(shop_order_ids.length===0) throw new BusinessLogicError("Không Có Sản Phẩm");
+
     // calculator bill
     for (let i = 0; i < shop_order_ids.length; i++) {
       const {
@@ -78,6 +80,7 @@ class OrderService {
       // check product available
       const checkProductServer = await checkProductByServer(item_products);
       if (!checkProductServer[0]) throw new BusinessLogicError("Order invalid");
+
 
       // sum total order
       const checkoutPrice = checkProductServer.reduce((acc, product) => {
