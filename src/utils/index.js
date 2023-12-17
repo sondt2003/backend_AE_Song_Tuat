@@ -35,7 +35,7 @@ const removeAttrUndefined = (object) => {
 
 const publicFolderPath = path.resolve(__dirname, "../../public");
 
-const saveBase64Image = async (base64Data,index) => {
+const saveBase64Image = async (base64Data, index) => {
   try {
     const ImageName = `image_${Date.now()}_${index}.png`;
     const filePath = path.join(publicFolderPath, ImageName);
@@ -47,28 +47,34 @@ const saveBase64Image = async (base64Data,index) => {
   }
 };
 
+const saveBase64ImageSharp = async ({
+  base64Data,
+  index,
+  width = 500,
+  height = 500,
+}) => {
+  const imageBuffer = Buffer.from(base64Data.replace(/^data:image\/\w+;base64,/, ""),"base64");
+  return await sharp(imageBuffer)
+    .resize(parseInt(width), parseInt(height))
+    .toBuffer()
+    .then(async (resizedBuffer) => {
+      console.log("imageBuffer:", imageBuffer);
+      const resizedBase64 = resizedBuffer.toString("base64");
 
-const saveBase64ImageSharp = async ({ base64Data, index, width = 360, height = 360 }) => {
-  try {
-    const imageBuffer = Buffer.from(base64Data, 'base64');
-    const resizedBuffer = await sharp(imageBuffer)
-      .resize(width, height)
-      .toFormat('jpeg')   // Đặt định dạng mong muốn (ví dụ: PNG)
-      .toBuffer();
+      const ImageName = `image_${Date.now()}_${index}.png`;
+      const filePath = path.join(publicFolderPath, ImageName);
+      await fs.writeFile(
+        filePath,
+        resizedBase64.split(";base64,").pop(),
+        "base64"
+      );
 
-    const resizedBase64 = resizedBuffer.toString('base64');
-
-    const ImageName = `image_${Date.now()}_${index}.png`;
-    const filePath = path.join(publicFolderPath, ImageName);
-
-    await fs.promises.writeFile(filePath, resizedBuffer);
-
-    console.log("Ảnh đã được lưu tại:", filePath);
-    return ImageName;
-  } catch (err) {
-    console.error("Error Save Image:", err);
-    // throw new BusinessLogicError("Error Save Image");
-  }
+      console.log("Ảnh đã được lưu tại:", filePath);
+      return ImageName;
+    })
+    .catch((err) => {
+      throw new BusinessLogicError("Error Save Image");
+    });
 };
 
 async function deleteImage(imageName) {
@@ -108,5 +114,5 @@ module.exports = {
   convert2ObjectId,
   saveBase64Image,
   deleteImage,
-  saveBase64ImageSharp
+  saveBase64ImageSharp,
 };

@@ -1,10 +1,10 @@
 const { BusinessLogicError } = require("../../core/error.response");
 const { category } = require("../../models/categories.model");
-const { convert2ObjectId, saveBase64Image } = require("../../utils");
+const { convert2ObjectId, saveBase64Image, saveBase64ImageSharp } = require("../../utils");
 
 class CategoryService {
   static async createCategory(payload) {
-    const category_image = await saveBase64Image(payload.category_image);
+    const category_image = await saveBase64ImageSharp({base64Data:payload.category_image,width:payload.width,height:payload.height});
     return await category.create({
         ...payload,
         category_image
@@ -30,7 +30,7 @@ class CategoryService {
   }
 
   static async updateCategory(categoryId, payload) {
-    const category_image = await saveBase64Image(payload.category_image);
+    const category_image = await saveBase64ImageSharp({base64Data:payload.category_image,width:payload.width,height:payload.height});
     return category
       .findByIdAndUpdate(
         categoryId,

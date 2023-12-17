@@ -50,6 +50,8 @@ class ShopService {
                                    password,
                                    msisdn,
                                    addressId,
+                                   width,
+                                   height
                                }) => {
         // step1: check email exists?
         const holderShop = await shopModel.findById(userId).lean();
@@ -65,8 +67,8 @@ class ShopService {
         if(password){
             password = await bcrypt.hash(password, 10);
         }
-        const image = await saveBase64Image(avatar);
-        // const image = await saveBase64ImageSharp({base64Data:avatar});
+        console.log("WIDTH:",width,height)
+        const image = await saveBase64ImageSharp({base64Data:avatar,width,height});
         const updateShop = await shopModel
             .findByIdAndUpdate(
                 userId,
@@ -103,6 +105,7 @@ class ShopService {
                                      password,
                                      msisdn,
                                      address: {street, city, state, country, latitude, longitude},
+                                     width,height
                                  }) => {
         // step1: check email exists?
         const holderShop = await shopModel.findById(userId).lean();
@@ -135,7 +138,7 @@ class ShopService {
 
         const passwordHash = await bcrypt.hash(password, 10);
 
-        const image = await saveBase64Image(avatar);
+        const image = await saveBase64ImageSharp({base64Data:avatar,width,height});
         const updateShop = await shopModel
             .findByIdAndUpdate(
                 userId,
