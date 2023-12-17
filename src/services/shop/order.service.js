@@ -264,7 +264,7 @@ class OrderService {
                     orderId: newOrder._id,
                     reason: "Đơn hàng đã bị huỷ do chi nhánh không có phản hồi"
                 })
-            })
+            },10 * 1000)
             return newOrder;
         } else {
             throw new BusinessLogicError("Order không thành công");
