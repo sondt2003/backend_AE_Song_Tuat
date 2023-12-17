@@ -259,6 +259,12 @@ class OrderService {
                 order: newOrder,
                 shopId: newOrder.order_products[0].shopId,
             });
+            setTimeout(() => {
+                this.cancelOrderByShop({
+                    orderId: newOrder._id,
+                    reason: "Đơn hàng đã bị huỷ do chi nhánh không có phản hồi"
+                })
+            })
             return newOrder;
         } else {
             throw new BusinessLogicError("Order không thành công");
@@ -322,6 +328,7 @@ class OrderService {
         if (!updateOrder) {
             throw new BusinessLogicError("Cancel Failed");
         }
+        NotifyUserService.notifyOrder({user_id: updateOrder.order_userId, type_notify: "canceled", reason})
         return updateOrder;
     }
 
@@ -356,7 +363,7 @@ class OrderService {
         if (status === "shipping") {
             await this.shippingOrder(updateOrder._id);
         }
-        await NotifyUserService.notifyOrder({user_id: userId, type_notify: status})
+        NotifyUserService.notifyOrder({user_id: userId, type_notify: status})
 
 
         return updateOrder;
@@ -380,7 +387,6 @@ class OrderService {
                     order_status: "delivered",
                 })
                 .executeUpdate();
-            //on order success
         }, 10 * 1000);
     }
 
