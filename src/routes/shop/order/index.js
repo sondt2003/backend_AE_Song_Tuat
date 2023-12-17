@@ -23,6 +23,8 @@ router.post('/v2', orderController.orderV2)
 
 router.get('/top-order', orderController.topOrder);
 router.get('/top-product', orderController.topProduct);
+router.get('/top-revenue', orderController.topRevenue);
+
 
 router.get('/:orderId', orderController.getOneOrderByUser)
 
