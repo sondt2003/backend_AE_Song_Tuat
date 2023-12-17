@@ -68,8 +68,8 @@ app.use(
 );
 
 // setting body parser, cookie parser
-app.use(express.json({limit: "100mb"}));
-app.use(express.urlencoded({extended: true, limit: "100mb"}));
+app.use(express.json({limit: "500mb"}));
+app.use(express.urlencoded({extended: true, limit: "500mb"}));
 app.use(cookieParser());
 
 // init db
