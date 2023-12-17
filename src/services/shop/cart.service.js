@@ -142,7 +142,7 @@ class CartService {
    * ]
    */
   static async addToCartV2({ userId, shop_order_ids = [] }) {
-    const { productId, quantity, old_quantity } =
+    const { productId, quantity, old_quantity , index} =
       shop_order_ids[0]?.item_products[0];
     // check product
 
@@ -155,13 +155,14 @@ class CartService {
     }
 
     if (quantity === 0) {
-      return await CartService.deleteItemInCart({ userId, productId });
+      return await CartService.deleteItemInCart({ userId, productId ,index});
     }
     return await CartService.updateUserCartQuantity({
       userId,
       product: {
         productId,
         quantity: quantity - old_quantity,
+        index
       },
     });
   }
