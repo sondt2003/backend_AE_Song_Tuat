@@ -63,7 +63,7 @@ class CommentService {
         let skip = (page - 1) * limit;
         return Comment.find({comment_product_id: productId})
             .skip(skip)
-            .limit(limit);
+            .limit(limit).sort({createdAt: -1});
     }
 
     static async getCommentsByParentId({productId, parentCommentId = null, limit = 50, offset = 0}) {

@@ -8,13 +8,13 @@ const NotifyTemplate =
     Object.freeze({
             pending: {
                 message: "Hãy chờ shop xác nhận đơn hàng của bạn",
-                title: "Đơn hàng của bạn đã được đặt"
+                title: "Đơn hàng được đặt"
             }, confirmed: {
                 message: "Hãy chờ shop chuẩn bị đơn hàng của bạn",
-                title: "Đơn hàng của bạn đã được xác nhận"
+                title: "Đơn hàng được xác nhận"
             }, shipping: {
                 message: "Đơn hàng sẽ sớm đến thôi, hãy kiên nhẫn nhé!!!",
-                title: "Đơn hàng của bạn đang được giao đi"
+                title: "Đơn hàng đang được giao đi"
             }, delivered: {
                 message: "Chúc ngon miệng ,hãy nhớ để lại đánh giá để những người khác biết về trải nghiệm của bạn nhé",
                 title: "Đơn hàng đã được giao đến"
@@ -22,8 +22,6 @@ const NotifyTemplate =
                 message: "Đơn hàng đã bị huỷ,Thật tiếc",
                 title: "Đơn hàng bị huỷ"
             },
-
-
         }
     )
 
@@ -60,11 +58,33 @@ class NotifyUserService {
         return await notifyModel.findOneAndDelete({_id: notificationId, userId}).lean();
     }
 
-    static async getUserNotifications(userId) {
-        // Your logic for getting user notifications goes here
-        return await notifyModel.find({
-            userId: userId
-        }).lean();
+    static async getUserNotifications({userId, limit, page, sort = 'ctime'}) {
+        const skip = (page - 1) * limit;
+        const sortBy = sort === 'ctime' ? {createdAt: -1} : {createdAt: 1};
+
+        const notifications = await notifyModel
+            .find({userId: userId})
+            .limit(limit)
+            .skip(skip)
+            .sort(sortBy)
+            .lean();
+
+        // Tính thời gian kể từ thời điểm tạo và thêm vào mỗi thông báo
+        const currentTime = new Date();
+        const notificationsWithTimeDifference = notifications.map((notification) => {
+            const createdAt = new Date(notification.createdAt);
+            const formattedHours = ('0' + createdAt.getHours()).slice(-2); // Ensure two characters
+            const formattedMinutes = ('0' + createdAt.getMinutes()).slice(-2); // Ensure two characters
+
+            const formattedCreatedAt = `${formattedHours}:${formattedMinutes} | ${createdAt.getDate()}-${createdAt.getMonth() + 1}-${createdAt.getFullYear()}`;
+
+            return {
+                ...notification,
+                time: formattedCreatedAt,
+            };
+        });
+
+        return notificationsWithTimeDifference;
     }
 
     static async getNotificationDetails({notificationId, userId}) {
@@ -79,7 +99,10 @@ class NotifyUserService {
     }
 
     static async putNotify({
-                               user_id, title = "Thông báo", message = "Đây là thông báo test của hệ thống", type_notify
+                               user_id,
+                               title = "Thông báo",
+                               message = "Đây là thông báo test của hệ thống",
+                               type_notify
                            }) {
         let user = await shopservice.findByIdShop({_id: user_id})
         if (!user) {
@@ -101,7 +124,7 @@ class NotifyUserService {
         if (!user) {
             throw new Api404Error("Không tìm thấy shop")
         }
-        const contentNotify = NotifyTemplate[`${type_notify}`]
+        const contentNotify = NotifyTemplate[type_notify]
         if (!contentNotify) {
             throw new Api404Error("Không tìm thấy nội dung notify phù hợp")
         }
@@ -116,7 +139,8 @@ class NotifyUserService {
             userId: user_id,
             title: contentNotify.title,
             message: contentNotify.message,
-            typeNotify: type_notify
+            typeNotify: type_notify,
+            orderId: order_id
         })
         return true
     }

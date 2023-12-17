@@ -4,7 +4,6 @@ const orderController = require('../../../controllers/shop/order.controller')
 const {authenticationV2} = require("../../../auth/authUtils");
 
 
-
 /**
  * 1. Create New Order [User]
  * 2. Query Orders [User]
@@ -16,7 +15,7 @@ router.use(authenticationV2)
 
 router.get('/', orderController.getOrderByUser)
 router.get('/shop', orderController.listOrderStatusByShop)
-
+router.get('/count', orderController.countOrderStatusByShop)
 router.post('/review', orderController.checkoutReview)
 
 router.post('/v1', orderController.order)
