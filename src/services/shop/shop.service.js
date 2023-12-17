@@ -1,6 +1,6 @@
 const shopModel = require("../../models/shop.model");
 const bcrypt = require("bcrypt");
-const {getInfoData, getSelectData, deleteImage, saveBase64Image} = require("../../utils");
+const {getInfoData, getSelectData, deleteImage, saveBase64ImageSharp, saveBase64Image} = require("../../utils");
 const {Api403Error, Api404Error} = require("../../core/error.response");
 const addressModel = require("../../models/address.model");
 const RoleShop = require("../../utils/role.util");
@@ -66,6 +66,7 @@ class ShopService {
             password = await bcrypt.hash(password, 10);
         }
         const image = await saveBase64Image(avatar);
+        // const image = await saveBase64ImageSharp({base64Data:avatar});
         const updateShop = await shopModel
             .findByIdAndUpdate(
                 userId,
