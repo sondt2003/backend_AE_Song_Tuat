@@ -232,7 +232,7 @@ class DiscountService {
     } else{
       const allProductsInDiscount = products.every(product => discount_product_ids.includes(product.productId));
       if(!allProductsInDiscount){
-        throw new BusinessLogicError("Phiếu giảm giá không áp dụng với");
+        throw new BusinessLogicError("Phiếu giảm giá không áp sản phẩm");
       }
       if (discount_min_order_value > 0) {
         // get total

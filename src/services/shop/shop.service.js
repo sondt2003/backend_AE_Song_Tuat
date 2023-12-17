@@ -1,6 +1,6 @@
 const shopModel = require("../../models/shop.model");
 const bcrypt = require("bcrypt");
-const {getInfoData, getSelectData, deleteImage} = require("../../utils");
+const {getInfoData, getSelectData, deleteImage, saveBase64Image} = require("../../utils");
 const {Api403Error, Api404Error} = require("../../core/error.response");
 const addressModel = require("../../models/address.model");
 const RoleShop = require("../../utils/role.util");
