@@ -32,6 +32,6 @@ router.post('/cancel', orderController.cancelOrderByUser)
 router.patch('/confirmed/:userId', orderController.updateOrderConfirmByShop)
 
 router.patch('/shipping/:userId', orderController.updateOrderShippingByShop)
-
+router.patch("/cancel/:orderId",orderController.cancelOrderByShop)
 // router
 module.exports = router

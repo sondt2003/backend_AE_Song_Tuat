@@ -18,40 +18,6 @@ class CommentService {
             comment_rating: rate,
             comment_product_id: productId
         })
-        // if (parentCommentId) {
-        //     // reply comment
-        //     const parentComment = await Comment.findById(parentCommentId);
-        //     if (!parentComment) throw new Api404Error('Parent comment not found')
-        //     rightValue = parentComment.comment_right
-        //     // updateMany comments
-        //     await Comment.updateMany({
-        //         comment_product_id: convert2ObjectId(productId),
-        //         comment_right: {$gte: rightValue}
-        //     }, {
-        //         $inc: {comment_right: 2}
-        //     })
-        //
-        //     // updateMany comments
-        //     await Comment.updateMany({
-        //         comment_product_id: convert2ObjectId(productId),
-        //         comment_left: {$gt: rightValue}
-        //     }, {
-        //         $inc: {comment_left: 2}
-        //     })
-        // } else {
-        //     const maxRightValue = await Comment.findOne({
-        //         comment_product_id: convert2ObjectId(productId)
-        //     }, 'comment_right', {sort: {comment_right: -1}})
-        //     if (maxRightValue) {
-        //         rightValue = maxRightValue.comment_right + 1
-        //     } else {
-        //         rightValue = 1
-        //     }
-        // }
-        // console.log('rightValue::', rightValue)
-        // // insert to comment
-        // comment.comment_left = rightValue
-        // comment.comment_right = rightValue + 1;
 
         await comment.save()
         await updateProductRating(productId)
@@ -115,41 +81,40 @@ class CommentService {
 
     static async getStatisticalCommentByForProductId(productId) {
 
-            // Find all comments for the given product
-            const comments = await Comment.find({comment_product_id: productId});
+        // Find all comments for the given product
+        const comments = await Comment.find({comment_product_id: productId});
 
-            if (!comments){
-                throw new Api404Error('Comment not found')
+        if (!comments) {
+            throw new Api404Error('Comment not found')
+        }
+        // Initialize an object to store the count of each rating
+        const ratingCount = {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0,
+        };
+
+        // Count the number of each rating
+        comments.forEach((comment) => {
+            const rating = comment.comment_rating;
+            if (rating >= 1 && rating <= 5) {
+                ratingCount[rating]++;
             }
-            // Initialize an object to store the count of each rating
-            const ratingCount = {
-                1: 0,
-                2: 0,
-                3: 0,
-                4: 0,
-                5: 0,
-            };
+        });
 
-            // Count the number of each rating
-            comments.forEach((comment) => {
-                const rating = comment.comment_rating;
-                if (rating >= 1 && rating <= 5) {
-                    ratingCount[rating]++;
-                }
-            });
+        // Calculate the total number of ratings
+        const totalRatings = comments.length;
 
-            // Calculate the total number of ratings
-            const totalRatings = comments.length;
+        // Calculate the percentage distribution
+        const ratingPercentage = {};
+        for (let i = 1; i <= 5; i++) {
+            const percentage = (ratingCount[i] / totalRatings) * 100;
+            ratingPercentage[i] = percentage.toFixed(2); // Round to 2 decimal places
+        }
 
-            // Calculate the percentage distribution
-            const ratingPercentage = {};
-            for (let i = 1; i <= 5; i++) {
-                const percentage = (ratingCount[i] / totalRatings) * 100;
-                ratingPercentage[i] = percentage.toFixed(2); // Round to 2 decimal places
-            }
-
-            return ratingPercentage;
-
+        return ratingPercentage;
 
 
     }
