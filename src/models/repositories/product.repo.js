@@ -203,8 +203,18 @@ const advancedSearch = async (queryInput) => {
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
     queryStr = JSON.parse(queryStr);
 
-    console.log(queryStr);
-    let query = product.find(queryStr);
+    let filter={};
+    if(queryInput.search){
+        filter= {
+            isPublished: true,
+            $or: [
+                {product_name: {$regex: queryInput.search, $options: "i"}},
+                {product_description: {$regex: queryInput.search, $options: "i"}},
+            ],
+        }
+    }
+    console.log("queryStr",queryStr);
+    let query = product.find({...queryStr,...filter});
 
     //2. sorting
     if (queryInput.sort) {
