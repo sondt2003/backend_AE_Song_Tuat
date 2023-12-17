@@ -191,6 +191,15 @@ class OrderService {
         }
     }
 
+    static async CountOrderStatusByShop({shopId, limit = 50, sort = "ctime", page = 1, status,}) {
+        return await countAllOrders({
+            limit,
+            sort,
+            filter: {"order_products.shopId": shopId, order_status: status},
+            page,
+        });
+    }
+
     static async orderByUserV2({shop_order_ids, cartId, userId, addressId, user_payment, order_note,}) {
         const {shop_order_ids_new, checkout_order} =
             await OrderService.checkoutReview({
@@ -376,14 +385,14 @@ class OrderService {
     }
 
     static query(query) {
-        const {page=1,limit=10}=query;
+        const {page = 1, limit = 10} = query;
         let queryStr = JSON.stringify(query);
         queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
         queryStr = JSON.parse(queryStr);
         let sort = {};
 
         const skip = (page - 1) * limit;
-      const  _limit = parseInt(limit);
+        const _limit = parseInt(limit);
 
         if (query.sort) {
             const sortByArray = query.sort.split(",");
@@ -412,7 +421,7 @@ class OrderService {
         }
         return {
             sort,
-            limit:_limit,
+            limit: _limit,
             skip,
             matchConditions,
         };
@@ -512,7 +521,7 @@ class OrderService {
     }
 
     static async topProduct(query) {
-        const {sort, limit,skip, matchConditions} = this.query(query);
+        const {sort, limit, skip, matchConditions} = this.query(query);
         matchConditions.order_status = query.status ? query.status : "delivered";
 
         const foundTopProduct = await orderModel.aggregate([
@@ -535,7 +544,7 @@ class OrderService {
                     productId: "$_id",
                 },
             },
-            {$skip:skip},
+            {$skip: skip},
             {$limit: limit}
         ]);
 
@@ -550,7 +559,7 @@ class OrderService {
 
 
     static async topRevenue(query) {
-        const {sort, limit,skip, matchConditions} = this.query(query);
+        const {sort, limit, skip, matchConditions} = this.query(query);
         matchConditions.order_status = query.status ? query.status : "delivered";
 
         const foundTopShop = await orderModel.aggregate([
@@ -571,14 +580,14 @@ class OrderService {
                     totalRevenueAll: 1,
                 },
             },
-            {$skip:skip},
+            {$skip: skip},
             {$limit: limit}
         ]);
 
         const updatedResult = await Promise.all(foundTopShop.map(async (item) => ({
             _id: item._id,
             totalRevenueAll: item.totalRevenueAll,
-            shopInfo: await findByIdShop({_id:item._id})
+            shopInfo: await findByIdShop({_id: item._id})
         })));
 
         return updatedResult;
