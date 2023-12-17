@@ -5,10 +5,10 @@ const { ShopService } = require('../../services/shop/shop.service');
 
 class ShopController {
     updateUser = catchAsync(async (req, res) => {
-        OK(res, "Register success", await ShopService.updateUser({userId: req.user.userId,...req.body}))
+        OK(res, "Register success", await ShopService.updateUser({userId: req.user.userId,...req.body,...req.headers}))
     })
     updateUserV2 = catchAsync(async (req, res) => {
-        OK(res, "Register success", await ShopService.updateUserV2({userId: req.user.userId,...req.body}))
+        OK(res, "Register success", await ShopService.updateUserV2({userId: req.user.userId,...req.body,...req.headers}))
     })
     listShop = catchAsync(async (req, res) => {
         OK(res, "List Shop success", await ShopService.listShop(req.query))
