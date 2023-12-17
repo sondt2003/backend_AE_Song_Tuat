@@ -112,7 +112,13 @@ class OrderController {
             })
         );
     });
+    cancelOrderByShop = catchAsync(async (req, res, next) => {
+        OK(res, "Update Order Status By shop success", await OrderService.cancelOrderByShop({
+            orderId: req.params.orderId,
+            reason: req.body.reason
+        }))
 
+    })
     listOrderStatusByShop = catchAsync(async (req, res, next) => {
         OK(
             res,
@@ -124,7 +130,7 @@ class OrderController {
             })
         );
     });
-     countOrderStatusByShop = catchAsync(async (req, res, next) => {
+    countOrderStatusByShop = catchAsync(async (req, res, next) => {
         OK(
             res,
             "Count Order Status By Shop success",
