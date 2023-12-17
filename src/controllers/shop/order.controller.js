@@ -80,6 +80,13 @@ class OrderController {
         );
     });
 
+    topRevenue = catchAsync(async (req, res, next) => {
+        OK(
+            res,
+            "Top Revenue By Shop success",
+            await OrderService.topRevenue(req.query)
+        );
+    });
 
     updateOrderConfirmByShop = catchAsync(async (req, res, next) => {
         OK(

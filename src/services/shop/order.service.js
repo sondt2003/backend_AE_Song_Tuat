@@ -376,11 +376,15 @@ class OrderService {
     }
 
     static query(query) {
+        const {page=1,limit=10}=query;
         let queryStr = JSON.stringify(query);
         queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
         queryStr = JSON.parse(queryStr);
         let sort = {};
-        let limit = query.limit ? parseInt(query.limit) : 10;
+
+        const skip = (page - 1) * limit;
+      const  _limit = parseInt(limit);
+
         if (query.sort) {
             const sortByArray = query.sort.split(",");
             sortByArray.forEach((item) => {
@@ -408,7 +412,8 @@ class OrderService {
         }
         return {
             sort,
-            limit,
+            limit:_limit,
+            skip,
             matchConditions,
         };
     }
@@ -507,7 +512,7 @@ class OrderService {
     }
 
     static async topProduct(query) {
-        const {sort, limit, matchConditions} = this.query(query);
+        const {sort, limit,skip, matchConditions} = this.query(query);
         matchConditions.order_status = query.status ? query.status : "delivered";
 
         const foundTopProduct = await orderModel.aggregate([
@@ -530,6 +535,7 @@ class OrderService {
                     productId: "$_id",
                 },
             },
+            {$skip:skip},
             {$limit: limit}
         ]);
 
@@ -537,6 +543,42 @@ class OrderService {
             _id: item.productId,
             totalQuantity: item.totalQuantity,
             productInfo: await getProductById(item.productId) || {}
+        })));
+
+        return updatedResult;
+    }
+
+
+    static async topRevenue(query) {
+        const {sort, limit,skip, matchConditions} = this.query(query);
+        matchConditions.order_status = query.status ? query.status : "delivered";
+
+        const foundTopShop = await orderModel.aggregate([
+            {
+                $match: matchConditions,
+            },
+            {$unwind: "$order_products"},
+            {
+                $group: {
+                    _id: "$order_products.shopId",
+                    totalRevenueAll: {$sum: "$order_products.priceRow"},
+                },
+            },
+            {$sort: sort},
+            {
+                $project: {
+                    _id: 1,
+                    totalRevenueAll: 1,
+                },
+            },
+            {$skip:skip},
+            {$limit: limit}
+        ]);
+
+        const updatedResult = await Promise.all(foundTopShop.map(async (item) => ({
+            _id: item._id,
+            totalRevenueAll: item.totalRevenueAll,
+            shopInfo: await findByIdShop({_id:item._id})
         })));
 
         return updatedResult;
