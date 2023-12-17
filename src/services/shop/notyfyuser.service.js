@@ -64,9 +64,9 @@ class NotifyUserService {
 
         const notifications = await notifyModel
             .find({userId: userId})
+            .sort(sortBy)
             .limit(limit)
             .skip(skip)
-            .sort(sortBy)
             .lean();
 
         // Tính thời gian kể từ thời điểm tạo và thêm vào mỗi thông báo
@@ -99,10 +99,7 @@ class NotifyUserService {
     }
 
     static async putNotify({
-                               user_id,
-                               title = "Thông báo",
-                               message = "Đây là thông báo test của hệ thống",
-                               type_notify
+                               user_id, title = "Thông báo", message = "Đây là thông báo test của hệ thống", type_notify
                            }) {
         let user = await shopservice.findByIdShop({_id: user_id})
         if (!user) {
