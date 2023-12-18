@@ -191,15 +191,6 @@ class OrderService {
         }
     }
 
-    static async CountOrderStatusByShop({shopId, limit = 50, sort = "ctime", page = 1, status,}) {
-        return await countAllOrders({
-            limit,
-            sort,
-            filter: {"order_products.shopId": shopId, order_status: status},
-            page,
-        });
-    }
-
     static async orderByUserV2({shop_order_ids, cartId, userId, addressId, user_payment, order_note,}) {
         const {shop_order_ids_new, checkout_order} =
             await OrderService.checkoutReview({
@@ -259,12 +250,6 @@ class OrderService {
                 order: newOrder,
                 shopId: newOrder.order_products[0].shopId,
             });
-            setTimeout(() => {
-                this.cancelOrderByShop({
-                    orderId: newOrder._id,
-                    reason: "Đơn hàng đã bị huỷ do chi nhánh không có phản hồi"
-                })
-            }, 10 * 1000)
             return newOrder;
         } else {
             throw new BusinessLogicError("Order không thành công");
@@ -328,7 +313,6 @@ class OrderService {
         if (!updateOrder) {
             throw new BusinessLogicError("Cancel Failed");
         }
-        NotifyUserService.notifyOrder({user_id: updateOrder.order_userId, type_notify: "canceled", reason})
         return updateOrder;
     }
 
@@ -363,7 +347,7 @@ class OrderService {
         if (status === "shipping") {
             await this.shippingOrder(updateOrder._id);
         }
-        NotifyUserService.notifyOrder({user_id: userId, type_notify: status})
+        await NotifyUserService.notifyOrder({user_id: userId, type_notify: status})
 
 
         return updateOrder;
@@ -387,18 +371,19 @@ class OrderService {
                     order_status: "delivered",
                 })
                 .executeUpdate();
+            //on order success
         }, 10 * 1000);
     }
 
     static query(query) {
-        const {page = 1, limit = 10} = query;
+        const {page=1,limit=10}=query;
         let queryStr = JSON.stringify(query);
         queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
         queryStr = JSON.parse(queryStr);
         let sort = {};
 
         const skip = (page - 1) * limit;
-        const _limit = parseInt(limit);
+      const  _limit = parseInt(limit);
 
         if (query.sort) {
             const sortByArray = query.sort.split(",");
@@ -409,7 +394,7 @@ class OrderService {
             });
             console.log("sortBy:", sort);
         } else {
-            sort = {createdAt: -1}
+            sort={createdAt:-1}
         }
         const matchConditions = {};
         const year = query.year;
@@ -429,130 +414,159 @@ class OrderService {
         }
         return {
             sort,
-            limit: _limit,
+            limit:_limit,
             skip,
             matchConditions,
         };
     }
-
-    static async topQuantity({matchConditions, skip, limit, sort}) {
-        const foundTopQuantity = await orderModel.aggregate([
-            {
-                $match: matchConditions,
+static async topQuantity({matchConditions,skip,limit,sort}){
+    const foundTopQuantity = await orderModel.aggregate([
+        {
+            $match: matchConditions,
+        },
+        {$unwind: "$order_products"},
+        {$unwind: "$order_products.item_products"},
+        {
+            $group: {
+                _id: {
+                    userId: "$order_userId",
+                    productId: "$order_products.item_products.productId",
+                },
+                totalQuantity: {$sum: "$order_products.item_products.quantity"},
             },
-            {$unwind: "$order_products"},
-            {$unwind: "$order_products.item_products"},
-            {
-                $group: {
-                    _id: {
-                        userId: "$order_userId",
-                        productId: "$order_products.item_products.productId",
+        },
+        {
+            $group: {
+                _id: "$_id.userId",
+                topProducts: {
+                    $push: {
+                        productId: "$_id.productId",
+                        totalQuantity: "$totalQuantity",
                     },
-                    totalQuantity: {$sum: "$order_products.item_products.quantity"},
                 },
+                totalQuantityAll: {$sum: "$totalQuantity"},
             },
-            {
-                $group: {
-                    _id: "$_id.userId",
-                    topProducts: {
-                        $push: {
-                            productId: "$_id.productId",
-                            totalQuantity: "$totalQuantity",
-                        },
+        },
+        {
+            $project: {
+                _id: 1,
+                totalQuantityAll: 1,
+            },
+        },
+        {$skip:skip},
+        {$limit: limit},
+        {$sort: sort},
+    ]);
+    return foundTopQuantity;
+}
+
+
+static async topPrice({matchConditions,skip,limit,sort}){
+    const foundTopPrice = await orderModel.aggregate([
+        {
+            $match: matchConditions,
+        },
+        {$unwind: "$order_products"},
+        {
+            $group: {
+                _id: {
+                    userId: "$order_userId",
+                    priceRow: "$order_products.priceRow",
+                },
+                totalPriceAll: {$sum: "$order_products.priceRow"},
+            },
+        },
+        {
+            $group: {
+                _id: "$_id.userId",
+                priceRow: {
+                    $push: {
+                        priceRow: "$_id.priceRow",
+                        totalPriceAll: "$totalPriceAll",
                     },
-                    totalQuantityAll: {$sum: "$totalQuantity"},
                 },
+                totalPriceAll: {$sum: "$totalPriceAll"},
             },
-            {
-                $project: {
-                    _id: 1,
-                    totalQuantityAll: 1,
-                },
+        },
+        {
+            $project: {
+                _id: 1,
+                totalPriceAll: 1,
             },
-            {$skip: skip},
-            {$limit: limit},
-            {$sort: sort},
-        ]);
-        return foundTopQuantity;
-    }
+        },
+        {$skip:skip},
+        {$limit: limit},
+        {$sort: sort},
+    ]);
+    return foundTopPrice;
+}
 
-
-    static async topPrice({matchConditions, skip, limit, sort}) {
-        const foundTopPrice = await orderModel.aggregate([
-            {
-                $match: matchConditions,
+static async topUser({matchConditions,skip,limit,sort}){
+    const foundTopUserShop = await orderModel.aggregate([
+        {
+            $match: matchConditions,
+        },
+        {$unwind: "$order_products"},
+        {
+            $group: {
+                _id: "$order_userId",
+                totalUserAll: {$sum: +1},
             },
-            {$unwind: "$order_products"},
-            {
-                $group: {
-                    _id: {
-                        userId: "$order_userId",
-                        priceRow: "$order_products.priceRow",
-                    },
-                    totalPriceAll: {$sum: "$order_products.priceRow"},
-                },
+        },
+        {
+            $project: {
+                _id: 1,
+                totalUserAll: 1,
             },
-            {
-                $group: {
-                    _id: "$_id.userId",
-                    priceRow: {
-                        $push: {
-                            priceRow: "$_id.priceRow",
-                            totalPriceAll: "$totalPriceAll",
-                        },
-                    },
-                    totalPriceAll: {$sum: "$totalPriceAll"},
-                },
-            },
-            {
-                $project: {
-                    _id: 1,
-                    totalPriceAll: 1,
-                },
-            },
-            {$skip: skip},
-            {$limit: limit},
-            {$sort: sort},
-        ]);
-        return foundTopPrice;
-    }
-
-    static async topUser({matchConditions, skip, limit, sort}) {
-        const foundTopUserShop = await orderModel.aggregate([
-            {
-                $match: matchConditions,
-            },
-            {$unwind: "$order_products"},
-            {
-                $group: {
-                    _id: "$order_userId",
-                    totalUserAll: {$sum: +1},
-                },
-            },
-            {
-                $project: {
-                    _id: 1,
-                    totalUserAll: 1,
-                },
-            },
-            {$skip: skip},
-            {$limit: limit},
-            {$sort: sort},
-        ]);
-        return foundTopUserShop;
-    }
-
+        },
+        {$skip:skip},
+        {$limit: limit},
+        {$sort: sort},
+    ]);
+    return foundTopUserShop;
+}
     static async topOrder(query) {
-        const {sort, limit, skip, matchConditions} = this.query(query);
+        const {sort, limit,skip, matchConditions} = this.query(query);
         matchConditions.order_status = "delivered";
 
-        const foundTopQuantity = await this.topQuantity({sort, limit, skip, matchConditions})
-        const foundTopPrice = await this.topPrice({sort, limit, skip, matchConditions})
-        const foundTopUserShop = await this.topUser({sort, limit, skip, matchConditions});
+        const foundTopQuantity=await this.topQuantity({sort, limit,skip, matchConditions})
+        const foundTopPrice = await this.topPrice({sort, limit,skip, matchConditions})
+        const foundTopUserShop = await this.topUser({sort, limit,skip, matchConditions});
 
 
         const mergedArray = {};
-        for (const item of [...foundTopQuantity, ...foundTopPrice, ...foundTopUserShop]) {
+        for (const item of [...foundTopQuantity, ...foundTopPrice,...foundTopUserShop]) {
+            const user = await findByIdShop({_id: item._id});
+            const updatedItem = {...user, ...item};
+            const {_id, ...rest} = updatedItem;
+
+            mergedArray[_id] = Object.assign(mergedArray[_id] || {}, rest);
+        }
+
+        const resultArray = Object.keys(mergedArray).map((_id) => ({
+            _id,
+            ...mergedArray[_id],
+        }));
+
+
+        return resultArray;
+    }
+
+    static async topOrderDetails(query) {
+        const {sort, limit,skip, matchConditions} = this.query(query);
+        matchConditions.order_status = "delivered";
+        
+        const matchConditionsFind={
+            ...matchConditions,
+            "order_products.shopId":query.shopId
+        };
+        const foundTopQuantity=await this.topQuantity({sort, limit,skip, matchConditions:matchConditionsFind})
+        const foundTopPrice = await this.topPrice({sort, limit,skip, matchConditions:matchConditionsFind})
+        const foundTopUserShop = await this.topUser({sort, limit,skip, matchConditions:matchConditionsFind});
+
+
+        const mergedArray = {};
+        for (const item of [...foundTopQuantity, ...foundTopPrice,...foundTopUserShop]) {
             const user = await findByIdShop({_id: item._id});
             const updatedItem = {...user, ...item};
             const {_id, ...rest} = updatedItem;
@@ -570,7 +584,7 @@ class OrderService {
     }
 
     static async topProduct(query) {
-        const {sort, limit, skip, matchConditions} = this.query(query);
+        const {sort, limit,skip, matchConditions} = this.query(query);
         matchConditions.order_status = query.status ? query.status : "delivered";
 
         const foundTopProduct = await orderModel.aggregate([
@@ -593,7 +607,7 @@ class OrderService {
                     productId: "$_id",
                 },
             },
-            {$skip: skip},
+            {$skip:skip},
             {$limit: limit}
         ]);
 
@@ -606,12 +620,8 @@ class OrderService {
         return updatedResult;
     }
 
-
-    static async topRevenue(query) {
-        const {sort, limit, skip, matchConditions} = this.query(query);
-        matchConditions.order_status = query.status ? query.status : "delivered";
-
-        const foundTopShop = await orderModel.aggregate([
+    static async topRevenue({matchConditions,skip,limit,sort}){
+      return  await orderModel.aggregate([
             {
                 $match: matchConditions,
             },
@@ -629,14 +639,85 @@ class OrderService {
                     totalRevenueAll: 1,
                 },
             },
-            {$skip: skip},
+            {$skip:skip},
             {$limit: limit}
-        ]);
+        ])
+    }
+
+    static async topRevenueShop(query) {
+        const {sort, limit,skip, matchConditions} = this.query(query);
+        matchConditions.order_status = query.status ? query.status : "delivered";
+
+        const foundTopShop =await this.topRevenue({sort, limit,skip, matchConditions});
 
         const updatedResult = await Promise.all(foundTopShop.map(async (item) => ({
             _id: item._id,
             totalRevenueAll: item.totalRevenueAll,
-            shopInfo: await findByIdShop({_id: item._id})
+            shopInfo: await findByIdShop({_id:item._id})
+        })));
+
+        return updatedResult;
+    }
+
+
+    static async topRevenueDate({matchConditions,skip,limit,sort,day}){
+        const today = new Date();
+        matchConditions.createdOn={
+            $gte: new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() + (day-1), 0, 0, 0), // Thứ 2 của tuần
+            $lt: new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() + (day-1) + 1, 0, 0, 0) // Ngày tiếp theo
+         }
+
+        const dayOfWeekStartFromMonday = {
+            $add: [ { $dayOfWeek: { date: "$createdOn", timezone: "Asia/Ho_Chi_Minh" } }, -1 ]
+        };
+
+        return  await orderModel.aggregate([
+              {
+                  $match: matchConditions,
+              },
+              {$unwind: "$order_products"},
+              {
+                  $group: {
+                      _id: "$order_products.shopId",
+                      totalRevenueAll: {$sum: "$order_products.priceRow"},
+                      createdOn: { $first: "$createdOn" },
+                  },
+              },
+              {$sort: sort},
+              {
+                  $project: {
+                      _id: 1,
+                      totalRevenueAll: 1,
+                      dayOfWeek: {
+                        $dayOfWeek: { date: "$createdOn", timezone: "Asia/Ho_Chi_Minh" }
+                      }
+                  },
+              },
+              {
+                $match: {
+                  dayOfWeek: { $gte: 1, $lte: 7 }
+                }
+              },            
+              {$skip:skip},
+              {$limit: limit}
+          ]);
+      }
+
+
+    static async topRevenueShopDate(query) {
+        const {sort, limit,skip, matchConditions} = this.query(query);
+        matchConditions.order_status = query.status ? query.status : "delivered";
+
+        const result=[];
+        for (let i = 1; i <= 7; i++) {
+            const found=await this.topRevenueDate({sort, limit,skip, matchConditions,day:i});
+            result.push(...found);
+        }
+        const updatedResult = await Promise.all(result.map(async (item) => ({
+            _id: item._id,
+            dayOfWeek: item.dayOfWeek,
+            totalRevenueAll: item.totalRevenueAll,
+            shopInfo: await findByIdShop({_id:item._id})
         })));
 
         return updatedResult;

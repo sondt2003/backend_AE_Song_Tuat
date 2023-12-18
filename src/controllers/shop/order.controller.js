@@ -72,6 +72,16 @@ class OrderController {
         );
     });
 
+    
+    topOrderDetails = catchAsync(async (req, res, next) => {
+        OK(
+            res,
+            "Top Order By Shop success",
+            await OrderService.topOrderDetails({shopId:req.user.userId,...req.query})
+        );
+    });
+
+
     topProduct = catchAsync(async (req, res, next) => {
         OK(
             res,
@@ -84,7 +94,16 @@ class OrderController {
         OK(
             res,
             "Top Revenue By Shop success",
-            await OrderService.topRevenue(req.query)
+            await OrderService.topRevenueShop(req.query)
+        );
+    });
+
+
+    topRevenueShopDate = catchAsync(async (req, res, next) => {
+        OK(
+            res,
+            "Top Revenue By Shop success",
+            await OrderService.topRevenueShopDate(req.query)
         );
     });
 
