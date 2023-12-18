@@ -57,7 +57,13 @@ class DiscountController {
                 shopId: req.user.userId
             }));
     })
-
+    getAllDiscountApply = catchAsync(async (req, res) => {
+        OK(res, "Cancel discount success",
+            await DiscountService.getAllDiscountApply({
+                ...req.body,
+                userId: req.user.userId
+            }));
+    })
 }
 
 module.exports = new DiscountController()

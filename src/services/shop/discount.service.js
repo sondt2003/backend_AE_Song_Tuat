@@ -155,6 +155,33 @@ class DiscountService {
     });
   }
 
+  static async getAllDiscountApply({
+    userId,
+    limit,
+    page,
+  }) {
+    const foundDiscount = await findAllDiscountCodesUnSelect({
+      filter: {
+        discount_is_active: true,
+        // discount_applies_to: "all",
+      },
+      limit:limit,
+      page:page,
+      unSelect: ["__v", "discount_product_ids"],
+      model: discountModel,
+  });
+
+  const filteredDiscounts = foundDiscount.filter(discount => {
+      const idCount = discount.discount_users_used.filter(id => id === userId).length;
+      console.log("idCount:",idCount,discount.discount_max_uses_per_user,"userId:",userId)
+      console.log("idCount:BOLEEN",idCount >= discount.discount_max_uses_per_user)
+      console.log("discount_users_used",discount.discount_users_used)
+      const idNotPresent = !discount.discount_users_used.includes(userId);
+      return idCount < discount.discount_max_uses_per_user || idNotPresent;
+    });
+    return await filteredDiscounts;
+  }
+
   static async getAllDiscountCodesByShop({ limit, page, shopId }) {
     return await findAllDiscountCodesUnSelect({
       limit: +limit,

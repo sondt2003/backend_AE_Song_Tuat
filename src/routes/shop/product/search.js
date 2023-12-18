@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const productController = require('../../../controllers/shop/product.controller')
+const { authenticationV2 } = require('../../../auth/authUtils')
 
 
 router.get('/all/:shopId', productController.getAllPublished)
@@ -91,5 +92,7 @@ router.get('/', productController.findAllProducts)
  *           contents:
  *             application/json
  */
+
+// router.use(authenticationV2)
 router.get('/:product_id', productController.findProduct)
 module.exports = router

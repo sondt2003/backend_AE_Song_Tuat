@@ -92,7 +92,7 @@ class ProductController {
 
     findProduct = catchAsync(async (req, res) => {
         OK(res, "find product success",
-            await ProductService.findOneProduct(req.params.product_id,req.query.isDiscount))
+            await ProductService.findOneProduct(req.params.product_id,req.query.isDiscount,req.params.userId))
     })
 
     advancedSearch = catchAsync(async (req, res) => {
