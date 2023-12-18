@@ -533,7 +533,38 @@ static async topUser({matchConditions,skip,limit,sort}){
         const foundTopPrice = await this.topPrice({sort, limit,skip, matchConditions})
         const foundTopUserShop = await this.topUser({sort, limit,skip, matchConditions});
 
+
+        const mergedArray = {};
+        for (const item of [...foundTopQuantity, ...foundTopPrice,...foundTopUserShop]) {
+            const user = await findByIdShop({_id: item._id});
+            const updatedItem = {...user, ...item};
+            const {_id, ...rest} = updatedItem;
+
+            mergedArray[_id] = Object.assign(mergedArray[_id] || {}, rest);
+        }
+
+        const resultArray = Object.keys(mergedArray).map((_id) => ({
+            _id,
+            ...mergedArray[_id],
+        }));
+
+
+        return resultArray;
+    }
+
+    static async topOrderDetails(query) {
+        const {sort, limit,skip, matchConditions} = this.query(query);
+        matchConditions.order_status = "delivered";
         
+        const matchConditionsFind={
+            ...matchConditions,
+            "order_products.shopId":query.shopId
+        };
+        const foundTopQuantity=await this.topQuantity({sort, limit,skip, matchConditions:matchConditionsFind})
+        const foundTopPrice = await this.topPrice({sort, limit,skip, matchConditions:matchConditionsFind})
+        const foundTopUserShop = await this.topUser({sort, limit,skip, matchConditions:matchConditionsFind});
+
+
         const mergedArray = {};
         for (const item of [...foundTopQuantity, ...foundTopPrice,...foundTopUserShop]) {
             const user = await findByIdShop({_id: item._id});
@@ -589,12 +620,8 @@ static async topUser({matchConditions,skip,limit,sort}){
         return updatedResult;
     }
 
-
-    static async topRevenue(query) {
-        const {sort, limit,skip, matchConditions} = this.query(query);
-        matchConditions.order_status = query.status ? query.status : "delivered";
-
-        const foundTopShop = await orderModel.aggregate([
+    static async topRevenue({matchConditions,skip,limit,sort}){
+      return  await orderModel.aggregate([
             {
                 $match: matchConditions,
             },
@@ -614,10 +641,81 @@ static async topUser({matchConditions,skip,limit,sort}){
             },
             {$skip:skip},
             {$limit: limit}
-        ]);
+        ])
+    }
+
+    static async topRevenueShop(query) {
+        const {sort, limit,skip, matchConditions} = this.query(query);
+        matchConditions.order_status = query.status ? query.status : "delivered";
+
+        const foundTopShop =await this.topRevenue({sort, limit,skip, matchConditions});
 
         const updatedResult = await Promise.all(foundTopShop.map(async (item) => ({
             _id: item._id,
+            totalRevenueAll: item.totalRevenueAll,
+            shopInfo: await findByIdShop({_id:item._id})
+        })));
+
+        return updatedResult;
+    }
+
+
+    static async topRevenueDate({matchConditions,skip,limit,sort,day}){
+        const today = new Date();
+        matchConditions.createdOn={
+            $gte: new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() + (day-1), 0, 0, 0), // Thứ 2 của tuần
+            $lt: new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() + (day-1) + 1, 0, 0, 0) // Ngày tiếp theo
+         }
+
+        const dayOfWeekStartFromMonday = {
+            $add: [ { $dayOfWeek: { date: "$createdOn", timezone: "Asia/Ho_Chi_Minh" } }, -1 ]
+        };
+
+        return  await orderModel.aggregate([
+              {
+                  $match: matchConditions,
+              },
+              {$unwind: "$order_products"},
+              {
+                  $group: {
+                      _id: "$order_products.shopId",
+                      totalRevenueAll: {$sum: "$order_products.priceRow"},
+                      createdOn: { $first: "$createdOn" },
+                  },
+              },
+              {$sort: sort},
+              {
+                  $project: {
+                      _id: 1,
+                      totalRevenueAll: 1,
+                      dayOfWeek: {
+                        $dayOfWeek: { date: "$createdOn", timezone: "Asia/Ho_Chi_Minh" }
+                      }
+                  },
+              },
+              {
+                $match: {
+                  dayOfWeek: { $gte: 1, $lte: 7 }
+                }
+              },            
+              {$skip:skip},
+              {$limit: limit}
+          ]);
+      }
+
+
+    static async topRevenueShopDate(query) {
+        const {sort, limit,skip, matchConditions} = this.query(query);
+        matchConditions.order_status = query.status ? query.status : "delivered";
+
+        const result=[];
+        for (let i = 1; i <= 7; i++) {
+            const found=await this.topRevenueDate({sort, limit,skip, matchConditions,day:i});
+            result.push(...found);
+        }
+        const updatedResult = await Promise.all(result.map(async (item) => ({
+            _id: item._id,
+            dayOfWeek: item.dayOfWeek,
             totalRevenueAll: item.totalRevenueAll,
             shopInfo: await findByIdShop({_id:item._id})
         })));

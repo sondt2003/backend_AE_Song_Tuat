@@ -21,9 +21,12 @@ router.post('/review', orderController.checkoutReview)
 router.post('/v1', orderController.order)
 router.post('/v2', orderController.orderV2)
 
+router.get('/top-order-details', orderController.topOrderDetails);
 router.get('/top-order', orderController.topOrder);
+
 router.get('/top-product', orderController.topProduct);
 router.get('/top-revenue', orderController.topRevenue);
+router.get('/top-revenue-date', orderController.topRevenueShopDate);
 
 
 router.get('/:orderId', orderController.getOneOrderByUser)
