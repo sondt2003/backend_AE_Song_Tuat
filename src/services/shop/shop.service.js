@@ -199,14 +199,13 @@ class ShopService {
     static getStatusShop = async (shop_id) => {
 
         let shop = await shopModel.findById(shop_id);
-        return shop.isOpen;
+        return !(!(shop.isOpen));
 
     }
     static changeStatusShop = async ({shop_id, isOpen}) => {
         let data = await shopModel.findByIdAndUpdate(shop_id, {
             isOpen: isOpen
         }).exec();
-
         return isOpen
     }
 

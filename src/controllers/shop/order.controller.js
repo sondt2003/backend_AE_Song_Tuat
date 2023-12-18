@@ -72,12 +72,12 @@ class OrderController {
         );
     });
 
-    
+
     topOrderDetails = catchAsync(async (req, res, next) => {
         OK(
             res,
             "Top Order By Shop success",
-            await OrderService.topOrderDetails({shopId:req.user.userId,...req.query})
+            await OrderService.topOrderDetails({shopId: req.user.userId, ...req.query})
         );
     });
 

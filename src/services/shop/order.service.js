@@ -201,8 +201,6 @@ class OrderService {
                 isOrder: true,
             });
 
-        // // check lai mot lan nua xem ton kho hay k
-        // // get new array products
         const products = shop_order_ids_new.flatMap((order) => order.item_products);
         console.log("[1]::", products);
         const acquireProduct = [];
