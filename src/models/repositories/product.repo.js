@@ -111,13 +111,13 @@ const getProductByIdUnselect = async ({productId, select}) => {
         .findOne({_id: convert2ObjectId(productId)})
         .select(select);
 };
-const findByIdAndDiscount = async ({product_id, unSelect, isDiscount}) => {
+const findByIdAndDiscount = async ({product_id, unSelect, isDiscount,userId}) => {
     const foundFood = await product
         .findOne({_id: product_id, isPublished: true})
         .select(unSelect)
         .lean();
 
-    if (!foundFood) throw new Api404Error("shop not found");
+    if (!foundFood) throw new Api404Error("Product not found");
 
     if (isDiscount) {
         const foundDiscount = await findAllDiscountCodesUnSelect({
@@ -129,17 +129,32 @@ const findByIdAndDiscount = async ({product_id, unSelect, isDiscount}) => {
                     },
                     {
                         discount_product_ids: product_id,
-                        discount_is_active: true,
+                        // discount_is_active: true,
                     },
                 ],
             },
-            unSelect: ["__v", "discount_product_ids", "discount_users_used"],
+            unSelect: ["__v", "discount_product_ids"],
             model: discountModel,
         });
 
+        let filteredDiscounts
+        if(userId){
+            filteredDiscounts=foundDiscount.filter(discount => {
+                const idCount = discount.discount_users_used.filter(id => id === userId).length;
+                console.log("idCount:",idCount,discount.discount_max_uses_per_user,"userId:",userId)
+                console.log("idCount:BOLEEN",idCount >= discount.discount_max_uses_per_user)
+                console.log("discount_users_used",discount.discount_users_used)
+                const idNotPresent = !discount.discount_users_used.includes(userId);
+                return idCount < discount.discount_max_uses_per_user || idNotPresent;
+              });
+        } else {
+            filteredDiscounts=foundDiscount;
+        }
+
+          
         return {
             ...foundFood,
-            discount: foundDiscount,
+            discount: filteredDiscounts,
         };
     } else {
         return foundFood;

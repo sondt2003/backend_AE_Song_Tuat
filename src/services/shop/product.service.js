@@ -104,10 +104,11 @@ class ProductService {
   static async draftProductByShop({ product_id }) {
     return await draftProductByShop({ product_id });
   }
-  static async findOneProduct(product_id, isDiscount = false) {
+  static async findOneProduct(product_id, isDiscount = false,userId) {
     return await findByIdAndDiscount({
       product_id,
       isDiscount,
+      userId,
       unSelect: unGetSelectData(["__v", "variations"]),
     });
   }

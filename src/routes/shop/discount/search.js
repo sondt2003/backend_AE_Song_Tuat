@@ -5,6 +5,7 @@ const {authenticationV2} = require("../../../auth/authUtils");
 
 router.use(authenticationV2)
 
+router.get('/discount-apply', discountController.getAllDiscountApply)
 router.post('/amount', discountController.getDiscountAmount)
 /**
  * @swagger
