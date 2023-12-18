@@ -68,13 +68,15 @@ class ShopService {
             password = await bcrypt.hash(password, 10);
         }
         console.log("WIDTH:",width,height)
-        const image = await saveBase64ImageSharp({base64Data:avatar,width,height});
+        if(avatar) {
+            avatar = await saveBase64ImageSharp({base64Data:avatar,width,height});
+        }
         const updateShop = await shopModel
             .findByIdAndUpdate(
                 userId,
                 {
                     name,
-                    avatar:image,
+                    avatar,
                     email,
                     password,
                     msisdn,
@@ -87,7 +89,9 @@ class ShopService {
         if (!updateShop) {
             return null;
         }
-        await deleteImage(holderShop.avatar);
+        if(avatar) {
+            await deleteImage(holderShop.avatar);
+        }
         return {
             shop: getInfoData({
                 fields: ["_id", "name", "email", "msisdn", "address_id", "avatar"],
@@ -138,7 +142,11 @@ class ShopService {
 
         const passwordHash = await bcrypt.hash(password, 10);
 
-        const image = await saveBase64ImageSharp({base64Data:avatar,width,height});
+
+        if(avatar) {
+           avatar = await saveBase64ImageSharp({base64Data:avatar,width,height});
+        }
+
         const updateShop = await shopModel
             .findByIdAndUpdate(
                 userId,
@@ -158,8 +166,9 @@ class ShopService {
         if (!updateShop) {
             return null;
         }
-
-        await deleteImage(holderShop.avatar);
+        if(avatar) {
+            await deleteImage(holderShop.avatar);
+        }
         return {
             shop: getInfoData({
                 fields: ["_id", "name", "email", "msisdn", "address_id", "avatar"],
