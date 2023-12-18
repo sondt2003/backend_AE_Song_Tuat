@@ -80,6 +80,7 @@ class OrderService {
             // check product available
             const checkProductServer = await checkProductByServer(item_products);
             if (!checkProductServer[0]) throw new BusinessLogicError("Order invalid");
+            if (!shopId) throw new BusinessLogicError("shopId invalid");
 
 
             // sum total order
