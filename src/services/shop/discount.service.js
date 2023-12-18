@@ -39,11 +39,16 @@ class DiscountService {
       permissions,
     } = payload;
 
+    // // validate
+    // if (new Date() > new Date(start_date) || new Date() > new Date(end_date)) {
+    //   throw new BusinessLogicError("Discount code has expired");
+    // }
     // validate
-    if (new Date() > new Date(start_date) || new Date() > new Date(end_date)) {
+    
+    if (new Date() > new Date(end_date)) {
       throw new BusinessLogicError("Discount code has expired");
     }
-
+    
     if (new Date(end_date) < new Date(start_date)) {
       throw new BusinessLogicError("End date more than start date");
     }
