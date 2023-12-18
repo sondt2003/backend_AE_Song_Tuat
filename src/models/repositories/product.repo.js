@@ -29,7 +29,7 @@ const publishProductByShop = async ({product_shop, product_id}) => {
     return modifiedCount;
 };
 
-const draftProductByShop = async ({ product_id}) => {
+const draftProductByShop = async ({product_id}) => {
     // find one
     const foundShop = await product.findOne({
         // product_shop: new Types.ObjectId(product_shop),
@@ -161,15 +161,15 @@ const findByIdAndDiscount = async ({product_id, unSelect, isDiscount,userId}) =>
     }
 };
 
-const queryProduct = async ({ query, limit, skip }) => {
-  return await product
-    .find(query)
-    .populate("product_shop", "name email")
-    .sort({ updateAt: -1 })
-    .skip(skip)
-    .limit(limit)
-    .lean()
-    .exec();
+const queryProduct = async ({query, limit, skip}) => {
+    return await product
+        .find(query)
+        .populate("product_shop", "name email")
+        .sort({updateAt: -1})
+        .skip(skip)
+        .limit(limit)
+        .lean()
+        .exec();
 };
 
 const updateProductById = async ({
@@ -218,8 +218,18 @@ const advancedSearch = async (queryInput) => {
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
     queryStr = JSON.parse(queryStr);
 
-    console.log(queryStr);
-    let query = product.find(queryStr);
+    let filter = {};
+    if (queryInput.search) {
+        filter = {
+            isPublished: true,
+            $or: [
+                {product_name: {$regex: queryInput.search, $options: "i"}},
+                {product_description: {$regex: queryInput.search, $options: "i"}},
+            ],
+        }
+    }
+    console.log("queryStr", queryStr);
+    let query = product.find({...queryStr, ...filter});
 
     //2. sorting
     if (queryInput.sort) {
@@ -265,8 +275,7 @@ const updateProductRating = async (productId) => {
         throw new Api404Error('No comments found for this product');
     }
     const totalRating = commentsFound.reduce((sum, comment) => sum + comment.comment_rating, 0);
-    const averageRating = totalRating / commentsFound.length;
-    foundProduct.product_ratingsAverage = Math.round(averageRating) ;
+    foundProduct.product_ratingsAverage = totalRating / commentsFound.length;
     await foundProduct.save();
     return true
 };

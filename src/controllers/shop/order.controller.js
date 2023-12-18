@@ -72,6 +72,16 @@ class OrderController {
         );
     });
 
+
+    topOrderDetails = catchAsync(async (req, res, next) => {
+        OK(
+            res,
+            "Top Order By Shop success",
+            await OrderService.topOrderDetails({shopId: req.user.userId, ...req.query})
+        );
+    });
+
+
     topProduct = catchAsync(async (req, res, next) => {
         OK(
             res,
@@ -80,6 +90,22 @@ class OrderController {
         );
     });
 
+    topRevenue = catchAsync(async (req, res, next) => {
+        OK(
+            res,
+            "Top Revenue By Shop success",
+            await OrderService.topRevenueShop(req.query)
+        );
+    });
+
+
+    topRevenueShopDate = catchAsync(async (req, res, next) => {
+        OK(
+            res,
+            "Top Revenue By Shop success",
+            await OrderService.topRevenueShopDate(req.query)
+        );
+    });
 
     updateOrderConfirmByShop = catchAsync(async (req, res, next) => {
         OK(
@@ -105,11 +131,17 @@ class OrderController {
             })
         );
     });
+    cancelOrderByShop = catchAsync(async (req, res, next) => {
+        OK(res, "Update Order Status By shop success", await OrderService.cancelOrderByShop({
+            orderId: req.params.orderId,
+            reason: req.body.reason
+        }))
 
+    })
     listOrderStatusByShop = catchAsync(async (req, res, next) => {
         OK(
             res,
-            "list Order Status By Shop success",
+            "List Order Status By Shop success",
             await OrderService.listOrderStatusByShop({
                 shopId: req.user.userId,
                 ...req.body,
@@ -117,6 +149,18 @@ class OrderController {
             })
         );
     });
+    countOrderStatusByShop = catchAsync(async (req, res, next) => {
+        OK(
+            res,
+            "Count Order Status By Shop success",
+            await OrderService.CountOrderStatusByShop({
+                shopId: req.user.userId,
+                ...req.body,
+                ...req.query,
+            })
+        );
+    });
+
 }
 
 module.exports = new OrderController();

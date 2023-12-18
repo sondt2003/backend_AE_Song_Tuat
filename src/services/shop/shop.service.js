@@ -1,6 +1,6 @@
 const shopModel = require("../../models/shop.model");
 const bcrypt = require("bcrypt");
-const {getInfoData, getSelectData, deleteImage} = require("../../utils");
+const {getInfoData, getSelectData, deleteImage, saveBase64ImageSharp, saveBase64Image} = require("../../utils");
 const {Api403Error, Api404Error} = require("../../core/error.response");
 const addressModel = require("../../models/address.model");
 const RoleShop = require("../../utils/role.util");
@@ -14,8 +14,8 @@ const findByEmail = async ({
                                    status: 3,
                                    roles: 4,
                                    name: 5,
-                                   avatar:6,
-                                   msisdn:7,
+                                   avatar: 6,
+                                   msisdn: 7,
                                },
                            }) => {
     return await shopModel
@@ -25,20 +25,22 @@ const findByEmail = async ({
         .lean();
 };
 
-const findByIdShop = async ({_id, select = {
-    // email: 1,
-    // password: 2,
-    // status: 3,
-    // roles: 4,
-    name: 5,
-    avatar:6,
-    msisdn:7,
-    },}) => {
-return await shopModel
-.findOne({_id:_id})
-.select(select)
-// .populate("address_id")
-.lean();
+const findByIdShop = async ({
+                                _id, select = {
+        // email: 1,
+        // password: 2,
+        // status: 3,
+        // roles: 4,
+        name: 5,
+        avatar: 6,
+        msisdn: 7,
+    },
+                            }) => {
+    return await shopModel
+        .findOne({_id: _id})
+        .select(select)
+        // .populate("address_id")
+        .lean();
 };
 
 class ShopService {
@@ -50,28 +52,36 @@ class ShopService {
                                    password,
                                    msisdn,
                                    addressId,
+                                   width,
+                                   height
                                }) => {
         // step1: check email exists?
         const holderShop = await shopModel.findById(userId).lean();
         if (!holderShop) {
             throw new Api403Error("Thông tin shop đã Tồn Tại");
         }
-        if(addressId){
+        if (addressId) {
             const foundAddress = await addressModel
-            .findOne({_id: addressId, user_id: userId})
-            .lean();
-         if (!foundAddress) throw new Api404Error("Address not found");
+                .findOne({_id: addressId, user_id: userId})
+                .lean();
+            if (!foundAddress) throw new Api404Error("Address not found");
         }
-        if(password){
+        if (password) {
             password = await bcrypt.hash(password, 10);
         }
-        const image = await saveBase64Image(avatar);
+
+        if (avatar === null) {
+            avatar = undefined;
+        }
+        if (avatar) {
+            avatar = await saveBase64ImageSharp({base64Data: avatar, width, height});
+        }
         const updateShop = await shopModel
             .findByIdAndUpdate(
                 userId,
                 {
                     name,
-                    avatar:image,
+                    avatar,
                     email,
                     password,
                     msisdn,
@@ -84,7 +94,9 @@ class ShopService {
         if (!updateShop) {
             return null;
         }
-        await deleteImage(holderShop.avatar);
+        if (avatar && holderShop.avatar) {
+            await deleteImage(holderShop.avatar);
+        }
         return {
             shop: getInfoData({
                 fields: ["_id", "name", "email", "msisdn", "address_id", "avatar"],
@@ -102,6 +114,7 @@ class ShopService {
                                      password,
                                      msisdn,
                                      address: {street, city, state, country, latitude, longitude},
+                                     width, height
                                  }) => {
         // step1: check email exists?
         const holderShop = await shopModel.findById(userId).lean();
@@ -133,14 +146,19 @@ class ShopService {
         }
 
         const passwordHash = await bcrypt.hash(password, 10);
+        if (avatar == null) {
+            avatar = undefined;
+        }
+        if (avatar) {
+            avatar = await saveBase64ImageSharp({base64Data: avatar, width, height});
+        }
 
-        const image = await saveBase64Image(avatar);
         const updateShop = await shopModel
             .findByIdAndUpdate(
                 userId,
                 {
                     name,
-                    avatar:image,
+                    avatar,
                     email,
                     password: passwordHash,
                     msisdn,
@@ -154,8 +172,9 @@ class ShopService {
         if (!updateShop) {
             return null;
         }
-
-        await deleteImage(holderShop.avatar);
+        if (avatar && holderShop.avatar) {
+            await deleteImage(holderShop.avatar);
+        }
         return {
             shop: getInfoData({
                 fields: ["_id", "name", "email", "msisdn", "address_id", "avatar"],
@@ -169,7 +188,7 @@ class ShopService {
         const sortBy = sort === "ctime" ? {_id: -1} : {_id: 1};
 
         const foundShop = await shopModel
-            .find({roles: {$elemMatch: {$eq: RoleShop.SHOP}}})
+            .find({roles: {$elemMatch: {$eq: RoleShop.SHOP}}, isOpen: true})
             .sort(sortBy)
             .skip(skip)
             .limit(limit)
@@ -177,9 +196,23 @@ class ShopService {
             .populate("address_id");
         return foundShop;
     };
+    static getStatusShop = async (shop_id) => {
+
+        let shop = await shopModel.findById(shop_id);
+        return !(!(shop.isOpen));
+
+    }
+    static changeStatusShop = async ({shop_id, isOpen}) => {
+        let data = await shopModel.findByIdAndUpdate(shop_id, {
+            isOpen: isOpen
+        }).exec();
+        return isOpen
+    }
+
+
 }
 
 module.exports = {
-    findByEmail,findByIdShop,
+    findByEmail, findByIdShop,
     ShopService,
 };

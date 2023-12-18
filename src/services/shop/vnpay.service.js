@@ -58,7 +58,7 @@ class VnPayService {
         vnp_Params["vnp_TxnRef"] = orderId;
         vnp_Params["vnp_OrderInfo"] = "Thanh toan cho ma GD:" + orderId;
         vnp_Params["vnp_OrderType"] = "other";
-        vnp_Params["vnp_Amount"] = amount;
+        vnp_Params["vnp_Amount"] = amount * 100;
         vnp_Params["vnp_ReturnUrl"] = returnUrl;
         vnp_Params["vnp_IpAddr"] = ipAddr;
         vnp_Params["vnp_CreateDate"] = createDate;
@@ -86,7 +86,7 @@ class VnPayService {
         let vnp_TxnRef = vnp_Params["vnp_TxnRef"]
         delete vnp_Params["vnp_SecureHash"];
         delete vnp_Params["vnp_SecureHashType"];
-
+        let vnp_ResponseCode = vnp_Params['vnp_ResponseCode']
         vnp_Params = sortObject(vnp_Params);
 
         let tmnCode = configVnPay.tmnCode;
@@ -98,7 +98,14 @@ class VnPayService {
         let hmac = crypto.createHmac("sha512", secretKey);
         let signed = hmac.update(new Buffer(signData, "utf-8")).digest("hex");
 
+
+        if (vnp_ResponseCode !== '00') {
+            throw new Api403Error('Lỗi giao dịch ,vui lòng thao tác lại');
+        }
+
+
         if (secureHash === signed) {
+
             let indexDelete;
             let request = ListRequest.find((value, index) => {
                 indexDelete = index;

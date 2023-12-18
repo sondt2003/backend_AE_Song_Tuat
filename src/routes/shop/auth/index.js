@@ -52,10 +52,8 @@ router.post('/login', validation.validateLoginRequest, accessController.login)
  *             application/json
  */
 router.post('/register', validation.validateRegister, accessController.signUp)
-
 // authentication
 router.use(authenticationV2)
-
 /**
  * @swagger
  *   /api/v1/auth/logout:
@@ -79,8 +77,6 @@ router.use(authenticationV2)
  *             application/json
  */
 router.post('/logout', accessController.logout)
-
-
 /**
  * @swagger
  *   /api/v1/auth/refresh-token:
@@ -98,5 +94,4 @@ router.post('/logout', accessController.logout)
  *             application/json
  */
 router.post('/refresh-token', accessController.refreshToken)
-
 module.exports = router

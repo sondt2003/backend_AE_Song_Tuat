@@ -8,13 +8,13 @@ const NotifyTemplate =
     Object.freeze({
             pending: {
                 message: "Hãy chờ shop xác nhận đơn hàng của bạn",
-                title: "Đơn hàng của bạn đã được đặt"
+                title: "Đơn hàng được đặt"
             }, confirmed: {
                 message: "Hãy chờ shop chuẩn bị đơn hàng của bạn",
-                title: "Đơn hàng của bạn đã được xác nhận"
+                title: "Đơn hàng được xác nhận"
             }, shipping: {
                 message: "Đơn hàng sẽ sớm đến thôi, hãy kiên nhẫn nhé!!!",
-                title: "Đơn hàng của bạn đang được giao đi"
+                title: "Đơn hàng đang được giao đi"
             }, delivered: {
                 message: "Chúc ngon miệng ,hãy nhớ để lại đánh giá để những người khác biết về trải nghiệm của bạn nhé",
                 title: "Đơn hàng đã được giao đến"
@@ -58,36 +58,29 @@ class NotifyUserService {
         return await notifyModel.findOneAndDelete({_id: notificationId, userId}).lean();
     }
 
-    static async getUserNotifications({userId, limit, page, sort}) {
+    static async getUserNotifications({userId, limit, page, sort = 'ctime'}) {
         const skip = (page - 1) * limit;
-        const sortBy = sort === 'ctime' ? {_id: -1} : {_id: 1};
+        const sortBy = sort === 'ctime' ? {createdAt: -1} : {createdAt: 1};
 
         const notifications = await notifyModel
             .find({userId: userId})
+            .sort(sortBy)
             .limit(limit)
             .skip(skip)
-            .sort(sortBy)
             .lean();
 
         // Tính thời gian kể từ thời điểm tạo và thêm vào mỗi thông báo
         const currentTime = new Date();
         const notificationsWithTimeDifference = notifications.map((notification) => {
             const createdAt = new Date(notification.createdAt);
-            const timeDifference = currentTime - createdAt;
+            const formattedHours = ('0' + createdAt.getHours()).slice(-2); // Ensure two characters
+            const formattedMinutes = ('0' + createdAt.getMinutes()).slice(-2); // Ensure two characters
 
-            // Chuyển đổi timeDifference thành giây, phút và giờ
-            const seconds = Math.floor(timeDifference / 1000);
-            const minutes = Math.floor(seconds / 60);
-            const hours = Math.floor(minutes / 60);
+            const formattedCreatedAt = `${formattedHours}:${formattedMinutes} | ${createdAt.getDate()}-${createdAt.getMonth() + 1}-${createdAt.getFullYear()}`;
 
             return {
                 ...notification,
-                timeDifference: {
-                    milliseconds: timeDifference,
-                    seconds: seconds,
-                    minutes: minutes,
-                    hours: hours,
-                },
+                time: formattedCreatedAt,
             };
         });
 
@@ -106,10 +99,7 @@ class NotifyUserService {
     }
 
     static async putNotify({
-                               user_id,
-                               title = "Thông báo",
-                               message = "Đây là thông báo test của hệ thống",
-                               type_notify
+                               user_id, title = "Thông báo", message = "Đây là thông báo test của hệ thống", type_notify
                            }) {
         let user = await shopservice.findByIdShop({_id: user_id})
         if (!user) {
@@ -126,7 +116,7 @@ class NotifyUserService {
         return true
     }
 
-    static async notifyOrder({user_id, type_notify, order_id}) {
+    static async notifyOrder({user_id, type_notify, order_id, reason}) {
         let user = await shopservice.findByIdShop({_id: user_id})
         if (!user) {
             throw new Api404Error("Không tìm thấy shop")
@@ -135,20 +125,21 @@ class NotifyUserService {
         if (!contentNotify) {
             throw new Api404Error("Không tìm thấy nội dung notify phù hợp")
         }
-        axios.post(native_notify_config.url_indie, {
-            subID: `${user_id}`,
-            appId: native_notify_config.appId,
-            appToken: native_notify_config.appToken,
-            title: contentNotify.title,
-            message: contentNotify.message,
-        });
         await this.createNotification({
             userId: user_id,
             title: contentNotify.title,
-            message: contentNotify.message,
+            message: reason || contentNotify.message,
             typeNotify: type_notify,
             orderId: order_id
         })
+        axios.post(native_notify_config.url_indie, {
+            subID: user_id,
+            appId: native_notify_config.appId,
+            appToken: native_notify_config.appToken,
+            title: contentNotify.title,
+            message: reason || contentNotify.message,
+        });
+
         return true
     }
 }

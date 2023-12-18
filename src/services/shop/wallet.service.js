@@ -2,7 +2,7 @@ const Wallet = require("../../models/wallet.model");
 const Shop = require("../../models/shop.model");
 const {
     Api404Error,
-    Api409Error, Api401Error,
+    Api401Error,
 } = require("../../core/error.response");
 const {TransactionHistoryService} = require("./transaction-history.service");
 
@@ -32,31 +32,46 @@ class WalletService {
         return wallet;
     }
 
-    static async Payoff(userId, amount) {
+    static async Payoff({userId, amount, order_id}) {
         const shop = await Shop.findOne({_id: userId});
 
         if (!shop) {
-            throw new Api404Error("Shop not found");
+            throw new Api404Error("Không tìm thấy user");
         }
-
         const wallet = await Wallet.findById(shop.wallet);
         if (!wallet) {
-            throw new Api404Error("Insufficient balance for payoff");
+            throw new Api404Error("Không tìm thấy wallet ");
         }
 
-        console.log(wallet, "----------")
-        console.log(Number(wallet.balance) >= Number(amount))
-        if (Number(wallet.balance) >= Number(amount)) {
+        if (order_id) {
+            console.log(Number(wallet.balance) >= Number(amount))
+            if (Number(wallet.balance) >= Number(amount)) {
+                await Wallet.findOneAndUpdate(
+                    {_id: shop.wallet, balance: {$gte: amount}},
+                    {$inc: {balance: -amount}},
+                    {new: true}
+                );
+                await TransactionHistoryService.createUserTransactionHistory({
+                    payment_method: 'e_wallets',
+                    currency: 'VND',
+                    amount: amount,
+                    userId: userId,
+                    comments: `Pay off for order {}`,
+                    is_recharge: false,
+                    billing_information: 'Wallet', orderId: order_id
+                })
 
-           let res= await Wallet.findOneAndUpdate(
+                return wallet;
+            } else {
+                throw new Api401Error("Số dư của bạn không đủ để thực hiện giao dịch");
+            }
+        } else {
+            await Wallet.findOneAndUpdate(
                 {_id: shop.wallet, balance: {$gte: amount}},
                 {$inc: {balance: -amount}},
                 {new: true}
             );
-            console.log(res)
-            return wallet;
-        } else {
-            throw new Api401Error("Insufficient balance");
+            return wallet
         }
     }
 
