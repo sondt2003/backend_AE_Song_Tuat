@@ -61,6 +61,7 @@ class DiscountController {
         OK(res, "Cancel discount success",
             await DiscountService.getAllDiscountApply({
                 ...req.body,
+                ...req.query,
                 userId: req.user.userId
             }));
     })

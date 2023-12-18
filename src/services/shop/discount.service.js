@@ -169,19 +169,19 @@ class DiscountService {
     const foundDiscount = await findAllDiscountCodesUnSelect({
       filter: {
         discount_is_active: true,
-        // discount_applies_to: "all",
+        discount_is_admin: true,
       },
-      limit:limit,
-      page:page,
+      limit,
+      page,
       unSelect: ["__v", "discount_product_ids"],
       model: discountModel,
   });
-
+  console.log("LIMIT:PAGE",limit,page)
   const filteredDiscounts = foundDiscount.filter(discount => {
       const idCount = discount.discount_users_used.filter(id => id === userId).length;
-      console.log("idCount:",idCount,discount.discount_max_uses_per_user,"userId:",userId)
-      console.log("idCount:BOLEEN",idCount >= discount.discount_max_uses_per_user)
-      console.log("discount_users_used",discount.discount_users_used)
+      // console.log("idCount:",idCount,discount.discount_max_uses_per_user,"userId:",userId)
+      // console.log("idCount:BOLEEN",idCount >= discount.discount_max_uses_per_user)
+      // console.log("discount_users_used",discount.discount_users_used)
       const idNotPresent = !discount.discount_users_used.includes(userId);
       return idCount < discount.discount_max_uses_per_user || idNotPresent;
     });
