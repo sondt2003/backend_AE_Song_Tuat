@@ -67,7 +67,10 @@ class ShopService {
         if(password){
             password = await bcrypt.hash(password, 10);
         }
-        console.log("WIDTH:",width,height)
+
+        if(avatar===null){
+            avatar=undefined;
+        }
         if(avatar) {
             avatar = await saveBase64ImageSharp({base64Data:avatar,width,height});
         }
@@ -89,7 +92,7 @@ class ShopService {
         if (!updateShop) {
             return null;
         }
-        if(avatar) {
+        if(avatar && holderShop.avatar) {
             await deleteImage(holderShop.avatar);
         }
         return {
@@ -141,8 +144,9 @@ class ShopService {
         }
 
         const passwordHash = await bcrypt.hash(password, 10);
-
-
+        if(avatar==null){
+            avatar=undefined;
+        }
         if(avatar) {
            avatar = await saveBase64ImageSharp({base64Data:avatar,width,height});
         }
@@ -152,7 +156,7 @@ class ShopService {
                 userId,
                 {
                     name,
-                    avatar:image,
+                    avatar,
                     email,
                     password: passwordHash,
                     msisdn,
@@ -166,7 +170,7 @@ class ShopService {
         if (!updateShop) {
             return null;
         }
-        if(avatar) {
+        if(avatar && holderShop.avatar) {
             await deleteImage(holderShop.avatar);
         }
         return {
