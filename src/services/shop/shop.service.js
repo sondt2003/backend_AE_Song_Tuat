@@ -14,8 +14,8 @@ const findByEmail = async ({
                                    status: 3,
                                    roles: 4,
                                    name: 5,
-                                   avatar:6,
-                                   msisdn:7,
+                                   avatar: 6,
+                                   msisdn: 7,
                                },
                            }) => {
     return await shopModel
@@ -25,20 +25,22 @@ const findByEmail = async ({
         .lean();
 };
 
-const findByIdShop = async ({_id, select = {
-    // email: 1,
-    // password: 2,
-    // status: 3,
-    // roles: 4,
-    name: 5,
-    avatar:6,
-    msisdn:7,
-    },}) => {
-return await shopModel
-.findOne({_id:_id})
-.select(select)
-// .populate("address_id")
-.lean();
+const findByIdShop = async ({
+                                _id, select = {
+        // email: 1,
+        // password: 2,
+        // status: 3,
+        // roles: 4,
+        name: 5,
+        avatar: 6,
+        msisdn: 7,
+    },
+                            }) => {
+    return await shopModel
+        .findOne({_id: _id})
+        .select(select)
+        // .populate("address_id")
+        .lean();
 };
 
 class ShopService {
@@ -58,21 +60,21 @@ class ShopService {
         if (!holderShop) {
             throw new Api403Error("Thông tin shop đã Tồn Tại");
         }
-        if(addressId){
+        if (addressId) {
             const foundAddress = await addressModel
-            .findOne({_id: addressId, user_id: userId})
-            .lean();
-         if (!foundAddress) throw new Api404Error("Address not found");
+                .findOne({_id: addressId, user_id: userId})
+                .lean();
+            if (!foundAddress) throw new Api404Error("Address not found");
         }
-        if(password){
+        if (password) {
             password = await bcrypt.hash(password, 10);
         }
 
-        if(avatar===null){
-            avatar=undefined;
+        if (avatar === null) {
+            avatar = undefined;
         }
-        if(avatar) {
-            avatar = await saveBase64ImageSharp({base64Data:avatar,width,height});
+        if (avatar) {
+            avatar = await saveBase64ImageSharp({base64Data: avatar, width, height});
         }
         const updateShop = await shopModel
             .findByIdAndUpdate(
@@ -92,7 +94,7 @@ class ShopService {
         if (!updateShop) {
             return null;
         }
-        if(avatar && holderShop.avatar) {
+        if (avatar && holderShop.avatar) {
             await deleteImage(holderShop.avatar);
         }
         return {
@@ -112,7 +114,7 @@ class ShopService {
                                      password,
                                      msisdn,
                                      address: {street, city, state, country, latitude, longitude},
-                                     width,height
+                                     width, height
                                  }) => {
         // step1: check email exists?
         const holderShop = await shopModel.findById(userId).lean();
@@ -144,11 +146,11 @@ class ShopService {
         }
 
         const passwordHash = await bcrypt.hash(password, 10);
-        if(avatar==null){
-            avatar=undefined;
+        if (avatar == null) {
+            avatar = undefined;
         }
-        if(avatar) {
-           avatar = await saveBase64ImageSharp({base64Data:avatar,width,height});
+        if (avatar) {
+            avatar = await saveBase64ImageSharp({base64Data: avatar, width, height});
         }
 
         const updateShop = await shopModel
@@ -170,7 +172,7 @@ class ShopService {
         if (!updateShop) {
             return null;
         }
-        if(avatar && holderShop.avatar) {
+        if (avatar && holderShop.avatar) {
             await deleteImage(holderShop.avatar);
         }
         return {
@@ -186,7 +188,7 @@ class ShopService {
         const sortBy = sort === "ctime" ? {_id: -1} : {_id: 1};
 
         const foundShop = await shopModel
-            .find({roles: {$elemMatch: {$eq: RoleShop.SHOP}}})
+            .find({roles: {$elemMatch: {$eq: RoleShop.SHOP}}, isOpen: true})
             .sort(sortBy)
             .skip(skip)
             .limit(limit)
@@ -194,9 +196,24 @@ class ShopService {
             .populate("address_id");
         return foundShop;
     };
+    static getStatusShop = async (shop_id) => {
+
+        let shop = await shopModel.findById(shop_id);
+        return shop.isOpen;
+
+    }
+    static changeStatusShop = async ({shop_id, isOpen}) => {
+        let data = await shopModel.findByIdAndUpdate(shop_id, {
+            isOpen: isOpen
+        }).exec();
+
+        return isOpen
+    }
+
+
 }
 
 module.exports = {
-    findByEmail,findByIdShop,
+    findByEmail, findByIdShop,
     ShopService,
 };

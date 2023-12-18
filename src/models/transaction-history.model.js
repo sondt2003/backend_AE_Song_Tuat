@@ -21,7 +21,7 @@ const transactionHistorySchema = new Schema(
             type: String,
             required: true,
         },
-        amount:{
+        amount: {
             type: String,
             required: true,
         }
