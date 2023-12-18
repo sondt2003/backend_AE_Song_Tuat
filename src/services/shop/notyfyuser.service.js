@@ -64,9 +64,9 @@ class NotifyUserService {
 
         const notifications = await notifyModel
             .find({userId: userId})
+            .sort(sortBy)
             .limit(limit)
             .skip(skip)
-            .sort(sortBy)
             .lean();
 
         // Tính thời gian kể từ thời điểm tạo và thêm vào mỗi thông báo
@@ -99,10 +99,7 @@ class NotifyUserService {
     }
 
     static async putNotify({
-                               user_id,
-                               title = "Thông báo",
-                               message = "Đây là thông báo test của hệ thống",
-                               type_notify
+                               user_id, title = "Thông báo", message = "Đây là thông báo test của hệ thống", type_notify
                            }) {
         let user = await shopservice.findByIdShop({_id: user_id})
         if (!user) {
@@ -119,7 +116,7 @@ class NotifyUserService {
         return true
     }
 
-    static async notifyOrder({user_id, type_notify, order_id}) {
+    static async notifyOrder({user_id, type_notify, order_id, reason}) {
         let user = await shopservice.findByIdShop({_id: user_id})
         if (!user) {
             throw new Api404Error("Không tìm thấy shop")
@@ -128,20 +125,21 @@ class NotifyUserService {
         if (!contentNotify) {
             throw new Api404Error("Không tìm thấy nội dung notify phù hợp")
         }
-        axios.post(native_notify_config.url_indie, {
-            subID: `${user_id}`,
-            appId: native_notify_config.appId,
-            appToken: native_notify_config.appToken,
-            title: contentNotify.title,
-            message: contentNotify.message,
-        });
         await this.createNotification({
             userId: user_id,
             title: contentNotify.title,
-            message: contentNotify.message,
+            message: reason || contentNotify.message,
             typeNotify: type_notify,
             orderId: order_id
         })
+        axios.post(native_notify_config.url_indie, {
+            subID: user_id,
+            appId: native_notify_config.appId,
+            appToken: native_notify_config.appToken,
+            title: contentNotify.title,
+            message: reason || contentNotify.message,
+        });
+
         return true
     }
 }
