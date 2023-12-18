@@ -251,6 +251,12 @@ class OrderService {
                 order: newOrder,
                 shopId: newOrder.order_products[0].shopId,
             });
+            setTimeout(() => {
+                this.cancelOrderByShop({
+                    orderId: newOrder._id,
+                    reason: "Đơn hàng đã bị huỷ do chi nhánh không có phản hồi"
+                })
+            },30 * 1000)
             return newOrder;
         } else {
             throw new BusinessLogicError("Order không thành công");
@@ -372,7 +378,6 @@ class OrderService {
                     order_status: "delivered",
                 })
                 .executeUpdate();
-            //on order success
         }, 10 * 1000);
     }
 
