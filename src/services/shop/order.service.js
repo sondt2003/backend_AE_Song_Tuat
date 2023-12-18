@@ -24,6 +24,7 @@ const addressModel = require("../../models/address.model");
 const SocketEmitService = require("../../socket.io/EmitService");
 const {findByIdShop} = require("./shop.service");
 const NotifyUserService = require('../../services/shop/notyfyuser.service')
+const WalletService = require("../../services/shop/wallet.service");
 
 class OrderService {
     /*
@@ -243,8 +244,16 @@ class OrderService {
                 await CartService.deleteItemInCart({userId, productId, index});
             }
             console.log("--------------------------", newOrder);
-            NotifyUserService.notifyOrder({user_id: userId, type_notify: "pending"})
+            if (user_payment === "e_wallet") {
+                await WalletService.Payoff({
+                    userId: userId,
+                    amount: checkout_order.totalCheckout,
+                    order_id: newOrder._id
+                })
+            }
 
+
+            NotifyUserService.notifyOrder({user_id: userId, type_notify: "pending"})
             SocketEmitService.EmitNewOrder({
                 order: newOrder,
                 shopId: newOrder.order_products[0].shopId,

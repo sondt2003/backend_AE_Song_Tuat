@@ -37,7 +37,6 @@ class StatisticalUserController {
             const users = await Shop.find({roles: [roleQuery]}).limit(pageSize).skip(skip);
 
             users.map((item) => item.isOpen = !(!item.isOpen))
-
             // Return the list of users
             res.json({
                 data: users,
