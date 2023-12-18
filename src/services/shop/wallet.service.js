@@ -32,7 +32,7 @@ class WalletService {
         return wallet;
     }
 
-    static async Payoff(userId, amount, order_id) {
+    static async Payoff({userId, amount, order_id}) {
         const shop = await Shop.findOne({_id: userId});
 
         if (!shop) {
@@ -47,7 +47,7 @@ class WalletService {
         console.log(Number(wallet.balance) >= Number(amount))
         if (Number(wallet.balance) >= Number(amount)) {
 
-            let res = await Wallet.findOneAndUpdate(
+            await Wallet.findOneAndUpdate(
                 {_id: shop.wallet, balance: {$gte: amount}},
                 {$inc: {balance: -amount}},
                 {new: true}

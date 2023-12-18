@@ -7,7 +7,7 @@ class WalletController {
         OK(
             res,
             "Thanh toán thành công",
-            await WalletService.Payoff( ...req.body)
+            await WalletService.Payoff(req.body)
         )
     })
 
