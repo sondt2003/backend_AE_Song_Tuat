@@ -54,12 +54,12 @@ class WalletService {
             );
 
             await TransactionHistoryService.createUserTransactionHistory({
-                payment_method: 'bank_transfer',
+                payment_method: 'e_wallets',
                 currency: 'VND',
                 amount: amount,
                 userId: userId,
                 comments: `Deposit {}`,
-                is_recharge: true,
+                is_recharge: false,
                 billing_information: 'Wallet', orderId: order_id
             })
 
